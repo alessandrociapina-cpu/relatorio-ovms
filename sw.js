@@ -1,4 +1,4 @@
-const CACHE_NAME = 'ovms-app-v2'; // Mudamos para v2 para forçar a atualização!
+const CACHE_NAME = 'ovms-app-v3'; // Mudou para v3!
 const urlsToCache = [
   './',
   './index.html',
@@ -44,3 +44,4 @@ self.addEventListener('fetch', event => {
     })
   );
 });
+

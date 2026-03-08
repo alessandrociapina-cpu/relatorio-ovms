@@ -159,7 +159,7 @@ document.addEventListener('DOMContentLoaded', () => {
   inicializarAutoSave();
 
   // ==========================================
-  // UI DO EDITOR
+  // EXIF, IMAGENS E GALERIA
   // ==========================================
   radiosFerramenta.forEach(radio => {
     radio.addEventListener('change', (e) => {
@@ -204,7 +204,7 @@ document.addEventListener('DOMContentLoaded', () => {
   btnAlternarPreview.addEventListener('click', () => { document.body.classList.toggle('preview-print'); areaRelatorio.scrollIntoView({ behavior: 'smooth', block: 'start' }); });
 
   // ==========================================
-  // LEITURA UNIVERSAL E BLINDADA DE METADADOS
+  // LEITURA DE METADADOS + ALERTA DE CENSURA
   // ==========================================
   function lerMetadadosExif(file) {
     return new Promise((resolve) => {
@@ -224,14 +224,12 @@ document.addEventListener('DOMContentLoaded', () => {
         const latRef = EXIF.getTag(this, "GPSLatitudeRef");
         const lngRef = EXIF.getTag(this, "GPSLongitudeRef");
 
-        // Mesmo se o telemóvel não enviar o "S" ou "W" (latRef/lngRef), extrai a matemática se lat e lng existirem
         if (lat !== undefined && lng !== undefined) {
           try {
             const extrairVetor = (coords) => {
-              if (typeof coords === 'number') return coords; // Número direto
-              if (typeof coords === 'string') return parseFloat(coords); // Texto
+              if (typeof coords === 'number') return coords;
+              if (typeof coords === 'string') return parseFloat(coords); 
               if (coords && coords.length >= 3) {
-                // O valueOf() força o objeto do exif-js a entregar o número fracionado
                 let d = coords[0].valueOf ? coords[0].valueOf() : parseFloat(coords[0]) || 0;
                 let m = coords[1].valueOf ? coords[1].valueOf() : parseFloat(coords[1]) || 0;
                 let s = coords[2].valueOf ? coords[2].valueOf() : parseFloat(coords[2]) || 0;
@@ -243,20 +241,20 @@ document.addEventListener('DOMContentLoaded', () => {
             let calcLat = extrairVetor(lat);
             let calcLng = extrairVetor(lng);
 
-            // Corrige para negativo nos hemisférios S e W, se a etiqueta existir
-            if (latRef === "S") calcLat = Math.abs(calcLat) * -1; 
-            else if (latRef === "N") calcLat = Math.abs(calcLat);
+            if (latRef === "S") calcLat = Math.abs(calcLat) * -1; else if (latRef === "N") calcLat = Math.abs(calcLat);
+            if (lngRef === "W") calcLng = Math.abs(calcLng) * -1; else if (lngRef === "E") calcLng = Math.abs(calcLng);
 
-            if (lngRef === "W") calcLng = Math.abs(calcLng) * -1;
-            else if (lngRef === "E") calcLng = Math.abs(calcLng);
-
-            // Bloqueia impressões zeradas (Null Island) e NaNs
             if (calcLat !== 0 && calcLng !== 0 && !isNaN(calcLat) && !isNaN(calcLng)) {
               textoMeta += `📍 GPS: ${calcLat.toFixed(6)}, ${calcLng.toFixed(6)}`;
+            } else {
+              textoMeta += `📍 GPS: Removido pelo sistema do telemóvel`;
             }
           } catch (e) {
-            console.warn("Metadados corrompidos ignorados pelo filtro universal.");
+            textoMeta += `📍 GPS: Falha na leitura`;
           }
+        } else {
+          // Se o telemóvel apagou a etiqueta do GPS por completo
+          textoMeta += `📍 GPS: Bloqueado pelo telemóvel (Use o botão abaixo)`;
         }
         resolve(textoMeta.trim());
       });
@@ -383,6 +381,20 @@ document.addEventListener('DOMContentLoaded', () => {
       const btnCrop = document.createElement('button'); btnCrop.innerHTML = '✂️ Cortar'; btnCrop.classList.add('btn-acao-foto'); 
       btnCrop.onclick = () => abrirCrop(idx);
 
+      const btnEditar = document.createElement('button'); btnEditar.innerHTML = '✏️ Desenhar'; btnEditar.classList.add('btn-acao-foto', 'btn-editar'); 
+      btnEditar.onclick = () => abrirEditor(idx);
+
+      const btnRestaurar = document.createElement('button');
+      btnRestaurar.innerHTML = '↩️ Limpar'; btnRestaurar.classList.add('btn-acao-foto', 'btn-restaurar');
+      btnRestaurar.title = 'Remove cortes e desenhos';
+      btnRestaurar.onclick = async () => {
+        if(confirm('Deseja remover todos os recortes e desenhos desta foto?')) {
+          fotoInfo.previewDataUrl = await redimensionarImagem(fotoInfo.originalDataUrl, 1024, 0.7);
+          fotoInfo.editedPreviewDataUrl = null;
+          renderizarGaleria(); salvarRascunhoLocal();
+        }
+      };
+
       const btnToggleLogo = document.createElement('button');
       btnToggleLogo.innerHTML = fotoInfo.ocultarLogo ? '+ Logo' : '- Logo'; btnToggleLogo.classList.add('btn-acao-foto');
       btnToggleLogo.disabled = !logoGlobalAtivo; if (fotoInfo.ocultarLogo && logoGlobalAtivo) btnToggleLogo.classList.add('btn-logo-off');
@@ -394,25 +406,49 @@ document.addEventListener('DOMContentLoaded', () => {
       if (fotoInfo.ocultarMetadados && mostrarMetadados && fotoInfo.metadadosExif) btnToggleMeta.classList.add('btn-logo-off');
       btnToggleMeta.onclick = () => { fotoInfo.ocultarMetadados = !fotoInfo.ocultarMetadados; renderizarGaleria(); salvarRascunhoLocal(); };
 
-      const btnEditar = document.createElement('button'); btnEditar.innerHTML = '✏️ Desenhar'; btnEditar.classList.add('btn-acao-foto', 'btn-editar'); 
-      btnEditar.onclick = () => abrirEditor(idx);
-      
-      const btnRestaurar = document.createElement('button');
-      btnRestaurar.innerHTML = '↩️ Limpar'; btnRestaurar.classList.add('btn-acao-foto', 'btn-restaurar');
-      btnRestaurar.title = 'Remove cortes e desenhos (mantém a rotação)';
-      btnRestaurar.onclick = async () => {
-        if(confirm('Deseja remover todos os recortes e desenhos desta foto?')) {
-          fotoInfo.previewDataUrl = await redimensionarImagem(fotoInfo.originalDataUrl, 1024, 0.7);
-          fotoInfo.editedPreviewDataUrl = null;
-          renderizarGaleria();
-          salvarRascunhoLocal();
-        }
-      };
-
       const btnRemover = document.createElement('button'); btnRemover.innerHTML = '✖ Excluir'; btnRemover.classList.add('btn-acao-foto', 'btn-remover');
       btnRemover.onclick = () => { fotosSelecionadasParaRelatorio.splice(idx, 1); renderizarGaleria(); salvarRascunhoLocal(); };
 
-      acoesDiv.append(btnSubir, btnDescer, btnGirarEsq, btnGirarDir, btnCrop, btnToggleLogo, btnToggleMeta, btnEditar, btnRestaurar, btnRemover);
+      // O NOVO BOTÃO DE CAPTURA DE GPS VIA NAVEGADOR
+      const btnGPSAtual = document.createElement('button');
+      btnGPSAtual.innerHTML = '📍 Capturar Localização Agora';
+      btnGPSAtual.classList.add('btn-acao-foto');
+      btnGPSAtual.style.backgroundColor = '#17a2b8';
+      btnGPSAtual.style.color = '#fff';
+      btnGPSAtual.style.flexBasis = '100%'; // Ocupa a linha inteira em baixo
+      btnGPSAtual.style.fontWeight = 'bold';
+      btnGPSAtual.title = 'Usa a antena GPS do telemóvel/computador para preencher a localização';
+      
+      btnGPSAtual.onclick = () => {
+        if(navigator.geolocation) {
+          btnGPSAtual.innerHTML = '⏳ A procurar satélites...';
+          navigator.geolocation.getCurrentPosition(
+            (pos) => {
+              const nLat = pos.coords.latitude.toFixed(6);
+              const nLng = pos.coords.longitude.toFixed(6);
+              
+              let metaAtual = fotoInfo.metadadosExif || '';
+              // Apaga a mensagem de erro antiga para meter o GPS correto
+              if (metaAtual.includes('📍 GPS:')) {
+                metaAtual = metaAtual.split('📍 GPS:')[0].trim();
+              }
+              fotoInfo.metadadosExif = metaAtual + `  📍 GPS: ${nLat}, ${nLng}`;
+              renderizarGaleria();
+              salvarRascunhoLocal();
+            },
+            (err) => {
+              alert('O navegador não tem permissão para usar o GPS. Verifique as Definições de Localização.');
+              btnGPSAtual.innerHTML = '📍 Capturar Localização Agora';
+            },
+            { enableHighAccuracy: true }
+          );
+        } else {
+          alert('GPS não suportado neste navegador.');
+        }
+      };
+
+      // Adicionando os botões. Agora são 11 botões (5 na primeira linha, 5 na segunda, 1 grande na terceira)
+      acoesDiv.append(btnSubir, btnDescer, btnGirarEsq, btnGirarDir, btnCrop, btnEditar, btnRestaurar, btnToggleLogo, btnToggleMeta, btnRemover, btnGPSAtual);
       itemPreviewDiv.appendChild(imgElement);
 
       if (fotoInfo.metadadosExif && mostrarMetadados && !fotoInfo.ocultarMetadados) {
@@ -436,7 +472,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // ==========================================
-  // CROP (SÓ RECORTE - SEM ROTAÇÃO)
+  // CROP (SÓ RECORTE)
   // ==========================================
   function abrirCrop(index) {
     fotoAtualCropIndex = index;

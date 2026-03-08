@@ -159,7 +159,7 @@ document.addEventListener('DOMContentLoaded', () => {
   inicializarAutoSave();
 
   // ==========================================
-  // EXIF E GALERIA
+  // EXIF, IMAGENS E GALERIA
   // ==========================================
   radiosFerramenta.forEach(radio => {
     radio.addEventListener('change', (e) => {
@@ -203,10 +203,13 @@ document.addEventListener('DOMContentLoaded', () => {
   btnGerarPDF.addEventListener('click', async (e) => { e.preventDefault(); await gerarRelatorio(true); setTimeout(() => window.print(), 100); });
   btnAlternarPreview.addEventListener('click', () => { document.body.classList.toggle('preview-print'); areaRelatorio.scrollIntoView({ behavior: 'smooth', block: 'start' }); });
 
-  // --- NOVA FUNÇÃO BLINDADA PARA LER GPS (EVITA NaN) ---
+  // ==========================================
+  // NOVA LEITURA DE METADADOS (BLINDADA CONTRA NaN)
+  // ==========================================
   function lerMetadadosExif(file) {
     return new Promise((resolve) => {
       if (typeof EXIF === 'undefined' || !file.type.startsWith('image/')) { resolve(''); return; }
+      
       EXIF.getData(file, function() {
         let textoMeta = '';
         
@@ -215,43 +218,36 @@ document.addEventListener('DOMContentLoaded', () => {
           const partes = dataExif.split(' '); 
           if (partes.length === 2) textoMeta += `🗓️ ${partes[0].split(':').reverse().join('/')} às ${partes[1].substring(0, 5)}  `;
         }
-
-        // Função interna que converte os formatos malucos de GPS dos telemóveis para decimal seguro
-        const converterParaDecimalSeguro = (coordenada) => {
-          if (!coordenada || coordenada.length < 3) return NaN;
-          
-          const extrairValor = (val) => {
-            if (typeof val === 'number') return val;
-            // Se o telemóvel guardou como fração (muito comum em iPhones e Samsungs)
-            if (val && typeof val.numerator === 'number' && typeof val.denominator === 'number') {
-              return val.denominator === 0 ? 0 : val.numerator / val.denominator;
-            }
-            return parseFloat(val) || 0;
-          };
-
-          const graus = extrairValor(coordenada[0]);
-          const minutos = extrairValor(coordenada[1]);
-          const segundos = extrairValor(coordenada[2]);
-          
-          return graus + (minutos / 60) + (segundos / 3600);
-        };
-
+        
         const lat = EXIF.getTag(this, "GPSLatitude");
         const latRef = EXIF.getTag(this, "GPSLatitudeRef");
         const lng = EXIF.getTag(this, "GPSLongitude");
         const lngRef = EXIF.getTag(this, "GPSLongitudeRef");
 
         if (lat && lng && latRef && lngRef) {
-          let calcLat = converterParaDecimalSeguro(lat);
-          let calcLng = converterParaDecimalSeguro(lng);
+          try {
+            // A biblioteca Exif.js às vezes guarda frações como objetos Number. O .valueOf() força a virar número real.
+            const extrairValor = (coord) => {
+              const graus = coord[0] ? coord[0].valueOf() : 0;
+              const minutos = coord[1] ? coord[1].valueOf() : 0;
+              const segundos = coord[2] ? coord[2].valueOf() : 0;
+              return graus + (minutos / 60) + (segundos / 3600);
+            };
 
-          if (!isNaN(calcLat) && !isNaN(calcLng)) {
+            let calcLat = extrairValor(lat);
+            let calcLng = extrairValor(lng);
+
             if (latRef === "S") calcLat *= -1; 
             if (lngRef === "W") calcLng *= -1;
-            textoMeta += `📍 GPS: ${calcLat.toFixed(6)}, ${calcLng.toFixed(6)}`;
+
+            // Prevenção final: só adiciona se os cálculos matemáticos tiverem sucesso
+            if (!isNaN(calcLat) && !isNaN(calcLng)) {
+              textoMeta += `📍 GPS: ${calcLat.toFixed(6)}, ${calcLng.toFixed(6)}`;
+            }
+          } catch (error) {
+            console.warn("Aviso: Formato de GPS corrompido ou desconhecido ignorado.", error);
           }
         }
-        
         resolve(textoMeta.trim());
       });
     });
@@ -273,7 +269,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // --- FUNÇÃO PARA GIRAR A IMAGEM NA GALERIA SEM BUG ---
   function girarImagemDiretoNaGaleria(index, graus) {
     const foto = fotosSelecionadasParaRelatorio[index];
     const img = new Image();
@@ -431,7 +426,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // ==========================================
-  // CROP (SÓ RECORTE)
+  // CROP (SÓ RECORTE - SEM ROTAÇÃO)
   // ==========================================
   function abrirCrop(index) {
     fotoAtualCropIndex = index;

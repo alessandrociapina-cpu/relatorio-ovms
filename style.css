@@ -15,19 +15,11 @@ body {
   border-radius: 8px;
   box-shadow: 0 0 10px rgba(0,0,0,0.1);
 }
-h1, h2 {
-  color: #333;
-  text-align: center;
-  margin-bottom: 20px;
-}
-hr {
-  margin: 30px 0;
-  border: 0;
-  border-top: 1px solid #ddd;
-}
+h1, h2 { color: #333; text-align: center; margin-bottom: 20px; }
+hr { margin: 30px 0; border: 0; border-top: 1px solid #ddd; }
 
-/* Secções de Entrada e Ação */
-.secao-entrada, .secao-fotos, .secao-observacoes, .secao-acao {
+/* Secções */
+.secao-projeto, .secao-entrada, .secao-fotos, .secao-observacoes, .secao-acao {
   margin-bottom: 30px;
   padding: 15px;
   border: 1px solid #e0e0e0;
@@ -35,379 +27,136 @@ hr {
   background-color: #f9f9f9;
 }
 .secao-entrada h2, .secao-fotos h2, .secao-observacoes h2 {
-  text-align: left;
-  margin-top: 0;
-  font-size: 1.2em;
-  color: #555;
-  border-bottom: 1px solid #eee;
-  padding-bottom: 10px;
+  text-align: left; margin-top: 0; font-size: 1.2em; color: #555; border-bottom: 1px solid #eee; padding-bottom: 10px;
 }
 #form-vistoria div { margin-bottom: 15px; }
 #form-vistoria label { display: block; margin-bottom: 5px; font-weight: bold; }
-
-#form-vistoria input[type="text"],
-#form-vistoria input[type="date"],
-#form-vistoria input[type="time"] {
-  width: calc(100% - 22px);
-  padding: 10px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  box-sizing: border-box;
-  font-family: Arial, sans-serif;
+#form-vistoria input[type="text"], #form-vistoria input[type="date"], #form-vistoria input[type="time"] {
+  width: calc(100% - 22px); padding: 10px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; font-family: Arial, sans-serif;
 }
 
-/* Opções do relatório */
-.opcoes-relatorio {
-  border: 1px dashed #cfd8dc;
-  border-radius: 6px;
-  padding: 12px;
-  margin-top: 10px;
-  background: #fff;
-}
-.opcoes-relatorio legend {
-  font-weight: bold;
-  color: #555;
-}
-.grupo-opcao {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  margin: 8px 0;
-  flex-wrap: wrap;
-}
-.grupo-opcao .grupo-label {
-  font-weight: bold;
-  color: #444;
-}
-.input-select {
-  padding: 5px;
-  border-radius: 4px;
-  border: 1px solid #ccc;
-}
+/* Opções */
+.opcoes-relatorio { border: 1px dashed #cfd8dc; border-radius: 6px; padding: 12px; margin-top: 10px; background: #fff; }
+.opcoes-relatorio legend { font-weight: bold; color: #555; }
+.grupo-opcao { display: flex; align-items: center; gap: 16px; margin: 8px 0; flex-wrap: wrap; }
+.grupo-opcao .grupo-label { font-weight: bold; color: #444; }
+.input-select { padding: 5px; border-radius: 4px; border: 1px solid #ccc; }
+#observacoesGerais { width: calc(100% - 22px); padding: 10px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; min-height: 120px; font-family: Arial, sans-serif; font-size: 1em; resize: vertical; }
 
-/* Observações */
-#observacoesGerais {
-  width: calc(100% - 22px);
-  padding: 10px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  box-sizing: border-box;
-  min-height: 120px;
-  font-family: Arial, sans-serif;
-  font-size: 1em;
-  resize: vertical;
-}
-
-/* Botões */
+/* Botões Globais */
 .botao-upload, .botao-principal, .botao-secundario {
-  display: inline-block;
-  background-color: #007bff;
-  color: white;
-  padding: 10px 20px;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  text-align: center;
-  font-size: 1em;
-  transition: background-color 0.3s ease;
-  margin-right: 8px;
+  display: inline-block; background-color: #007bff; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; text-align: center; font-size: 1em; transition: background-color 0.3s ease; margin-right: 8px; margin-bottom: 5px;
 }
 .botao-upload:hover, .botao-principal:hover, .botao-secundario:hover { background-color: #0056b3; }
-
-.botao-texto {
-  background: transparent;
-  color: #007bff;
-  border: none;
-  cursor: pointer;
-  text-decoration: underline;
-  padding: 8px 10px;
-  margin-right: 8px;
-}
-.nota-pdf {
-  display: block;
-  color: #666;
-  margin-top: 8px;
-  font-size: 0.9em;
-}
+.botao-texto { background: transparent; color: #007bff; border: none; cursor: pointer; text-decoration: underline; padding: 8px 10px; margin-right: 8px; }
+.nota-pdf { display: block; color: #666; margin-top: 8px; font-size: 0.9em; }
 
 /* Galeria de Pré-visualização */
-.galeria-preview {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 20px;
-  margin-top: 20px;
-}
+.galeria-preview { display: flex; flex-wrap: wrap; gap: 20px; margin-top: 20px; }
 .foto-legenda-item-preview {
-  border: 1px solid #ddd;
-  padding: 10px;
-  border-radius: 5px;
-  background-color: #fff;
-  width: calc(50% - 30px);
-  box-sizing: border-box;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+  border: 1px solid #ddd; padding: 10px; border-radius: 5px; background-color: #fff;
+  width: calc(50% - 10px); /* Ajustado para melhor matemática de grid no desktop */
+  box-sizing: border-box; display: flex; flex-direction: column; align-items: center;
 }
-.foto-legenda-item-preview img {
-  max-width: 100%;
-  height: auto;
-  max-height: 200px;
-  display: block;
-  margin-bottom: 10px;
-  border-radius: 4px;
-}
-.foto-legenda-item-preview textarea {
-  width: calc(100% - 20px);
-  padding: 8px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  min-height: 60px;
-  box-sizing: border-box;
-  font-family: Arial, sans-serif;
-  font-size: 0.9em;
-}
+.foto-legenda-item-preview img { max-width: 100%; height: auto; max-height: 250px; display: block; margin-bottom: 10px; border-radius: 4px; }
+.foto-legenda-item-preview textarea { width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; min-height: 60px; box-sizing: border-box; font-family: Arial, sans-serif; font-size: 0.9em; }
 
-/* Botões de ação nas fotos - Acomodando perfeitamente 5 colunas */
-.acoes-foto {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 5px;
-  margin-top: 10px;
-  width: 100%;
-}
+/* Painel de Botões de Cada Foto */
+.acoes-foto { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 10px; width: 100%; }
 .btn-acao-foto {
-  flex: 1 1 calc(20% - 6px); /* Garante 5 colunas exatas (10 botões = 2 linhas de 5) */
-  padding: 6px 2px;
-  background-color: #f0f0f0;
-  border: 1px solid #ccc;
-  border-radius: 3px;
-  cursor: pointer;
-  font-size: 0.75em;
-  white-space: nowrap;
+  flex: 1 1 calc(20% - 5px); /* 5 colunas no Desktop */
+  padding: 6px 2px; background-color: #f0f0f0; border: 1px solid #ccc; border-radius: 3px; cursor: pointer; font-size: 0.75em; white-space: nowrap; text-align: center;
 }
 .btn-acao-foto:hover { background-color: #e0e0e0; }
 .btn-acao-foto:disabled { opacity: 0.5; cursor: not-allowed; }
 .btn-remover { background-color: #ffe6e6; color: #cc0000; border-color: #ffcccc; }
-.btn-remover:hover { background-color: #ffcccc; }
 .btn-logo-off { background-color: #fff3cd; color: #856404; border-color: #ffeeba; }
-.btn-logo-off:hover { background-color: #ffeeba; }
 .btn-editar { background-color: #e2e3e5; color: #383d41; border-color: #d6d8db; }
-.btn-editar:hover { background-color: #d6d8db; }
 .btn-restaurar { background-color: #d1ecf1; color: #0c5460; border-color: #bee5eb; }
-.btn-restaurar:hover { background-color: #bee5eb; }
 
-/* MODAIS GERAIS */
-.modal-oculto {
-  display: none !important;
+/* Botão de GPS Elegante e Discreto */
+.btn-gps {
+  flex: 1 1 100%;
+  background-color: #e2e3e5;
+  color: #383d41;
+  border: 1px solid #d6d8db;
+  padding: 6px;
+  font-size: 0.85em;
+  margin-top: 2px;
 }
-#modalEditor, #modalVideo, #modalCrop {
-  display: flex;
-  position: fixed;
-  z-index: 1000;
-  left: 0;
-  top: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.8);
-  justify-content: center;
-  align-items: center;
-}
-.modal-conteudo {
-  background-color: #fff;
-  padding: 20px;
-  border-radius: 8px;
-  width: 90%;
-  max-width: 800px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-.canvas-container {
-  overflow: auto; 
-  max-height: 60vh;
-  width: 100%;
-  border: 1px solid #ccc;
-  margin-bottom: 15px;
-  cursor: crosshair;
-  background-color: #e9ecef; 
-  text-align: left;
-}
-#canvasEditor {
-  transform-origin: top left;
-  transition: transform 0.15s ease-out;
-  display: block;
-}
-.modal-acoes {
-  display: flex;
-  gap: 10px;
-  flex-wrap: wrap;
-  justify-content: center;
-}
+.btn-gps:hover { background-color: #d6d8db; }
+
+/* Modais */
+.modal-oculto { display: none !important; }
+#modalEditor, #modalVideo, #modalCrop { display: flex; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.8); justify-content: center; align-items: center; }
+.modal-conteudo { background-color: #fff; padding: 20px; border-radius: 8px; width: 95%; max-width: 900px; display: flex; flex-direction: column; align-items: center; max-height: 95vh; overflow-y: auto; }
+.canvas-container { overflow: auto; max-height: 60vh; width: 100%; border: 1px solid #ccc; margin-bottom: 15px; cursor: crosshair; background-color: #e9ecef; text-align: left; border-radius: 5px; }
+#canvasEditor { transform-origin: top left; transition: transform 0.15s ease-out; display: block; margin: auto; }
+.modal-acoes { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; }
 
 /* Área do Relatório */
-#area-relatorio {
-  display: none; 
-  margin-top: 30px;
-  padding: 20px;
-  border: 1px solid #ccc;
-  background-color: #fff;
-  border-radius: 5px;
-}
+#area-relatorio { display: none; margin-top: 30px; padding: 20px; border: 1px solid #ccc; background-color: #fff; border-radius: 5px; }
+.cabecalho-principal { display: grid; grid-template-columns: 125px 1fr 125px; align-items: center; border-bottom: 2px solid #eee; padding-bottom: 15px; margin-bottom: 15px; }
+.titulo-companhia { font-family: Tahoma, sans-serif; font-size: 12pt; font-weight: bold; color: #12D0FF; margin-bottom: 5px; text-align: center; }
+.titulo-vistoria { font-weight: bold; font-size: 18pt; color: #12D0FF; text-align: center; margin: 0; }
+.logo-relatorio-direito { max-width: 125px; max-height: 75px; object-fit: contain; justify-self: end; }
+.info-vistoria { display: flex; flex-direction: column; gap: 5px; margin-bottom: 20px; }
+.info-vistoria p { margin: 0; text-align: left; }
+.corpo-relatorio-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; }
+.item-relatorio { border: 1px solid #e0e0e0; padding: 10px; border-radius: 5px; text-align: center; background-color: #f9f9f9; page-break-inside: avoid; display: flex; flex-direction: column; align-items: center; }
+.imagem-wrapper { position: relative; display: inline-block; max-width: 100%; margin-bottom: 10px; }
+.item-relatorio img.foto-principal { max-width: 100%; height: auto; max-height: 350px; display: block; border-radius: 4px; }
+.metadados-foto { font-size: 0.85em; color: #777; margin-top: 3px; margin-bottom: 0; font-style: italic; word-wrap: break-word; width: 100%; }
+.marca-dagua-overlay { position: absolute; pointer-events: none; z-index: 10; max-width: 90%; }
+.logo-pequeno { width: 20px !important; } .logo-medio { width: 35px !important; } .logo-grande { width: 55px !important; }
+.pos-bottom-right { bottom: 8px; right: 8px; } .pos-bottom-left { bottom: 8px; left: 8px; } .pos-top-right { top: 8px; right: 8px; } .pos-top-left { top: 8px; left: 8px; }
+.item-relatorio p.legenda { color: #333; margin-top: 5px; margin-bottom: 2px; word-wrap: break-word; width: 100%; }
+#observacoes-finais-relatorio { margin-top: 25px; padding-top: 15px; border-top: 1px solid #eee; page-break-before: auto; page-break-inside: avoid; }
+#observacoes-finais-relatorio h3 { font-size: 1.2em; color: #444; margin-bottom: 10px; text-align: left; }
+#observacoes-finais-relatorio p { color: #333; white-space: pre-wrap; text-align: justify; }
 
-/* Cabeçalho do Relatório */
-.cabecalho-principal {
-  display: grid;
-  grid-template-columns: 125px 1fr 125px; 
-  align-items: center;
-  border-bottom: 2px solid #eee;
-  padding-bottom: 15px;
-  margin-bottom: 15px;
-}
-.espacador-logo { }
-.titulos-cabecalho {
-  text-align: center;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  overflow: visible;
-}
-.titulo-companhia {
-  font-family: Tahoma, sans-serif;
-  font-size: 12pt;
-  font-weight: bold;
-  color: #12D0FF;
-  margin-bottom: 5px;
-  white-space: nowrap; 
-}
-.titulo-vistoria {
-  font-weight: bold;
-  font-size: 18pt;
-  color: #12D0FF;
-  text-align: center;
-  margin: 0;
-  white-space: nowrap; 
-  text-transform: uppercase; 
-}
-.logo-relatorio-direito {
-  max-width: 125px; 
-  max-height: 75px; 
-  object-fit: contain;
-  justify-self: end;
-}
-.info-vistoria {
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
-  margin-bottom: 20px;
-}
-.info-vistoria p {
-  margin: 0;
-  text-align: left;
-}
-
-/* Grid do corpo */
-.corpo-relatorio-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 20px;
-}
-.item-relatorio {
-  border: 1px solid #e0e0e0;
-  padding: 10px;
-  border-radius: 5px;
-  text-align: center;
-  background-color: #f9f9f9;
-  page-break-inside: avoid;
-  display: flex;
-  flex-direction: column;
-  align-items: center; 
-}
-.imagem-wrapper {
-  position: relative;
-  display: inline-block; 
-  max-width: 100%;
-  margin-bottom: 10px;
-}
-.item-relatorio img.foto-principal {
-  max-width: 100%;
-  height: auto;
-  max-height: 350px;
-  display: block;
-  border-radius: 4px;
-}
-
-/* Metadados EXIF da Foto */
-.metadados-foto {
-  font-size: 0.85em;
-  color: #777;
-  margin-top: 3px;
-  margin-bottom: 0;
-  font-style: italic;
-  word-wrap: break-word;
-  width: 100%;
-}
-
-/* Configurações da Marca de água sobreposta */
-.marca-dagua-overlay {
-  position: absolute;
-  pointer-events: none;
-  z-index: 10;
-  max-width: 90%;
-}
-.logo-pequeno { width: 20px !important; }
-.logo-medio   { width: 35px !important; }
-.logo-grande  { width: 55px !important; }
-
-.pos-bottom-right { bottom: 8px; right: 8px; }
-.pos-bottom-left { bottom: 8px; left: 8px; }
-.pos-top-right { top: 8px; right: 8px; }
-.pos-top-left { top: 8px; left: 8px; }
-
-.item-relatorio p.legenda {
-  color: #333;
-  margin-top: 5px;
-  margin-bottom: 2px;
-  word-wrap: break-word;
-  width: 100%;
-}
-
-/* Observações finais */
-#observacoes-finais-relatorio {
-  margin-top: 25px;
-  padding-top: 15px;
-  border-top: 1px solid #eee;
-  page-break-before: auto;
-  page-break-inside: avoid;
-}
-#observacoes-finais-relatorio h3 {
-  font-size: 1.2em;
-  color: #444;
-  margin-bottom: 10px;
-  text-align: left;
-}
-#observacoes-finais-relatorio p {
-  color: #333;
-  white-space: pre-wrap;
-  text-align: justify;
+/* ========================================= */
+/* OTIMIZAÇÕES PARA SMARTPHONES (MOBILE UX)  */
+/* ========================================= */
+@media (max-width: 650px) {
+  body { padding: 5px; background-color: #fff; }
+  .container { padding: 10px; box-shadow: none; border: none; }
+  h1 { font-size: 1.5em; }
+  
+  /* Secções ocupam toda a largura e menos padding */
+  .secao-projeto, .secao-entrada, .secao-fotos, .secao-observacoes, .secao-acao { padding: 10px; margin-bottom: 15px; }
+  
+  /* A foto e os seus botões agora ocupam o ecrã inteiro no telemóvel */
+  .foto-legenda-item-preview { width: 100%; margin-bottom: 15px; padding: 12px; border: 1px solid #ccc; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+  
+  /* Os botões pequenos ganham 3 colunas em vez de 5, para os dedos não falharem */
+  .btn-acao-foto { flex: 1 1 calc(33% - 5px); font-size: 0.8em; padding: 8px 2px; }
+  
+  /* O Botão de GPS continua a ocupar a linha inteira */
+  .btn-gps { flex: 1 1 100%; font-size: 0.9em; padding: 10px; font-weight: bold; }
+  
+  /* Ajuste no cabeçalho do PDF no ecrã (se ele alternar o preview) */
+  .cabecalho-principal { grid-template-columns: 1fr; gap: 10px; padding-bottom: 10px; }
+  .logo-relatorio-direito { justify-self: center; margin-top: 5px; }
+  .titulo-companhia { white-space: normal; font-size: 10pt; }
+  .titulo-vistoria { font-size: 14pt; white-space: normal; }
+  
+  /* Ajuste na barra do editor de desenhos */
+  .editor-toolbar { flex-direction: column; align-items: stretch; }
+  .editor-toolbar > div { justify-content: center; }
 }
 
 /* -------- Impressão e Preview -------- */
-@page {
-  size: A4 portrait;
-  margin: 10mm;
-}
-
+@page { size: A4 portrait; margin: 10mm; }
 @media print, (max-width: 10000px) { 
   body.preview-print { background-color: #fff !important; }
   body.preview-print .container { max-width: 210mm; padding: 0 !important; margin: 0 auto; box-shadow: none !important; border: none !important; }
   body.preview-print #area-relatorio { border: none !important; padding: 0 !important; margin: 0 !important; display: block; }
   body.preview-print .cabecalho-principal { display: grid !important; grid-template-columns: 31mm 1fr 31mm; align-items: center; border-bottom: 1px solid #ddd; padding-bottom: 4mm; margin-bottom: 4mm; }
-  body.preview-print .titulo-companhia { font-size: 12pt; margin-bottom: 2mm; white-space: nowrap; }
-  body.preview-print .titulo-vistoria { font-size: 18pt; white-space: nowrap; text-transform: uppercase; }
-  body.preview-print .logo-relatorio-direito { max-width: 31mm; max-height: 19mm; justify-self: end; }
+  body.preview-print .titulo-companhia { font-size: 12pt; margin-bottom: 2mm; white-space: nowrap; text-align: center; }
+  body.preview-print .titulo-vistoria { font-size: 18pt; white-space: nowrap; text-transform: uppercase; text-align: center; }
+  body.preview-print .logo-relatorio-direito { max-width: 31mm; max-height: 19mm; justify-self: end; margin-top: 0; }
   body.preview-print .info-vistoria { display: flex !important; flex-direction: column; gap: 2mm; margin-bottom: 6mm; }
-  body.preview-print .info-vistoria p { margin: 0; }
   body.preview-print .corpo-relatorio-grid { display: grid !important; grid-template-columns: repeat(2, 1fr); column-gap: 5mm; row-gap: 5mm; margin: 0; }
   body.preview-print .item-relatorio { border: 1px solid #e6e6e6; padding: 2mm; border-radius: 2mm; background: #fff; page-break-inside: avoid; }
   body.preview-print .imagem-wrapper { max-width: 100%; margin: 0 auto; }
@@ -415,8 +164,6 @@ hr {
   body.preview-print .item-relatorio p.legenda { margin: 0 0 1mm 0; word-wrap: break-word; }
   body.preview-print .metadados-foto { font-size: 0.8em; color: #555; }
   body.preview-print #observacoes-finais-relatorio { margin-top: 6mm; padding-top: 3mm; border-top: 1px solid #ddd; page-break-before: auto; page-break-inside: avoid; }
-  body.preview-print #observacoes-finais-relatorio h3 { font-size: 1.1em; margin: 0 0 2mm 0; text-align: left; }
-  body.preview-print #observacoes-finais-relatorio p { white-space: pre-wrap; text-align: justify; margin: 0; }
   body.preview-print .logo-pequeno { width: 5mm !important; }
   body.preview-print .logo-medio   { width: 8.75mm !important; }
   body.preview-print .logo-grande  { width: 13.75mm !important; }
@@ -429,24 +176,4 @@ hr {
   .container { width: 100% !important; margin: 0 !important; padding: 0 !important; box-shadow: none !important; border: none !important; }
   .secao-entrada, .secao-fotos, .secao-observacoes, .secao-acao, .secao-projeto, body > .container > h1, hr { display: none !important; }
   #area-relatorio { border: none !important; padding: 0 !important; margin: 0 !important; display: block !important; }
-  .cabecalho-principal { display: grid !important; grid-template-columns: 31mm 1fr 31mm; align-items: center; border-bottom: 1px solid #ddd; padding-bottom: 4mm; margin-bottom: 4mm; }
-  .titulo-companhia { font-size: 12pt; margin-bottom: 2mm; white-space: nowrap; }
-  .titulo-vistoria { font-size: 18pt; white-space: nowrap; text-transform: uppercase; }
-  .logo-relatorio-direito { max-width: 31mm; max-height: 19mm; justify-self: end; }
-  .info-vistoria { display: flex !important; flex-direction: column; gap: 2mm; margin-bottom: 6mm; }
-  .info-vistoria p { margin: 0; }
-  .corpo-relatorio-grid { display: grid !important; grid-template-columns: repeat(2, 1fr); column-gap: 5mm; row-gap: 5mm; margin: 0; }
-  .item-relatorio { border: 1px solid #e6e6e6; padding: 2mm; border-radius: 2mm; background: #fff; page-break-inside: avoid; }
-  .imagem-wrapper { max-width: 100%; margin: 0 auto; }
-  .item-relatorio img.foto-principal { max-width: 100%; height: auto; max-height: 110mm; border-radius: 1.5mm; display: block; margin: 0 auto; }
-  .item-relatorio p.legenda { margin: 0 0 1mm 0; word-wrap: break-word; }
-  .metadados-foto { font-size: 0.8em; color: #555; }
-  #observacoes-finais-relatorio { margin-top: 6mm; padding-top: 3mm; border-top: 1px solid #ddd; page-break-before: auto; page-break-inside: avoid; }
-  #observacoes-finais-relatorio h3 { font-size: 1.1em; margin: 0 0 2mm 0; text-align: left; }
-  #observacoes-finais-relatorio p { white-space: pre-wrap; text-align: justify; margin: 0; }
-  #area-relatorio.layout-1-col .corpo-relatorio-grid { grid-template-columns: 1fr !important; }
-  #area-relatorio.layout-1-col .item-relatorio img.foto-principal { max-height: 230mm; }
-  .logo-pequeno { width: 5mm !important; }
-  .logo-medio   { width: 8.75mm !important; }
-  .logo-grande  { width: 13.75mm !important; }
 }

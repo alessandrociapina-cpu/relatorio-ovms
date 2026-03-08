@@ -1,4 +1,4 @@
-const CACHE_NAME = 'ovms-app-v1';
+const CACHE_NAME = 'ovms-app-v2'; // Mudamos para v2 para forçar a atualização!
 const urlsToCache = [
   './',
   './index.html',
@@ -11,26 +11,36 @@ const urlsToCache = [
   'https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.js'
 ];
 
-// Instala o Service Worker e salva os arquivos em cache
 self.addEventListener('install', event => {
+  // Oculta caches antigos e instala o novo
+  self.skipWaiting();
   event.waitUntil(
-    caches.open(CACHE_NAME)
-      .then(cache => {
-        console.log('Cache aberto');
-        return cache.addAll(urlsToCache);
-      })
+    caches.open(CACHE_NAME).then(cache => {
+      return cache.addAll(urlsToCache);
+    })
   );
 });
 
-// Responde às requisições usando o cache (Permite uso Offline)
+self.addEventListener('activate', event => {
+  // Limpa o lixo das versões antigas (v1)
+  event.waitUntil(
+    caches.keys().then(cacheNames => {
+      return Promise.all(
+        cacheNames.map(cacheName => {
+          if (cacheName !== CACHE_NAME) {
+            return caches.delete(cacheName);
+          }
+        })
+      );
+    })
+  );
+  self.clients.claim();
+});
+
 self.addEventListener('fetch', event => {
   event.respondWith(
-    caches.match(event.request)
-      .then(response => {
-        if (response) {
-          return response; // Retorna do cache
-        }
-        return fetch(event.request); // Busca da rede se não tiver no cache
-      })
+    caches.match(event.request).then(response => {
+      return response || fetch(event.request);
+    })
   );
 });

@@ -1,4 +1,4 @@
-const CACHE_NAME = 'ovms-app-v4'; // Força a atualização no celular
+const CACHE_NAME = 'ovms-app-v5'; // Força a atualização
 const urlsToCache = [
   './',
   './index.html',
@@ -44,5 +44,6 @@ self.addEventListener('fetch', event => {
     })
   );
 });
+
 
 

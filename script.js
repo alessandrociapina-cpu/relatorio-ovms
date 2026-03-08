@@ -1,0 +1,659 @@
+document.addEventListener('DOMContentLoaded', () => {
+  const formVistoria = document.getElementById('form-vistoria');
+  const inputLocalVistoria = document.getElementById('localVistoria');
+  const inputDataVistoria = document.getElementById('dataVistoria');
+  const inputHoraVistoria = document.getElementById('horaVistoria');
+  const inputNomeFiscal = document.getElementById('nomeFiscal');
+  const inputSelecionarFotos = document.getElementById('selecionarFotos');
+  const galeriaPreview = document.getElementById('galeria-fotos-legenda');
+  const btnGerarRelatorio = document.getElementById('btnGerarRelatorio');
+  const btnGerarPDF = document.getElementById('btnGerarPDF');
+  const btnAlternarPreview = document.getElementById('btnAlternarPreview');
+  const inputObservacoes = document.getElementById('observacoesGerais');
+  const areaRelatorio = document.getElementById('area-relatorio');
+  const cabecalhoRelatorioDiv = document.getElementById('cabecalho-relatorio');
+  const corpoRelatorioDiv = document.getElementById('corpo-relatorio');
+  const observacoesFinaisRelatorioDiv = document.getElementById('observacoes-finais-relatorio');
+
+  const imgLogoBase = new Image();
+  imgLogoBase.src = 'sabesp-logo.png';
+
+  // Controles de Projeto (Save/Load)
+  const btnSalvarProjeto = document.getElementById('btnSalvarProjeto');
+  const inputCarregarProjeto = document.getElementById('inputCarregarProjeto');
+  const autoSaveStatus = document.getElementById('autoSaveStatus');
+
+  // Controles de Marca e Metadados
+  const checkboxMarca = document.getElementById('usarMarcaDagua');
+  const divOpcoesMarca = document.getElementById('opcoesMarcaDagua');
+  const selectPosicaoMarca = document.getElementById('posicaoMarcaDagua');
+  const selectTamanhoMarca = document.getElementById('tamanhoMarcaDagua');
+  const rangeOpacidadeMarca = document.getElementById('opacidadeMarcaDagua');
+  const spanValorOpacidade = document.getElementById('valorOpacidade');
+  const checkboxMetadados = document.getElementById('usarMetadados'); 
+
+  const selectFonte = document.getElementById('fonteRelatorio');
+  const selectTamanhoFonte = document.getElementById('tamanhoFonteRelatorio');
+
+  // EDITOR DE IMAGENS (DESENHO)
+  const modalEditor = document.getElementById('modalEditor');
+  const canvasEditor = document.getElementById('canvasEditor');
+  const ctxEditor = canvasEditor.getContext('2d');
+  const btnSalvarEdicao = document.getElementById('btnSalvarEdicao');
+  const btnDesfazerSeta = document.getElementById('btnDesfazerSeta');
+  const btnFecharModal = document.getElementById('btnFecharModal');
+  const radiosFerramenta = document.querySelectorAll('input[name="ferramentaEdicao"]');
+  const inputTextoEdicao = document.getElementById('textoEdicao');
+  let ferramentaAtual = 'seta';
+  
+  const btnZoomIn = document.getElementById('btnZoomIn');
+  const btnZoomOut = document.getElementById('btnZoomOut');
+  const zoomLabel = document.getElementById('zoomLabel');
+  let zoomLevel = 1;
+  
+  let fotoAtualEdicaoIndex = null;
+  let isDrawing = false;
+  let startX = 0, startY = 0;
+  let historicoEdicao = []; 
+  let lastStateImageData = null; 
+
+  // EDITOR DE CROP 
+  const modalCrop = document.getElementById('modalCrop');
+  const imgCrop = document.getElementById('imgCrop');
+  const btnAplicarCrop = document.getElementById('btnAplicarCrop');
+  const btnFecharCrop = document.getElementById('btnFecharCrop');
+  let cropperInstancia = null;
+  let fotoAtualCropIndex = null;
+
+  // EXTRATOR DE VÍDEO
+  const inputSelecionarVideo = document.getElementById('selecionarVideo');
+  const modalVideo = document.getElementById('modalVideo');
+  const videoPlayer = document.getElementById('videoPlayer');
+  const videoSlider = document.getElementById('videoSlider');
+  const btnVideoRewind = document.getElementById('btnVideoRewind');
+  const btnVideoForward = document.getElementById('btnVideoForward');
+  const btnCapturarFrame = document.getElementById('btnCapturarFrame');
+  const btnFecharModalVideo = document.getElementById('btnFecharModalVideo');
+  const msgFrameCapturado = document.getElementById('msgFrameCapturado');
+  let videoFileName = '';
+
+  let fotosSelecionadasParaRelatorio = [];
+
+  // ==========================================
+  // LÓGICA DE SALVAMENTO (AUTO-SAVE)
+  // ==========================================
+  function exportarEstado() {
+    return {
+      form: {
+        local: inputLocalVistoria.value, data: inputDataVistoria.value, hora: inputHoraVistoria.value,
+        fiscal: inputNomeFiscal.value, obs: inputObservacoes.value,
+      },
+      fotos: fotosSelecionadasParaRelatorio
+    };
+  }
+
+  function carregarEstado(estado) {
+    if(estado.form) {
+      inputLocalVistoria.value = estado.form.local || ''; inputDataVistoria.value = estado.form.data || '';
+      inputHoraVistoria.value = estado.form.hora || ''; inputNomeFiscal.value = estado.form.fiscal || '';
+      inputObservacoes.value = estado.form.obs || '';
+    }
+    if(estado.fotos) {
+      fotosSelecionadasParaRelatorio = estado.fotos;
+      renderizarGaleria();
+    }
+  }
+
+  function salvarRascunhoLocal() {
+    try {
+      const estado = exportarEstado();
+      localStorage.setItem('ovms_rascunho', JSON.stringify(estado));
+      const agora = new Date();
+      autoSaveStatus.textContent = `✔ Salvo às ${agora.getHours()}:${String(agora.getMinutes()).padStart(2, '0')}`;
+      autoSaveStatus.style.color = 'green';
+    } catch (e) {
+      autoSaveStatus.textContent = `⚠️ Rascunho pesado. Use "Baixar Projeto" para salvar!`;
+      autoSaveStatus.style.color = '#d9534f';
+    }
+  }
+
+  formVistoria.addEventListener('input', salvarRascunhoLocal);
+
+  btnSalvarProjeto.addEventListener('click', (e) => {
+    e.preventDefault();
+    const blob = new Blob([JSON.stringify(exportarEstado())], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `Vistoria_${inputDataVistoria.value || 'OVMS'}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+  });
+
+  inputCarregarProjeto.addEventListener('change', (e) => {
+    const file = e.target.files[0];
+    if(!file) return;
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      try {
+        carregarEstado(JSON.parse(ev.target.result));
+        alert("Projeto carregado com sucesso!");
+        salvarRascunhoLocal();
+      } catch(err) { alert("Erro ao ler o arquivo."); }
+    };
+    reader.readAsText(file);
+    inputCarregarProjeto.value = ''; 
+  });
+
+  function inicializarAutoSave() {
+    const draft = localStorage.getItem('ovms_rascunho');
+    if(draft) {
+      if(confirm('Encontramos um relatório em andamento salvo. Deseja restaurá-lo?')) {
+        carregarEstado(JSON.parse(draft));
+        autoSaveStatus.textContent = 'Rascunho restaurado.';
+      } else {
+        localStorage.removeItem('ovms_rascunho');
+      }
+    }
+  }
+  inicializarAutoSave();
+
+  // ==========================================
+  // EXIF, IMAGENS E GALERIA
+  // ==========================================
+  radiosFerramenta.forEach(radio => {
+    radio.addEventListener('change', (e) => {
+      ferramentaAtual = e.target.value;
+      if (ferramentaAtual === 'texto') {
+        inputTextoEdicao.style.display = 'inline-block'; inputTextoEdicao.focus();
+      } else {
+        inputTextoEdicao.style.display = 'none';
+      }
+    });
+  });
+
+  function updateZoomDisplay() {
+    if (zoomLevel <= 1) {
+      canvasEditor.style.maxWidth = '100%';
+      canvasEditor.style.maxHeight = '60vh';
+      canvasEditor.style.width = 'auto';
+      canvasEditor.style.height = 'auto';
+    } else {
+      canvasEditor.style.maxWidth = 'none';
+      canvasEditor.style.maxHeight = 'none';
+      canvasEditor.style.width = `${Math.round(zoomLevel * 100)}%`;
+      canvasEditor.style.height = 'auto';
+    }
+    zoomLabel.textContent = `${Math.round(zoomLevel * 100)}%`;
+  }
+  
+  btnZoomIn.addEventListener('click', () => { zoomLevel = Math.min(zoomLevel + 0.2, 3); updateZoomDisplay(); });
+  btnZoomOut.addEventListener('click', () => { zoomLevel = Math.max(zoomLevel - 0.2, 0.4); updateZoomDisplay(); });
+
+  checkboxMarca.addEventListener('change', (e) => { divOpcoesMarca.style.display = e.target.checked ? 'flex' : 'none'; renderizarGaleria(); });
+  rangeOpacidadeMarca.addEventListener('input', (e) => spanValorOpacidade.textContent = `${e.target.value}%`);
+  checkboxMetadados.addEventListener('change', () => renderizarGaleria());
+
+  const radiosLayout = formVistoria.querySelectorAll('input[name="layoutColunas"]');
+  const radiosQualidade = formVistoria.querySelectorAll('input[name="qualidadeImagens"]');
+  const radiosMargens = formVistoria.querySelectorAll('input[name="margensImpressao"]');
+
+  inputSelecionarFotos.addEventListener('change', handleFotosSelecionadas);
+  btnGerarRelatorio.addEventListener('click', (e) => { e.preventDefault(); gerarRelatorio(true); });
+  btnGerarPDF.addEventListener('click', async (e) => { e.preventDefault(); await gerarRelatorio(true); setTimeout(() => window.print(), 100); });
+  btnAlternarPreview.addEventListener('click', () => { document.body.classList.toggle('preview-print'); areaRelatorio.scrollIntoView({ behavior: 'smooth', block: 'start' }); });
+
+  function lerMetadadosExif(file) {
+    return new Promise((resolve) => {
+      if (typeof EXIF === 'undefined' || !file.type.startsWith('image/')) { resolve(''); return; }
+      EXIF.getData(file, function() {
+        let textoMeta = '';
+        const dataExif = EXIF.getTag(this, "DateTimeOriginal");
+        if (dataExif) {
+          const partes = dataExif.split(' '); 
+          if (partes.length === 2) textoMeta += `🗓️ ${partes[0].split(':').reverse().join('/')} às ${partes[1].substring(0, 5)}  `;
+        }
+        const lat = EXIF.getTag(this, "GPSLatitude"), latRef = EXIF.getTag(this, "GPSLatitudeRef");
+        const lng = EXIF.getTag(this, "GPSLongitude"), lngRef = EXIF.getTag(this, "GPSLongitudeRef");
+        if (lat && lng && latRef && lngRef) {
+          let calcLat = lat[0] + (lat[1] / 60) + (lat[2] / 3600);
+          let calcLng = lng[0] + (lng[1] / 60) + (lng[2] / 3600);
+          if (latRef === "S") calcLat *= -1; if (lngRef === "W") calcLng *= -1;
+          textoMeta += `📍 GPS: ${calcLat.toFixed(6)}, ${calcLng.toFixed(6)}`;
+        }
+        resolve(textoMeta.trim());
+      });
+    });
+  }
+
+  function redimensionarImagem(dataUrl, maxWidth, quality) {
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        const ratio = img.width / img.height;
+        canvas.width = Math.min(img.width, maxWidth);
+        canvas.height = canvas.width / ratio;
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+        resolve(canvas.toDataURL('image/jpeg', quality));
+      };
+      img.onerror = reject; img.src = dataUrl;
+    });
+  }
+
+  // --- FUNÇÃO PARA GIRAR A IMAGEM NA GALERIA SEM BUG ---
+  function girarImagemDiretoNaGaleria(index, graus) {
+    const foto = fotosSelecionadasParaRelatorio[index];
+    const img = new Image();
+    img.onload = async () => {
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+
+      // Se for giro de 90 graus, inverte a proporção do canvas
+      if (Math.abs(graus) === 90 || Math.abs(graus) === 270) {
+        canvas.width = img.height;
+        canvas.height = img.width;
+      } else {
+        canvas.width = img.width;
+        canvas.height = img.height;
+      }
+
+      ctx.translate(canvas.width / 2, canvas.height / 2);
+      ctx.rotate((graus * Math.PI) / 180);
+      ctx.drawImage(img, -img.width / 2, -img.height / 2);
+
+      const novaImagemBase64 = canvas.toDataURL('image/jpeg', 0.9);
+
+      // Atualiza a imagem base. O botão "Restaurar" vai voltar pra cá, mantendo o giro correto!
+      foto.originalDataUrl = novaImagemBase64;
+      foto.previewDataUrl = await redimensionarImagem(novaImagemBase64, 1024, 0.7);
+      foto.editedPreviewDataUrl = null; // Limpa desenhos, pois agora ficariam tortos
+
+      renderizarGaleria();
+      salvarRascunhoLocal();
+    };
+    img.src = foto.originalDataUrl;
+  }
+
+  async function handleFotosSelecionadas(event) {
+    const files = event.target.files;
+    if (files.length === 0) return;
+    galeriaPreview.innerHTML = '<h4>A processar imagens... Por favor, aguarde.</h4>';
+    const sortedFiles = Array.from(files).sort((a, b) => a.name.localeCompare(b.name, undefined, { numeric: true }));
+    const novasFotos = new Array(sortedFiles.length);
+
+    const promises = sortedFiles.map((file, index) => new Promise(async (resolve) => {
+      if (!file.type.startsWith('image/')) { novasFotos[index] = null; resolve(); return; }
+      const metadadosExtraidos = await lerMetadadosExif(file);
+      const reader = new FileReader();
+      reader.onload = async (e) => {
+        try {
+          const originalDataUrl = e.target.result;
+          const resizedPreview = await redimensionarImagem(originalDataUrl, 1024, 0.7);
+          novasFotos[index] = {
+            id: `foto-${Date.now()}-${index}`, fileName: file.name,
+            originalDataUrl: originalDataUrl, 
+            previewDataUrl: resizedPreview,   
+            editedPreviewDataUrl: null,       
+            textoLegenda: '', metadadosExif: metadadosExtraidos, ocultarLogo: false, ocultarMetadados: false 
+          };
+        } catch (error) { novasFotos[index] = null; } finally { resolve(); }
+      };
+      reader.readAsDataURL(file);
+    }));
+
+    await Promise.all(promises);
+    fotosSelecionadasParaRelatorio = [...fotosSelecionadasParaRelatorio, ...novasFotos.filter(f => f !== null)];
+    inputSelecionarFotos.value = '';
+    renderizarGaleria();
+    salvarRascunhoLocal(); 
+  }
+
+  function renderizarGaleria() {
+    galeriaPreview.innerHTML = '';
+    if (fotosSelecionadasParaRelatorio.length === 0) {
+      galeriaPreview.innerHTML = '<p>Nenhuma foto selecionada.</p>';
+      return;
+    }
+
+    const logoGlobalAtivo = checkboxMarca.checked;
+    const mostrarMetadados = checkboxMetadados.checked; 
+
+    fotosSelecionadasParaRelatorio.forEach((fotoInfo, idx) => {
+      const itemPreviewDiv = document.createElement('div');
+      itemPreviewDiv.classList.add('foto-legenda-item-preview');
+
+      const imgElement = document.createElement('img');
+      imgElement.src = fotoInfo.editedPreviewDataUrl || fotoInfo.previewDataUrl;
+      
+      const legendaTextarea = document.createElement('textarea');
+      legendaTextarea.placeholder = `Legenda para ${fotoInfo.fileName}`;
+      legendaTextarea.value = fotoInfo.textoLegenda || ''; 
+      legendaTextarea.addEventListener('input', (e) => { fotoInfo.textoLegenda = e.target.value; salvarRascunhoLocal(); });
+
+      const acoesDiv = document.createElement('div');
+      acoesDiv.classList.add('acoes-foto');
+
+      const btnSubir = document.createElement('button'); btnSubir.innerHTML = '▲'; btnSubir.title = 'Subir foto'; btnSubir.classList.add('btn-acao-foto');
+      btnSubir.disabled = idx === 0; btnSubir.onclick = () => { moverFoto(idx, -1); };
+      
+      const btnDescer = document.createElement('button'); btnDescer.innerHTML = '▼'; btnDescer.title = 'Descer foto'; btnDescer.classList.add('btn-acao-foto');
+      btnDescer.disabled = idx === fotosSelecionadasParaRelatorio.length - 1; btnDescer.onclick = () => { moverFoto(idx, 1); };
+
+      const btnGirarEsq = document.createElement('button'); btnGirarEsq.innerHTML = '↺ Esq.'; btnGirarEsq.classList.add('btn-acao-foto');
+      btnGirarEsq.onclick = () => girarImagemDiretoNaGaleria(idx, -90);
+
+      const btnGirarDir = document.createElement('button'); btnGirarDir.innerHTML = '↻ Dir.'; btnGirarDir.classList.add('btn-acao-foto');
+      btnGirarDir.onclick = () => girarImagemDiretoNaGaleria(idx, 90);
+
+      const btnCrop = document.createElement('button'); btnCrop.innerHTML = '✂️ Cortar'; btnCrop.classList.add('btn-acao-foto'); 
+      btnCrop.onclick = () => abrirCrop(idx);
+
+      const btnToggleLogo = document.createElement('button');
+      btnToggleLogo.innerHTML = fotoInfo.ocultarLogo ? '+ Logo' : '- Logo'; btnToggleLogo.classList.add('btn-acao-foto');
+      btnToggleLogo.disabled = !logoGlobalAtivo; if (fotoInfo.ocultarLogo && logoGlobalAtivo) btnToggleLogo.classList.add('btn-logo-off');
+      btnToggleLogo.onclick = () => { fotoInfo.ocultarLogo = !fotoInfo.ocultarLogo; renderizarGaleria(); salvarRascunhoLocal(); };
+
+      const btnToggleMeta = document.createElement('button');
+      btnToggleMeta.innerHTML = fotoInfo.ocultarMetadados ? '+ Dados' : '- Dados'; btnToggleMeta.classList.add('btn-acao-foto');
+      btnToggleMeta.disabled = !mostrarMetadados || !fotoInfo.metadadosExif; 
+      if (fotoInfo.ocultarMetadados && mostrarMetadados && fotoInfo.metadadosExif) btnToggleMeta.classList.add('btn-logo-off');
+      btnToggleMeta.onclick = () => { fotoInfo.ocultarMetadados = !fotoInfo.ocultarMetadados; renderizarGaleria(); salvarRascunhoLocal(); };
+
+      const btnEditar = document.createElement('button'); btnEditar.innerHTML = '✏️ Desenhar'; btnEditar.classList.add('btn-acao-foto', 'btn-editar'); 
+      btnEditar.onclick = () => abrirEditor(idx);
+      
+      const btnRestaurar = document.createElement('button');
+      btnRestaurar.innerHTML = '↩️ Limpar'; btnRestaurar.classList.add('btn-acao-foto', 'btn-restaurar');
+      btnRestaurar.title = 'Remove cortes e desenhos (mantém a rotação)';
+      btnRestaurar.onclick = async () => {
+        if(confirm('Deseja remover todos os recortes e desenhos desta foto?')) {
+          fotoInfo.previewDataUrl = await redimensionarImagem(fotoInfo.originalDataUrl, 1024, 0.7);
+          fotoInfo.editedPreviewDataUrl = null;
+          renderizarGaleria();
+          salvarRascunhoLocal();
+        }
+      };
+
+      const btnRemover = document.createElement('button'); btnRemover.innerHTML = '✖ Excluir'; btnRemover.classList.add('btn-acao-foto', 'btn-remover');
+      btnRemover.onclick = () => { fotosSelecionadasParaRelatorio.splice(idx, 1); renderizarGaleria(); salvarRascunhoLocal(); };
+
+      // Adicionando os 10 botões para formar um painel de controle perfeito 2x5
+      acoesDiv.append(btnSubir, btnDescer, btnGirarEsq, btnGirarDir, btnCrop, btnToggleLogo, btnToggleMeta, btnEditar, btnRestaurar, btnRemover);
+      itemPreviewDiv.appendChild(imgElement);
+
+      if (fotoInfo.metadadosExif && mostrarMetadados && !fotoInfo.ocultarMetadados) {
+        const metaInfoPreview = document.createElement('div');
+        metaInfoPreview.style.fontSize = '0.75em'; metaInfoPreview.style.color = '#777'; metaInfoPreview.style.marginBottom = '5px';
+        metaInfoPreview.innerText = fotoInfo.metadadosExif;
+        itemPreviewDiv.appendChild(metaInfoPreview);
+      }
+      itemPreviewDiv.appendChild(legendaTextarea);
+      itemPreviewDiv.appendChild(acoesDiv);
+      galeriaPreview.appendChild(itemPreviewDiv);
+    });
+  }
+
+  function moverFoto(index, direcao) {
+    const novo = index + direcao;
+    const temp = fotosSelecionadasParaRelatorio[index];
+    fotosSelecionadasParaRelatorio[index] = fotosSelecionadasParaRelatorio[novo];
+    fotosSelecionadasParaRelatorio[novo] = temp;
+    renderizarGaleria(); salvarRascunhoLocal();
+  }
+
+  // ==========================================
+  // CROP (SÓ RECORTE - SEM ROTAÇÃO)
+  // ==========================================
+  function abrirCrop(index) {
+    fotoAtualCropIndex = index;
+    const foto = fotosSelecionadasParaRelatorio[index];
+    imgCrop.src = foto.previewDataUrl; 
+    modalCrop.classList.remove('modal-oculto');
+
+    imgCrop.onload = () => {
+      if(cropperInstancia) cropperInstancia.destroy();
+      cropperInstancia = new Cropper(imgCrop, {
+        viewMode: 1, 
+        autoCropArea: 1, 
+        background: false,
+        zoomable: true,       
+        zoomOnWheel: false,   
+        zoomOnTouch: false,   
+        transition: false     
+      });
+    };
+  }
+
+  function fecharCrop() {
+    modalCrop.classList.add('modal-oculto');
+    if (cropperInstancia) { cropperInstancia.destroy(); cropperInstancia = null; }
+    fotoAtualCropIndex = null;
+  }
+  
+  btnAplicarCrop.onclick = () => {
+    const canvasRecortado = cropperInstancia.getCroppedCanvas();
+    const recortadaDataUrl = canvasRecortado.toDataURL('image/jpeg', 0.8);
+    
+    fotosSelecionadasParaRelatorio[fotoAtualCropIndex].previewDataUrl = recortadaDataUrl;
+    fotosSelecionadasParaRelatorio[fotoAtualCropIndex].editedPreviewDataUrl = null; 
+    
+    renderizarGaleria();
+    salvarRascunhoLocal();
+    fecharCrop();
+  };
+  btnFecharCrop.onclick = fecharCrop;
+
+  // ==========================================
+  // EDITOR DE DESENHO (SETAS E TEXTO)
+  // ==========================================
+  function abrirEditor(index) {
+    fotoAtualEdicaoIndex = index;
+    const foto = fotosSelecionadasParaRelatorio[index];
+    zoomLevel = 1; updateZoomDisplay();
+
+    const imgBase = new Image();
+    imgBase.onload = () => {
+      canvasEditor.width = imgBase.width; canvasEditor.height = imgBase.height;
+      ctxEditor.drawImage(imgBase, 0, 0);
+      historicoEdicao = [canvasEditor.toDataURL()]; 
+      modalEditor.classList.remove('modal-oculto');
+    };
+    imgBase.src = foto.editedPreviewDataUrl || foto.previewDataUrl; 
+  }
+
+  function fecharEditor() {
+    modalEditor.classList.add('modal-oculto');
+    fotoAtualEdicaoIndex = null; historicoEdicao = [];
+  }
+
+  function drawArrow(ctx, fromx, fromy, tox, toy) {
+    const headlen = Math.max(15, canvasEditor.width * 0.03); 
+    const angle = Math.atan2(toy - fromy, tox - fromx);
+    ctx.beginPath(); ctx.moveTo(fromx, fromy); ctx.lineTo(tox, toy);
+    ctx.lineTo(tox - headlen * Math.cos(angle - Math.PI / 6), toy - headlen * Math.sin(angle - Math.PI / 6));
+    ctx.moveTo(tox, toy);
+    ctx.lineTo(tox - headlen * Math.cos(angle + Math.PI / 6), toy - headlen * Math.sin(angle + Math.PI / 6));
+    ctx.strokeStyle = 'red'; ctx.lineWidth = Math.max(4, canvasEditor.width * 0.008); ctx.lineCap = 'round'; ctx.stroke();
+  }
+
+  function drawCircle(ctx, x, y, radiusX, radiusY) {
+    ctx.beginPath(); ctx.ellipse(x, y, radiusX, radiusY, 0, 0, 2 * Math.PI);
+    ctx.strokeStyle = 'red'; ctx.lineWidth = Math.max(4, canvasEditor.width * 0.008); ctx.stroke();
+  }
+
+  function getPos(e) {
+    const rect = canvasEditor.getBoundingClientRect();
+    const scaleX = canvasEditor.width / rect.width, scaleY = canvasEditor.height / rect.height;
+    let cx = e.clientX, cy = e.clientY;
+    if (e.touches && e.touches.length > 0) { cx = e.touches[0].clientX; cy = e.touches[0].clientY; }
+    return { x: (cx - rect.left) * scaleX, y: (cy - rect.top) * scaleY };
+  }
+
+  function startDrawing(e) {
+    e.preventDefault();
+    const pos = getPos(e);
+    if (ferramentaAtual === 'texto') {
+      const txt = inputTextoEdicao.value.trim();
+      if (txt !== '') {
+        const fontSize = Math.max(20, canvasEditor.width * 0.04);
+        ctxEditor.font = `bold ${fontSize}px Arial`; ctxEditor.fillStyle = 'red'; ctxEditor.strokeStyle = 'white';
+        ctxEditor.lineWidth = Math.max(2, fontSize * 0.1); ctxEditor.textBaseline = "middle";
+        ctxEditor.strokeText(txt, pos.x, pos.y); ctxEditor.fillText(txt, pos.x, pos.y);
+        historicoEdicao.push(canvasEditor.toDataURL());
+      } else { alert('Digite o texto na barra superior antes de clicar na foto.'); inputTextoEdicao.focus(); }
+      return; 
+    }
+    isDrawing = true; startX = pos.x; startY = pos.y;
+    lastStateImageData = ctxEditor.getImageData(0, 0, canvasEditor.width, canvasEditor.height);
+  }
+
+  function draw(e) {
+    if (!isDrawing) return;
+    e.preventDefault();
+    const pos = getPos(e);
+    ctxEditor.putImageData(lastStateImageData, 0, 0);
+    if (ferramentaAtual === 'seta') drawArrow(ctxEditor, startX, startY, pos.x, pos.y);
+    else if (ferramentaAtual === 'circulo') drawCircle(ctxEditor, startX, startY, Math.abs(pos.x - startX), Math.abs(pos.y - startY));
+  }
+
+  function stopDrawing(e) {
+    if (!isDrawing) return;
+    e.preventDefault(); isDrawing = false;
+    historicoEdicao.push(canvasEditor.toDataURL());
+  }
+
+  canvasEditor.addEventListener('mousedown', startDrawing); canvasEditor.addEventListener('mousemove', draw);
+  canvasEditor.addEventListener('mouseup', stopDrawing); canvasEditor.addEventListener('mouseout', stopDrawing);
+  canvasEditor.addEventListener('touchstart', startDrawing, {passive: false}); canvasEditor.addEventListener('touchmove', draw, {passive: false}); canvasEditor.addEventListener('touchend', stopDrawing);
+
+  btnSalvarEdicao.addEventListener('click', () => {
+    if (fotoAtualEdicaoIndex !== null) {
+      fotosSelecionadasParaRelatorio[fotoAtualEdicaoIndex].editedPreviewDataUrl = canvasEditor.toDataURL('image/jpeg', 0.8);
+      renderizarGaleria(); salvarRascunhoLocal();
+    }
+    fecharEditor();
+  });
+
+  btnDesfazerSeta.addEventListener('click', () => {
+    if (historicoEdicao.length > 1) {
+      historicoEdicao.pop(); 
+      const imgAnterior = new Image();
+      imgAnterior.onload = () => { ctxEditor.clearRect(0, 0, canvasEditor.width, canvasEditor.height); ctxEditor.drawImage(imgAnterior, 0, 0); };
+      imgAnterior.src = historicoEdicao[historicoEdicao.length - 1];
+    }
+  });
+
+  btnFecharModal.addEventListener('click', fecharEditor);
+
+  // ==========================================
+  // EXTRATOR DE VÍDEO
+  // ==========================================
+  inputSelecionarVideo.addEventListener('change', (e) => {
+    const file = e.target.files[0]; if (!file) return;
+    videoFileName = file.name; videoPlayer.src = URL.createObjectURL(file);
+    videoPlayer.onloadedmetadata = () => { videoSlider.max = videoPlayer.duration; modalVideo.classList.remove('modal-oculto'); };
+    inputSelecionarVideo.value = ''; 
+  });
+
+  videoPlayer.addEventListener('timeupdate', () => videoSlider.value = videoPlayer.currentTime);
+  videoSlider.addEventListener('input', (e) => videoPlayer.currentTime = e.target.value);
+  btnVideoRewind.addEventListener('click', () => videoPlayer.currentTime = Math.max(0, videoPlayer.currentTime - 0.1));
+  btnVideoForward.addEventListener('click', () => videoPlayer.currentTime = Math.min(videoPlayer.duration, videoPlayer.currentTime + 0.1));
+
+  btnCapturarFrame.addEventListener('click', async () => {
+    const canvas = document.createElement('canvas');
+    canvas.width = videoPlayer.videoWidth; canvas.height = videoPlayer.videoHeight;
+    canvas.getContext('2d').drawImage(videoPlayer, 0, 0, canvas.width, canvas.height);
+    const originalDataUrl = canvas.toDataURL('image/jpeg', 0.9);
+    
+    fotosSelecionadasParaRelatorio.push({
+      id: `foto-${Date.now()}`, fileName: `Frame de ${videoFileName}`,
+      originalDataUrl: originalDataUrl, previewDataUrl: await redimensionarImagem(originalDataUrl, 1024, 0.7),
+      editedPreviewDataUrl: null, textoLegenda: `Extraído do vídeo: ${videoFileName}`,
+      metadadosExif: '', ocultarLogo: false, ocultarMetadados: false 
+    });
+    renderizarGaleria(); salvarRascunhoLocal();
+    msgFrameCapturado.style.display = 'block'; setTimeout(() => msgFrameCapturado.style.display = 'none', 2500);
+  });
+  btnFecharModalVideo.addEventListener('click', () => { modalVideo.classList.add('modal-oculto'); videoPlayer.pause(); videoPlayer.src = ''; });
+
+  // ==========================================
+  // GERAÇÃO DO RELATÓRIO
+  // ==========================================
+  function getOpcoesRelatorio() {
+    const layout = Array.from(radiosLayout).find(r => r.checked)?.value || '2';
+    const qualidade = Array.from(radiosQualidade).find(r => r.checked)?.value || 'media';
+    const margens = Array.from(radiosMargens).find(r => r.checked)?.value || 'maiores';
+    const mapaQualidade = { media: { largura: 1024, qualidade: 0.7 }, maxima: { largura: 1600, qualidade: 0.8 } };
+    const mapaMargens = { menores: 5, maiores: 15 };
+    return {
+      layoutColunas: layout, largura: mapaQualidade[qualidade].largura, qualidade: mapaQualidade[qualidade].qualidade,
+      margensMm: mapaMargens[margens], usarMarca: checkboxMarca.checked, posMarca: selectPosicaoMarca.value, 
+      tamMarca: selectTamanhoMarca.value, opacMarca: parseInt(rangeOpacidadeMarca.value, 10) / 100, 
+      fonte: selectFonte.value, tamanhoFonte: selectTamanhoFonte.value, usarMetadados: checkboxMetadados.checked
+    };
+  }
+
+  function applyPrintMargins(mm) {
+    const STYLE_ID = 'print-margins-style'; let styleTag = document.getElementById(STYLE_ID);
+    const css = `@page { size: A4 portrait; margin: ${mm}mm; }`;
+    if (!styleTag) { styleTag = document.createElement('style'); styleTag.id = STYLE_ID; styleTag.setAttribute('media', 'print'); document.head.appendChild(styleTag); }
+    styleTag.textContent = css;
+  }
+
+  async function gerarRelatorio(ativarPreview = true) {
+    if (!formVistoria.checkValidity()) { alert('Preencha as informações obrigatórias.'); formVistoria.reportValidity(); return; }
+    const fotosValidas = fotosSelecionadasParaRelatorio.filter(f => f && f.originalDataUrl);
+    if (fotosValidas.length === 0) { alert('Selecione pelo menos uma foto.'); return; }
+
+    const opt = getOpcoesRelatorio();
+    cabecalhoRelatorioDiv.innerHTML = ''; corpoRelatorioDiv.innerHTML = ''; observacoesFinaisRelatorioDiv.innerHTML = '';
+
+    const local = inputLocalVistoria.value; const data = new Date(inputDataVistoria.value + 'T00:00:00');
+    const dataFormatada = data.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' });
+    const horaHtml = inputHoraVistoria.value ? `<p><strong>Hora:</strong> ${inputHoraVistoria.value}</p>` : '';
+    
+    areaRelatorio.style.fontFamily = opt.fonte; areaRelatorio.style.fontSize = `${opt.tamanhoFonte}pt`;
+    cabecalhoRelatorioDiv.innerHTML = `
+      <div class="cabecalho-principal">
+        <div class="espacador-logo"></div>
+        <div class="titulos-cabecalho">
+          <div class="titulo-companhia">COMPANHIA DE SANEAMENTO BÁSICO DO ESTADO DE SÃO PAULO</div>
+          <h2 class="titulo-vistoria">RELATÓRIO FOTOGRÁFICO DE VISTORIA</h2>
+        </div>
+        <img src="sabesp-logo.png" alt="Logo" class="logo-relatorio-direito">
+      </div>
+      <div class="info-vistoria"><p><strong>Local da Vistoria:</strong> ${local}</p><p><strong>Fiscal/Inspetor:</strong> ${inputNomeFiscal.value}</p><p><strong>Data da Vistoria:</strong> ${dataFormatada}</p>${horaHtml}</div>
+    `;
+
+    areaRelatorio.classList.remove('layout-1-col'); if (opt.layoutColunas === '1') areaRelatorio.classList.add('layout-1-col');
+    applyPrintMargins(opt.margensMm);
+
+    const imagensProcessadas = await Promise.all(fotosValidas.map(async (f, i) => {
+      const base = f.editedPreviewDataUrl || f.previewDataUrl;
+      return { url: await redimensionarImagem(base, opt.largura, opt.qualidade), leg: `Imagem ${i + 1}: ${(f.textoLegenda || '').trim() || 'Sem legenda'}`, meta: f.metadadosExif, noLogo: f.ocultarLogo, noMeta: f.ocultarMetadados };
+    }));
+
+    imagensProcessadas.forEach((imgObj) => {
+      const itemDiv = document.createElement('div'); itemDiv.classList.add('item-relatorio');
+      const wrapper = document.createElement('div'); wrapper.classList.add('imagem-wrapper');
+      const imgEl = document.createElement('img'); imgEl.src = imgObj.url; imgEl.classList.add('foto-principal'); wrapper.appendChild(imgEl);
+      if (opt.usarMarca && !imgObj.noLogo) {
+        const logo = document.createElement('img'); logo.src = 'sabesp-logo.png'; logo.classList.add('marca-dagua-overlay', `pos-${opt.posMarca}`, opt.tamMarca); logo.style.opacity = opt.opacMarca; wrapper.appendChild(logo);
+      }
+      const legP = document.createElement('p'); legP.classList.add('legenda'); legP.textContent = imgObj.leg;
+      itemDiv.appendChild(wrapper); itemDiv.appendChild(legP);
+      if (imgObj.meta && opt.usarMetadados && !imgObj.noMeta) {
+        const metaP = document.createElement('p'); metaP.classList.add('metadados-foto'); metaP.textContent = imgObj.meta; itemDiv.appendChild(metaP);
+      }
+      corpoRelatorioDiv.appendChild(itemDiv);
+    });
+
+    if (inputObservacoes.value.trim()) observacoesFinaisRelatorioDiv.innerHTML = `<h3>Observações Gerais</h3><p>${inputObservacoes.value.trim()}</p>`;
+    areaRelatorio.style.display = 'block';
+    if (ativarPreview) document.body.classList.add('preview-print');
+    areaRelatorio.scrollIntoView({ behavior: 'smooth' });
+  }
+});

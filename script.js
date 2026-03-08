@@ -18,10 +18,12 @@ document.addEventListener('DOMContentLoaded', () => {
   const imgLogoBase = new Image();
   imgLogoBase.src = 'sabesp-logo.png';
 
+  // Controles de Projeto (Save/Load)
   const btnSalvarProjeto = document.getElementById('btnSalvarProjeto');
   const inputCarregarProjeto = document.getElementById('inputCarregarProjeto');
   const autoSaveStatus = document.getElementById('autoSaveStatus');
 
+  // Controles de Marca e Metadados
   const checkboxMarca = document.getElementById('usarMarcaDagua');
   const divOpcoesMarca = document.getElementById('opcoesMarcaDagua');
   const selectPosicaoMarca = document.getElementById('posicaoMarcaDagua');
@@ -33,6 +35,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const selectFonte = document.getElementById('fonteRelatorio');
   const selectTamanhoFonte = document.getElementById('tamanhoFonteRelatorio');
 
+  // EDITOR DE IMAGENS (DESENHO)
   const modalEditor = document.getElementById('modalEditor');
   const canvasEditor = document.getElementById('canvasEditor');
   const ctxEditor = canvasEditor.getContext('2d');
@@ -54,6 +57,7 @@ document.addEventListener('DOMContentLoaded', () => {
   let historicoEdicao = []; 
   let lastStateImageData = null; 
 
+  // EDITOR DE CROP 
   const modalCrop = document.getElementById('modalCrop');
   const imgCrop = document.getElementById('imgCrop');
   const btnAplicarCrop = document.getElementById('btnAplicarCrop');
@@ -61,6 +65,7 @@ document.addEventListener('DOMContentLoaded', () => {
   let cropperInstancia = null;
   let fotoAtualCropIndex = null;
 
+  // EXTRATOR DE VÍDEO
   const inputSelecionarVideo = document.getElementById('selecionarVideo');
   const modalVideo = document.getElementById('modalVideo');
   const videoPlayer = document.getElementById('videoPlayer');
@@ -199,7 +204,7 @@ document.addEventListener('DOMContentLoaded', () => {
   btnAlternarPreview.addEventListener('click', () => { document.body.classList.toggle('preview-print'); areaRelatorio.scrollIntoView({ behavior: 'smooth', block: 'start' }); });
 
   // ==========================================
-  // NOVA LEITURA DE METADADOS ULTRA-BLINDADA (SEM NaN)
+  // METADADOS BLINDADA CONTRA "Null Island" (0.000000)
   // ==========================================
   function lerMetadadosExif(file) {
     return new Promise((resolve) => {
@@ -221,32 +226,36 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (lat && lng && latRef && lngRef) {
           try {
-            // Conversão forçada robusta que resolve fracções, strings e números corrompidos
             const extrairVetor = (coords) => {
-              if(!coords || coords.length < 3) return NaN;
-              let v = [0, 0, 0];
-              for(let i = 0; i < 3; i++) {
-                let val = coords[i];
-                if (val && typeof val.numerator !== 'undefined' && typeof val.denominator !== 'undefined') {
-                  v[i] = val.denominator === 0 ? 0 : val.numerator / val.denominator;
-                } else {
-                  v[i] = Number(val);
+              // Se já vier como número simples
+              if (typeof coords === 'number') return coords;
+              // Se vier como formato padrão EXIF (Graus, Minutos, Segundos)
+              if (Array.isArray(coords) && coords.length >= 3) {
+                let v = [0, 0, 0];
+                for(let i = 0; i < 3; i++) {
+                  let val = coords[i];
+                  if (val && typeof val.numerator !== 'undefined' && typeof val.denominator !== 'undefined') {
+                    v[i] = val.denominator === 0 ? 0 : val.numerator / val.denominator;
+                  } else {
+                    v[i] = Number(val) || 0;
+                  }
                 }
+                return v[0] + (v[1] / 60) + (v[2] / 3600);
               }
-              if (isNaN(v[0]) || isNaN(v[1]) || isNaN(v[2])) return NaN;
-              return v[0] + (v[1] / 60) + (v[2] / 3600);
+              return 0; 
             };
 
             let calcLat = extrairVetor(lat);
             let calcLng = extrairVetor(lng);
 
-            if (!isNaN(calcLat) && !isNaN(calcLng)) {
+            // A MÁGICA ESTÁ AQUI: Se a conta der diferente de zero exato, imprime o GPS!
+            if (calcLat !== 0 && calcLng !== 0 && !isNaN(calcLat) && !isNaN(calcLng)) {
               if (latRef === "S") calcLat *= -1; 
               if (lngRef === "W") calcLng *= -1;
               textoMeta += `📍 GPS: ${calcLat.toFixed(6)}, ${calcLng.toFixed(6)}`;
             }
           } catch (e) {
-            console.warn("Metadados corrompidos ignorados.");
+            console.warn("Erro ao extrair coordenadas. O GPS será omitido.");
           }
         }
         resolve(textoMeta.trim());

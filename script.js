@@ -148,7 +148,7 @@ document.addEventListener('DOMContentLoaded', () => {
   function inicializarAutoSave() {
     const draft = localStorage.getItem('ovms_rascunho');
     if(draft) {
-      if(confirm('Encontramos um relatório em andamento salvo. Deseja restaurá-lo?')) {
+      if(confirm('Encontrámos um relatório em andamento guardado. Deseja restaurá-lo?')) {
         carregarEstado(JSON.parse(draft));
         autoSaveStatus.textContent = 'Rascunho restaurado.';
       } else {
@@ -159,7 +159,7 @@ document.addEventListener('DOMContentLoaded', () => {
   inicializarAutoSave();
 
   // ==========================================
-  // EXIF, IMAGENS E GALERIA
+  // EXIF E GALERIA
   // ==========================================
   radiosFerramenta.forEach(radio => {
     radio.addEventListener('change', (e) => {
@@ -203,24 +203,55 @@ document.addEventListener('DOMContentLoaded', () => {
   btnGerarPDF.addEventListener('click', async (e) => { e.preventDefault(); await gerarRelatorio(true); setTimeout(() => window.print(), 100); });
   btnAlternarPreview.addEventListener('click', () => { document.body.classList.toggle('preview-print'); areaRelatorio.scrollIntoView({ behavior: 'smooth', block: 'start' }); });
 
+  // --- NOVA FUNÇÃO BLINDADA PARA LER GPS (EVITA NaN) ---
   function lerMetadadosExif(file) {
     return new Promise((resolve) => {
       if (typeof EXIF === 'undefined' || !file.type.startsWith('image/')) { resolve(''); return; }
       EXIF.getData(file, function() {
         let textoMeta = '';
+        
         const dataExif = EXIF.getTag(this, "DateTimeOriginal");
         if (dataExif) {
           const partes = dataExif.split(' '); 
           if (partes.length === 2) textoMeta += `🗓️ ${partes[0].split(':').reverse().join('/')} às ${partes[1].substring(0, 5)}  `;
         }
-        const lat = EXIF.getTag(this, "GPSLatitude"), latRef = EXIF.getTag(this, "GPSLatitudeRef");
-        const lng = EXIF.getTag(this, "GPSLongitude"), lngRef = EXIF.getTag(this, "GPSLongitudeRef");
+
+        // Função interna que converte os formatos malucos de GPS dos telemóveis para decimal seguro
+        const converterParaDecimalSeguro = (coordenada) => {
+          if (!coordenada || coordenada.length < 3) return NaN;
+          
+          const extrairValor = (val) => {
+            if (typeof val === 'number') return val;
+            // Se o telemóvel guardou como fração (muito comum em iPhones e Samsungs)
+            if (val && typeof val.numerator === 'number' && typeof val.denominator === 'number') {
+              return val.denominator === 0 ? 0 : val.numerator / val.denominator;
+            }
+            return parseFloat(val) || 0;
+          };
+
+          const graus = extrairValor(coordenada[0]);
+          const minutos = extrairValor(coordenada[1]);
+          const segundos = extrairValor(coordenada[2]);
+          
+          return graus + (minutos / 60) + (segundos / 3600);
+        };
+
+        const lat = EXIF.getTag(this, "GPSLatitude");
+        const latRef = EXIF.getTag(this, "GPSLatitudeRef");
+        const lng = EXIF.getTag(this, "GPSLongitude");
+        const lngRef = EXIF.getTag(this, "GPSLongitudeRef");
+
         if (lat && lng && latRef && lngRef) {
-          let calcLat = lat[0] + (lat[1] / 60) + (lat[2] / 3600);
-          let calcLng = lng[0] + (lng[1] / 60) + (lng[2] / 3600);
-          if (latRef === "S") calcLat *= -1; if (lngRef === "W") calcLng *= -1;
-          textoMeta += `📍 GPS: ${calcLat.toFixed(6)}, ${calcLng.toFixed(6)}`;
+          let calcLat = converterParaDecimalSeguro(lat);
+          let calcLng = converterParaDecimalSeguro(lng);
+
+          if (!isNaN(calcLat) && !isNaN(calcLng)) {
+            if (latRef === "S") calcLat *= -1; 
+            if (lngRef === "W") calcLng *= -1;
+            textoMeta += `📍 GPS: ${calcLat.toFixed(6)}, ${calcLng.toFixed(6)}`;
+          }
         }
+        
         resolve(textoMeta.trim());
       });
     });
@@ -250,7 +281,6 @@ document.addEventListener('DOMContentLoaded', () => {
       const canvas = document.createElement('canvas');
       const ctx = canvas.getContext('2d');
 
-      // Se for giro de 90 graus, inverte a proporção do canvas
       if (Math.abs(graus) === 90 || Math.abs(graus) === 270) {
         canvas.width = img.height;
         canvas.height = img.width;
@@ -264,11 +294,9 @@ document.addEventListener('DOMContentLoaded', () => {
       ctx.drawImage(img, -img.width / 2, -img.height / 2);
 
       const novaImagemBase64 = canvas.toDataURL('image/jpeg', 0.9);
-
-      // Atualiza a imagem base. O botão "Restaurar" vai voltar pra cá, mantendo o giro correto!
       foto.originalDataUrl = novaImagemBase64;
       foto.previewDataUrl = await redimensionarImagem(novaImagemBase64, 1024, 0.7);
-      foto.editedPreviewDataUrl = null; // Limpa desenhos, pois agora ficariam tortos
+      foto.editedPreviewDataUrl = null; 
 
       renderizarGaleria();
       salvarRascunhoLocal();
@@ -379,7 +407,6 @@ document.addEventListener('DOMContentLoaded', () => {
       const btnRemover = document.createElement('button'); btnRemover.innerHTML = '✖ Excluir'; btnRemover.classList.add('btn-acao-foto', 'btn-remover');
       btnRemover.onclick = () => { fotosSelecionadasParaRelatorio.splice(idx, 1); renderizarGaleria(); salvarRascunhoLocal(); };
 
-      // Adicionando os 10 botões para formar um painel de controle perfeito 2x5
       acoesDiv.append(btnSubir, btnDescer, btnGirarEsq, btnGirarDir, btnCrop, btnToggleLogo, btnToggleMeta, btnEditar, btnRestaurar, btnRemover);
       itemPreviewDiv.appendChild(imgElement);
 
@@ -404,7 +431,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // ==========================================
-  // CROP (SÓ RECORTE - SEM ROTAÇÃO)
+  // CROP (SÓ RECORTE)
   // ==========================================
   function abrirCrop(index) {
     fotoAtualCropIndex = index;

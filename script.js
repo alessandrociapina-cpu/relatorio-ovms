@@ -159,7 +159,7 @@ document.addEventListener('DOMContentLoaded', () => {
   inicializarAutoSave();
 
   // ==========================================
-  // EXIF, IMAGENS E GALERIA
+  // UI DO EDITOR
   // ==========================================
   radiosFerramenta.forEach(radio => {
     radio.addEventListener('change', (e) => {
@@ -204,7 +204,7 @@ document.addEventListener('DOMContentLoaded', () => {
   btnAlternarPreview.addEventListener('click', () => { document.body.classList.toggle('preview-print'); areaRelatorio.scrollIntoView({ behavior: 'smooth', block: 'start' }); });
 
   // ==========================================
-  // METADADOS BLINDADA CONTRA "Null Island" (0.000000)
+  // LEITURA UNIVERSAL E BLINDADA DE METADADOS
   // ==========================================
   function lerMetadadosExif(file) {
     return new Promise((resolve) => {
@@ -220,42 +220,42 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         
         const lat = EXIF.getTag(this, "GPSLatitude");
-        const latRef = EXIF.getTag(this, "GPSLatitudeRef");
         const lng = EXIF.getTag(this, "GPSLongitude");
+        const latRef = EXIF.getTag(this, "GPSLatitudeRef");
         const lngRef = EXIF.getTag(this, "GPSLongitudeRef");
 
-        if (lat && lng && latRef && lngRef) {
+        // Mesmo se o telemóvel não enviar o "S" ou "W" (latRef/lngRef), extrai a matemática se lat e lng existirem
+        if (lat !== undefined && lng !== undefined) {
           try {
             const extrairVetor = (coords) => {
-              // Se já vier como número simples
-              if (typeof coords === 'number') return coords;
-              // Se vier como formato padrão EXIF (Graus, Minutos, Segundos)
-              if (Array.isArray(coords) && coords.length >= 3) {
-                let v = [0, 0, 0];
-                for(let i = 0; i < 3; i++) {
-                  let val = coords[i];
-                  if (val && typeof val.numerator !== 'undefined' && typeof val.denominator !== 'undefined') {
-                    v[i] = val.denominator === 0 ? 0 : val.numerator / val.denominator;
-                  } else {
-                    v[i] = Number(val) || 0;
-                  }
-                }
-                return v[0] + (v[1] / 60) + (v[2] / 3600);
+              if (typeof coords === 'number') return coords; // Número direto
+              if (typeof coords === 'string') return parseFloat(coords); // Texto
+              if (coords && coords.length >= 3) {
+                // O valueOf() força o objeto do exif-js a entregar o número fracionado
+                let d = coords[0].valueOf ? coords[0].valueOf() : parseFloat(coords[0]) || 0;
+                let m = coords[1].valueOf ? coords[1].valueOf() : parseFloat(coords[1]) || 0;
+                let s = coords[2].valueOf ? coords[2].valueOf() : parseFloat(coords[2]) || 0;
+                return d + (m / 60) + (s / 3600);
               }
-              return 0; 
+              return 0;
             };
 
             let calcLat = extrairVetor(lat);
             let calcLng = extrairVetor(lng);
 
-            // A MÁGICA ESTÁ AQUI: Se a conta der diferente de zero exato, imprime o GPS!
+            // Corrige para negativo nos hemisférios S e W, se a etiqueta existir
+            if (latRef === "S") calcLat = Math.abs(calcLat) * -1; 
+            else if (latRef === "N") calcLat = Math.abs(calcLat);
+
+            if (lngRef === "W") calcLng = Math.abs(calcLng) * -1;
+            else if (lngRef === "E") calcLng = Math.abs(calcLng);
+
+            // Bloqueia impressões zeradas (Null Island) e NaNs
             if (calcLat !== 0 && calcLng !== 0 && !isNaN(calcLat) && !isNaN(calcLng)) {
-              if (latRef === "S") calcLat *= -1; 
-              if (lngRef === "W") calcLng *= -1;
               textoMeta += `📍 GPS: ${calcLat.toFixed(6)}, ${calcLng.toFixed(6)}`;
             }
           } catch (e) {
-            console.warn("Erro ao extrair coordenadas. O GPS será omitido.");
+            console.warn("Metadados corrompidos ignorados pelo filtro universal.");
           }
         }
         resolve(textoMeta.trim());
@@ -436,7 +436,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // ==========================================
-  // CROP (SÓ RECORTE)
+  // CROP (SÓ RECORTE - SEM ROTAÇÃO)
   // ==========================================
   function abrirCrop(index) {
     fotoAtualCropIndex = index;

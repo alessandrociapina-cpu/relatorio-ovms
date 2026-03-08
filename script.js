@@ -18,12 +18,10 @@ document.addEventListener('DOMContentLoaded', () => {
   const imgLogoBase = new Image();
   imgLogoBase.src = 'sabesp-logo.png';
 
-  // Controles de Projeto (Save/Load)
   const btnSalvarProjeto = document.getElementById('btnSalvarProjeto');
   const inputCarregarProjeto = document.getElementById('inputCarregarProjeto');
   const autoSaveStatus = document.getElementById('autoSaveStatus');
 
-  // Controles de Marca e Metadados
   const checkboxMarca = document.getElementById('usarMarcaDagua');
   const divOpcoesMarca = document.getElementById('opcoesMarcaDagua');
   const selectPosicaoMarca = document.getElementById('posicaoMarcaDagua');
@@ -35,7 +33,6 @@ document.addEventListener('DOMContentLoaded', () => {
   const selectFonte = document.getElementById('fonteRelatorio');
   const selectTamanhoFonte = document.getElementById('tamanhoFonteRelatorio');
 
-  // EDITOR DE IMAGENS (DESENHO)
   const modalEditor = document.getElementById('modalEditor');
   const canvasEditor = document.getElementById('canvasEditor');
   const ctxEditor = canvasEditor.getContext('2d');
@@ -57,7 +54,6 @@ document.addEventListener('DOMContentLoaded', () => {
   let historicoEdicao = []; 
   let lastStateImageData = null; 
 
-  // EDITOR DE CROP 
   const modalCrop = document.getElementById('modalCrop');
   const imgCrop = document.getElementById('imgCrop');
   const btnAplicarCrop = document.getElementById('btnAplicarCrop');
@@ -65,7 +61,6 @@ document.addEventListener('DOMContentLoaded', () => {
   let cropperInstancia = null;
   let fotoAtualCropIndex = null;
 
-  // EXTRATOR DE VÍDEO
   const inputSelecionarVideo = document.getElementById('selecionarVideo');
   const modalVideo = document.getElementById('modalVideo');
   const videoPlayer = document.getElementById('videoPlayer');
@@ -79,9 +74,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
   let fotosSelecionadasParaRelatorio = [];
 
-  // ==========================================
-  // LÓGICA DE SALVAMENTO (AUTO-SAVE)
-  // ==========================================
   function exportarEstado() {
     return {
       form: {
@@ -158,9 +150,6 @@ document.addEventListener('DOMContentLoaded', () => {
   }
   inicializarAutoSave();
 
-  // ==========================================
-  // EXIF, IMAGENS E GALERIA
-  // ==========================================
   radiosFerramenta.forEach(radio => {
     radio.addEventListener('change', (e) => {
       ferramentaAtual = e.target.value;
@@ -174,15 +163,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function updateZoomDisplay() {
     if (zoomLevel <= 1) {
-      canvasEditor.style.maxWidth = '100%';
-      canvasEditor.style.maxHeight = '60vh';
-      canvasEditor.style.width = 'auto';
-      canvasEditor.style.height = 'auto';
+      canvasEditor.style.maxWidth = '100%'; canvasEditor.style.maxHeight = '60vh'; canvasEditor.style.width = 'auto'; canvasEditor.style.height = 'auto';
     } else {
-      canvasEditor.style.maxWidth = 'none';
-      canvasEditor.style.maxHeight = 'none';
-      canvasEditor.style.width = `${Math.round(zoomLevel * 100)}%`;
-      canvasEditor.style.height = 'auto';
+      canvasEditor.style.maxWidth = 'none'; canvasEditor.style.maxHeight = 'none'; canvasEditor.style.width = `${Math.round(zoomLevel * 100)}%`; canvasEditor.style.height = 'auto';
     }
     zoomLabel.textContent = `${Math.round(zoomLevel * 100)}%`;
   }
@@ -203,16 +186,12 @@ document.addEventListener('DOMContentLoaded', () => {
   btnGerarPDF.addEventListener('click', async (e) => { e.preventDefault(); await gerarRelatorio(true); setTimeout(() => window.print(), 100); });
   btnAlternarPreview.addEventListener('click', () => { document.body.classList.toggle('preview-print'); areaRelatorio.scrollIntoView({ behavior: 'smooth', block: 'start' }); });
 
-  // ==========================================
-  // LEITURA DE METADADOS + ALERTA DE CENSURA
-  // ==========================================
   function lerMetadadosExif(file) {
     return new Promise((resolve) => {
       if (typeof EXIF === 'undefined' || !file.type.startsWith('image/')) { resolve(''); return; }
       
       EXIF.getData(file, function() {
         let textoMeta = '';
-        
         const dataExif = EXIF.getTag(this, "DateTimeOriginal");
         if (dataExif) {
           const partes = dataExif.split(' '); 
@@ -247,14 +226,13 @@ document.addEventListener('DOMContentLoaded', () => {
             if (calcLat !== 0 && calcLng !== 0 && !isNaN(calcLat) && !isNaN(calcLng)) {
               textoMeta += `📍 GPS: ${calcLat.toFixed(6)}, ${calcLng.toFixed(6)}`;
             } else {
-              textoMeta += `📍 GPS: Removido pelo sistema do telemóvel`;
+              textoMeta += `📍 Sem GPS`;
             }
           } catch (e) {
-            textoMeta += `📍 GPS: Falha na leitura`;
+            textoMeta += `📍 Sem GPS`;
           }
         } else {
-          // Se o telemóvel apagou a etiqueta do GPS por completo
-          textoMeta += `📍 GPS: Bloqueado pelo telemóvel (Use o botão abaixo)`;
+          textoMeta += `📍 Sem GPS`;
         }
         resolve(textoMeta.trim());
       });
@@ -409,36 +387,31 @@ document.addEventListener('DOMContentLoaded', () => {
       const btnRemover = document.createElement('button'); btnRemover.innerHTML = '✖ Excluir'; btnRemover.classList.add('btn-acao-foto', 'btn-remover');
       btnRemover.onclick = () => { fotosSelecionadasParaRelatorio.splice(idx, 1); renderizarGaleria(); salvarRascunhoLocal(); };
 
-      // O NOVO BOTÃO DE CAPTURA DE GPS VIA NAVEGADOR
+      // BOTÃO DE GPS REFINADO (Usa a classe .btn-gps do CSS)
       const btnGPSAtual = document.createElement('button');
-      btnGPSAtual.innerHTML = '📍 Capturar Localização Agora';
-      btnGPSAtual.classList.add('btn-acao-foto');
-      btnGPSAtual.style.backgroundColor = '#17a2b8';
-      btnGPSAtual.style.color = '#fff';
-      btnGPSAtual.style.flexBasis = '100%'; // Ocupa a linha inteira em baixo
-      btnGPSAtual.style.fontWeight = 'bold';
-      btnGPSAtual.title = 'Usa a antena GPS do telemóvel/computador para preencher a localização';
+      btnGPSAtual.innerHTML = '📍 Atualizar GPS pelo Celular';
+      btnGPSAtual.classList.add('btn-acao-foto', 'btn-gps');
+      btnGPSAtual.title = 'Usa a antena GPS do telemóvel para preencher a localização';
       
       btnGPSAtual.onclick = () => {
         if(navigator.geolocation) {
-          btnGPSAtual.innerHTML = '⏳ A procurar satélites...';
+          btnGPSAtual.innerHTML = '⏳ A procurar...';
           navigator.geolocation.getCurrentPosition(
             (pos) => {
               const nLat = pos.coords.latitude.toFixed(6);
               const nLng = pos.coords.longitude.toFixed(6);
               
               let metaAtual = fotoInfo.metadadosExif || '';
-              // Apaga a mensagem de erro antiga para meter o GPS correto
-              if (metaAtual.includes('📍 GPS:')) {
-                metaAtual = metaAtual.split('📍 GPS:')[0].trim();
+              if (metaAtual.includes('📍')) {
+                metaAtual = metaAtual.split('📍')[0].trim();
               }
               fotoInfo.metadadosExif = metaAtual + `  📍 GPS: ${nLat}, ${nLng}`;
               renderizarGaleria();
               salvarRascunhoLocal();
             },
             (err) => {
-              alert('O navegador não tem permissão para usar o GPS. Verifique as Definições de Localização.');
-              btnGPSAtual.innerHTML = '📍 Capturar Localização Agora';
+              alert('Por favor, ative a Localização (GPS) no seu celular e dê permissão ao navegador.');
+              btnGPSAtual.innerHTML = '📍 Atualizar GPS pelo Celular';
             },
             { enableHighAccuracy: true }
           );
@@ -447,7 +420,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
       };
 
-      // Adicionando os botões. Agora são 11 botões (5 na primeira linha, 5 na segunda, 1 grande na terceira)
+      // Adicionando os 11 botões
       acoesDiv.append(btnSubir, btnDescer, btnGirarEsq, btnGirarDir, btnCrop, btnEditar, btnRestaurar, btnToggleLogo, btnToggleMeta, btnRemover, btnGPSAtual);
       itemPreviewDiv.appendChild(imgElement);
 
@@ -471,9 +444,6 @@ document.addEventListener('DOMContentLoaded', () => {
     renderizarGaleria(); salvarRascunhoLocal();
   }
 
-  // ==========================================
-  // CROP (SÓ RECORTE)
-  // ==========================================
   function abrirCrop(index) {
     fotoAtualCropIndex = index;
     const foto = fotosSelecionadasParaRelatorio[index];
@@ -503,19 +473,12 @@ document.addEventListener('DOMContentLoaded', () => {
   btnAplicarCrop.onclick = () => {
     const canvasRecortado = cropperInstancia.getCroppedCanvas();
     const recortadaDataUrl = canvasRecortado.toDataURL('image/jpeg', 0.8);
-    
     fotosSelecionadasParaRelatorio[fotoAtualCropIndex].previewDataUrl = recortadaDataUrl;
     fotosSelecionadasParaRelatorio[fotoAtualCropIndex].editedPreviewDataUrl = null; 
-    
-    renderizarGaleria();
-    salvarRascunhoLocal();
-    fecharCrop();
+    renderizarGaleria(); salvarRascunhoLocal(); fecharCrop();
   };
   btnFecharCrop.onclick = fecharCrop;
 
-  // ==========================================
-  // EDITOR DE DESENHO (SETAS E TEXTO)
-  // ==========================================
   function abrirEditor(index) {
     fotoAtualEdicaoIndex = index;
     const foto = fotosSelecionadasParaRelatorio[index];
@@ -615,9 +578,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
   btnFecharModal.addEventListener('click', fecharEditor);
 
-  // ==========================================
-  // EXTRATOR DE VÍDEO
-  // ==========================================
   inputSelecionarVideo.addEventListener('change', (e) => {
     const file = e.target.files[0]; if (!file) return;
     videoFileName = file.name; videoPlayer.src = URL.createObjectURL(file);
@@ -647,9 +607,6 @@ document.addEventListener('DOMContentLoaded', () => {
   });
   btnFecharModalVideo.addEventListener('click', () => { modalVideo.classList.add('modal-oculto'); videoPlayer.pause(); videoPlayer.src = ''; });
 
-  // ==========================================
-  // GERAÇÃO DO RELATÓRIO
-  // ==========================================
   function getOpcoesRelatorio() {
     const layout = Array.from(radiosLayout).find(r => r.checked)?.value || '2';
     const qualidade = Array.from(radiosQualidade).find(r => r.checked)?.value || 'media';

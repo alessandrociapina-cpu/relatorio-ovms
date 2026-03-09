@@ -1,19 +1,7 @@
-const CACHE_NAME = 'ovms-app-v15'; 
-const urlsToCache = [
-  './',
-  './index.html',
-  './style.css',
-  './script.js',
-  './manifest.json',
-  './sabesp-logo.png',
-  'https://cdn.jsdelivr.net/npm/exif-js',
-  'https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.css',
-  'https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.js'
-];
+const CACHE_NAME = 'ovms-app-v16'; 
 
 self.addEventListener('install', event => {
   self.skipWaiting();
-  event.waitUntil(caches.open(CACHE_NAME).then(cache => cache.addAll(urlsToCache)));
 });
 
 self.addEventListener('activate', event => {
@@ -29,14 +17,22 @@ self.addEventListener('activate', event => {
   self.clients.claim();
 });
 
+// Estratégia "Network First": Tenta sempre buscar o arquivo da internet primeiro.
+// Se falhar (modo Offline), ele busca do cache.
 self.addEventListener('fetch', event => {
-  if (event.request.mode === 'navigate' || (event.request.headers.get('accept') && event.request.headers.get('accept').includes('text/html'))) {
-    event.respondWith(
-      fetch(event.request).catch(() => caches.match(event.request))
-    );
-    return;
-  }
   event.respondWith(
-    caches.match(event.request).then(response => response || fetch(event.request))
+    fetch(event.request)
+      .then(response => {
+        // Atualiza o cache silenciosamente com a versão mais nova
+        const clone = response.clone();
+        caches.open(CACHE_NAME).then(cache => {
+          cache.put(event.request, clone);
+        });
+        return response;
+      })
+      .catch(() => {
+        // Sem internet? Usa o cache salvo.
+        return caches.match(event.request);
+      })
   );
 });

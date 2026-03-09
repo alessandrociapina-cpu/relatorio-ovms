@@ -11,7 +11,6 @@
   <script src="https://cdn.jsdelivr.net/npm/exif-js"></script>
   <link href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.css" rel="stylesheet">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.js"></script>
-  
   <link rel="stylesheet" href="style.css"/>
 </head>
 <body>
@@ -20,7 +19,7 @@
 
     <div class="secao-projeto" style="margin-bottom: 25px; padding: 15px; background: #eef2f5; border-radius: 6px; border: 1px solid #ced4da; display: flex; flex-wrap: wrap; gap: 10px; align-items: center;">
       <span style="font-weight: bold; color: #495057; margin-right: 10px;">Gerenciar Rascunho:</span>
-      <button id="btnSalvarProjeto" class="botao-principal" style="background-color: #17a2b8;">💾 Baixar Projeto (Salvar)</button>
+      <button id="btnSalvarProjeto" class="botao-principal" style="background-color: #17a2b8;">💾 Baixar Projeto</button>
       <label for="inputCarregarProjeto" class="botao-secundario" style="margin: 0; background-color: #6c757d; color: white; cursor: pointer;">📂 Carregar Projeto</label>
       <input type="file" id="inputCarregarProjeto" accept=".json" style="display:none;">
       <span id="autoSaveStatus" style="font-size: 0.85em; color: #6c757d; font-style: italic; margin-left: auto;">Nenhum rascunho salvo</span>
@@ -41,32 +40,41 @@
           <label for="horaVistoria">Hora da Vistoria:</label>
           <input type="time" id="horaVistoria" name="horaVistoria">
         </div>
+        
         <div>
           <label for="nomeFiscal">Nome do Fiscal/Inspetor:</label>
-          <input type="text" id="nomeFiscal" name="nomeFiscal" required>
+          <div style="display: flex; flex-wrap: wrap; gap: 10px; align-items: center;">
+            <input type="text" id="nomeFiscal" name="nomeFiscal" required style="flex-grow: 1; margin-bottom: 0; min-width: 200px;">
+            
+            <div style="background: #eef2f5; padding: 6px 12px; border-radius: 4px; border: 1px solid #ccc; display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+              <label style="margin:0; cursor:pointer; display:flex; align-items:center; gap:5px; font-weight: normal; font-size: 0.9em;">
+                <input type="checkbox" id="incluirAssinatura"> 📝 Assinar no rodapé
+              </label>
+              <input type="file" id="imagemAssinatura" accept="image/*" style="display:none;">
+              <label for="imagemAssinatura" class="botao-secundario" id="btnAssinaturaLabel" style="margin:0; display:none; font-size:0.75em; padding:4px 8px; background-color:#6c757d;">📎 Anexar Imagem</label>
+              <span id="assinaturaStatus" style="font-size:0.8em; color:green; display:none; font-weight:bold;">✔ Carregada</span>
+              <button type="button" id="btnRemoverAssinatura" style="display:none; background:transparent; border:none; color:#d9534f; cursor:pointer; font-size:1em; padding:0; font-weight:bold;" title="Remover imagem da assinatura">✖</button>
+            </div>
+          </div>
         </div>
 
         <fieldset class="opcoes-relatorio">
           <legend>Opções de Layout e Impressão</legend>
-
           <div class="grupo-opcao">
             <span class="grupo-label">Layout de colunas:</span>
             <label><input type="radio" name="layoutColunas" value="2" checked> 2 colunas (padrão)</label>
             <label><input type="radio" name="layoutColunas" value="1"> 1 coluna (fotos maiores)</label>
           </div>
-
           <div class="grupo-opcao">
             <span class="grupo-label">Qualidade das imagens:</span>
             <label><input type="radio" name="qualidadeImagens" value="media" checked> Média — 1024 px</label>
             <label><input type="radio" name="qualidadeImagens" value="maxima"> Máxima — 1600 px</label>
           </div>
-
           <div class="grupo-opcao">
             <span class="grupo-label">Margens de impressão:</span>
             <label><input type="radio" name="margensImpressao" value="menores"> Menores (5 mm)</label>
             <label><input type="radio" name="margensImpressao" value="maiores" checked> Maiores (15 mm) (padrão)</label>
           </div>
-          
           <div class="grupo-opcao">
             <span class="grupo-label">Fonte:</span>
             <select id="fonteRelatorio" class="input-select">
@@ -76,7 +84,6 @@
               <option value="Calibri, sans-serif">Calibri</option>
               <option value="Verdana, sans-serif">Verdana</option>
             </select>
-
             <span class="grupo-label" style="margin-left: 15px;">Tamanho:</span>
             <select id="tamanhoFonteRelatorio" class="input-select">
               <option value="9">9 pt</option>
@@ -122,13 +129,11 @@
           <div class="grupo-opcao">
             <label><input type="checkbox" id="usarMetadados" checked> Exibir Data, Hora e Coordenadas GPS nas fotos</label>
           </div>
-          
           <p style="font-size: 0.85em; color: #d9534f; margin: 8px 0 0 0; line-height: 1.4; background-color: #fdf2f2; padding: 10px; border-left: 4px solid #d9534f; border-radius: 4px;">
-            <strong>⚠️ AVISO DE METADADOS:</strong> Se você enviar uma foto pelo WhatsApp, o aplicativo "limpa" os dados de GPS e Data para economizar espaço e proteger a privacidade. Portanto, a leitura automática só vai funcionar se a foto for original (passada por cabo, Google Drive, OneDrive, E-mail como anexo ou tirada diretamente no tablet/celular onde o sistema está aberto).
+            <strong>⚠️ AVISO DE METADADOS:</strong> Se você enviar uma foto pelo WhatsApp, o aplicativo "limpa" os dados de GPS e Data para economizar espaço e proteger a privacidade. Portanto, a leitura automática só vai funcionar se a foto for original.
           </p>
-          
           <p style="font-size: 0.85em; color: #0c5460; margin: 10px 0 0 0; line-height: 1.4; background-color: #d1ecf1; padding: 10px; border-left: 4px solid #0c5460; border-radius: 4px;">
-            <strong>🔒 SEGURANÇA DA INFORMAÇÃO (100% Seguro):</strong> Este sistema opera de forma local <strong>(Client-Side)</strong>. Todo o processamento das imagens, extração de GPS, recortes e geração do PDF ocorre <strong>exclusivamente na memória do seu navegador</strong>. Nenhuma foto, dado do fiscal ou local de vistoria é enviado para a internet ou servidores externos, garantindo total privacidade e conformidade com políticas de TI.
+            <strong>🔒 SEGURANÇA DA INFORMAÇÃO:</strong> Este sistema opera de forma local <strong>(Client-Side)</strong>. Todo o processamento das imagens e geração do PDF ocorre na memória do seu navegador. Nenhuma foto é enviada para servidores externos.
           </p>
         </fieldset>
       </form>
@@ -148,7 +153,7 @@
 
     <div class="secao-observacoes">
       <h2>3. Observações Gerais</h2>
-      <textarea id="observacoesGerais" placeholder="Descreva aqui as observações gerais..."></textarea>
+      <textarea id="observacoesGerais" placeholder="Descreva aqui as observações gerais, serviços realizados..."></textarea>
     </div>
 
     <div class="secao-acao">
@@ -180,19 +185,16 @@
           <label style="cursor: pointer;"><input type="radio" name="ferramentaEdicao" value="texto"> 🔠 Texto</label>
           <input type="text" id="textoEdicao" placeholder="1. Digite o texto e 2. Clique na foto" style="display:none; padding: 6px; border: 1px solid #ccc; border-radius: 4px; flex-grow: 1; min-width: 200px;">
         </div>
-
         <div style="border-left: 2px solid #ddd; padding-left: 15px; display: flex; gap: 5px; align-items: center;">
           <span style="font-weight: bold; color: #444; margin-right: 5px;">Zoom:</span>
-          <button id="btnZoomOut" class="botao-secundario" style="padding: 2px 10px; font-weight: bold; margin: 0;" title="Reduzir">-</button>
+          <button id="btnZoomOut" class="botao-secundario" style="padding: 2px 10px; font-weight: bold; margin: 0;">-</button>
           <span id="zoomLabel" style="min-width: 45px; text-align: center; font-weight: bold;">100%</span>
-          <button id="btnZoomIn" class="botao-secundario" style="padding: 2px 10px; font-weight: bold; margin: 0;" title="Ampliar">+</button>
+          <button id="btnZoomIn" class="botao-secundario" style="padding: 2px 10px; font-weight: bold; margin: 0;">+</button>
         </div>
       </div>
-
       <div class="canvas-container" style="height: 60vh; width: 100%; background: #e9ecef; border: 1px solid #ccc; overflow: auto; text-align: center; margin-bottom: 15px; border-radius: 5px;">
         <canvas id="canvasEditor" style="max-width: 100%; max-height: 60vh; margin: auto; display: block;"></canvas>
       </div>
-
       <div class="modal-acoes">
         <button id="btnSalvarEdicao" class="botao-principal">Salvar Imagem</button>
         <button id="btnDesfazerSeta" class="botao-secundario">Desfazer Última</button>
@@ -205,11 +207,9 @@
     <div class="modal-conteudo" style="max-width: 900px; width: 95%;">
       <h3>Recortar Imagem</h3>
       <p style="font-size: 0.9em; color: #555; margin-top: -10px;">Ajuste a área para focar no detalhe principal da patologia.</p>
-      
       <div style="height: 60vh; width: 100%; background: #e9ecef; border: 1px solid #ccc; display: flex; justify-content: center; align-items: center; overflow: hidden; margin-bottom: 15px; border-radius: 5px;">
         <img id="imgCrop" style="max-width: 100%; max-height: 100%; display: block;" src="">
       </div>
-
       <div class="modal-acoes">
         <button id="btnAplicarCrop" class="botao-principal">Aplicar Recorte</button>
         <button id="btnFecharCrop" class="botao-texto">Cancelar</button>
@@ -221,17 +221,14 @@
     <div class="modal-conteudo">
       <h3>Extrair Frame do Vídeo</h3>
       <p style="font-size: 0.9em; color: #555; margin-top: -10px;">Use os controles para encontrar o momento exato e clique em Capturar.</p>
-      
       <div class="video-container" style="text-align: center; background: #000; margin-bottom: 15px; border-radius: 4px; width: 100%;">
         <video id="videoPlayer" style="max-width: 100%; max-height: 50vh;" controls></video>
       </div>
-
       <div class="video-controles" style="display: flex; gap: 10px; align-items: center; margin-bottom: 15px; width: 100%;">
         <button id="btnVideoRewind" class="botao-secundario" style="padding: 5px 10px;">⏪ -0.1s</button>
         <input type="range" id="videoSlider" min="0" max="100" value="0" step="0.01" style="flex-grow: 1; cursor: pointer;">
         <button id="btnVideoForward" class="botao-secundario" style="padding: 5px 10px;">+0.1s ⏩</button>
       </div>
-
       <div class="modal-acoes">
         <button id="btnCapturarFrame" class="botao-principal" style="background-color: #28a745;">📸 Capturar Frame</button>
         <button id="btnFecharModalVideo" class="botao-secundario">Concluir e Fechar</button>
@@ -241,17 +238,9 @@
   </div>
 
   <script src="script.js"></script>
-  
   <script>
     if ('serviceWorker' in navigator) {
-      window.addEventListener('load', () => {
-        navigator.serviceWorker.register('sw.js')
-          .then(registration => {
-            console.log('ServiceWorker registrado com sucesso. Escopo:', registration.scope);
-          }, err => {
-            console.log('Falha ao registrar o ServiceWorker:', err);
-          });
-      });
+      window.addEventListener('load', () => navigator.serviceWorker.register('sw.js'));
     }
   </script>
 </body>

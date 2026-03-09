@@ -18,10 +18,56 @@ document.addEventListener('DOMContentLoaded', () => {
   const imgLogoBase = new Image();
   imgLogoBase.src = 'sabesp-logo.png';
 
+  // Controles de Projeto (Save/Load)
   const btnSalvarProjeto = document.getElementById('btnSalvarProjeto');
   const inputCarregarProjeto = document.getElementById('inputCarregarProjeto');
   const autoSaveStatus = document.getElementById('autoSaveStatus');
 
+  // --- NOVA LÓGICA DE ASSINATURA ---
+  const checkboxAssinatura = document.getElementById('incluirAssinatura');
+  const inputImagemAssinatura = document.getElementById('imagemAssinatura');
+  const btnAssinaturaLabel = document.getElementById('btnAssinaturaLabel');
+  const assinaturaStatus = document.getElementById('assinaturaStatus');
+  const btnRemoverAssinatura = document.getElementById('btnRemoverAssinatura');
+  let assinaturaBase64 = null;
+
+  checkboxAssinatura.addEventListener('change', (e) => {
+    btnAssinaturaLabel.style.display = e.target.checked ? 'inline-block' : 'none';
+    if (!e.target.checked) {
+      assinaturaBase64 = null;
+      inputImagemAssinatura.value = '';
+      assinaturaStatus.style.display = 'none';
+      btnRemoverAssinatura.style.display = 'none';
+    } else if (assinaturaBase64) {
+      assinaturaStatus.style.display = 'inline-block';
+      btnRemoverAssinatura.style.display = 'inline-block';
+    }
+    salvarRascunhoLocal();
+  });
+
+  inputImagemAssinatura.addEventListener('change', (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        assinaturaBase64 = ev.target.result;
+        assinaturaStatus.style.display = 'inline-block';
+        btnRemoverAssinatura.style.display = 'inline-block';
+        salvarRascunhoLocal();
+      };
+      reader.readAsDataURL(file);
+    }
+  });
+
+  btnRemoverAssinatura.addEventListener('click', () => {
+    assinaturaBase64 = null;
+    inputImagemAssinatura.value = '';
+    assinaturaStatus.style.display = 'none';
+    btnRemoverAssinatura.style.display = 'none';
+    salvarRascunhoLocal();
+  });
+
+  // Controles de Marca e Metadados
   const checkboxMarca = document.getElementById('usarMarcaDagua');
   const divOpcoesMarca = document.getElementById('opcoesMarcaDagua');
   const selectPosicaoMarca = document.getElementById('posicaoMarcaDagua');
@@ -33,6 +79,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const selectFonte = document.getElementById('fonteRelatorio');
   const selectTamanhoFonte = document.getElementById('tamanhoFonteRelatorio');
 
+  // EDITOR DE IMAGENS (DESENHO)
   const modalEditor = document.getElementById('modalEditor');
   const canvasEditor = document.getElementById('canvasEditor');
   const ctxEditor = canvasEditor.getContext('2d');
@@ -79,6 +126,8 @@ document.addEventListener('DOMContentLoaded', () => {
       form: {
         local: inputLocalVistoria.value, data: inputDataVistoria.value, hora: inputHoraVistoria.value,
         fiscal: inputNomeFiscal.value, obs: inputObservacoes.value,
+        incluirAssinatura: checkboxAssinatura.checked,
+        assinaturaUrl: assinaturaBase64
       },
       fotos: fotosSelecionadasParaRelatorio
     };
@@ -89,6 +138,18 @@ document.addEventListener('DOMContentLoaded', () => {
       inputLocalVistoria.value = estado.form.local || ''; inputDataVistoria.value = estado.form.data || '';
       inputHoraVistoria.value = estado.form.hora || ''; inputNomeFiscal.value = estado.form.fiscal || '';
       inputObservacoes.value = estado.form.obs || '';
+      
+      checkboxAssinatura.checked = estado.form.incluirAssinatura || false;
+      assinaturaBase64 = estado.form.assinaturaUrl || null;
+      
+      btnAssinaturaLabel.style.display = checkboxAssinatura.checked ? 'inline-block' : 'none';
+      if(assinaturaBase64 && checkboxAssinatura.checked) {
+         assinaturaStatus.style.display = 'inline-block';
+         btnRemoverAssinatura.style.display = 'inline-block';
+      } else {
+         assinaturaStatus.style.display = 'none';
+         btnRemoverAssinatura.style.display = 'none';
+      }
     }
     if(estado.fotos) {
       fotosSelecionadasParaRelatorio = estado.fotos;
@@ -226,13 +287,13 @@ document.addEventListener('DOMContentLoaded', () => {
             if (calcLat !== 0 && calcLng !== 0 && !isNaN(calcLat) && !isNaN(calcLng)) {
               textoMeta += `📍 GPS: ${calcLat.toFixed(6)}, ${calcLng.toFixed(6)}`;
             } else {
-              textoMeta += `📍 Sem GPS`;
+              textoMeta += `📍 GPS: Removido pelo sistema do telemóvel`;
             }
           } catch (e) {
-            textoMeta += `📍 Sem GPS`;
+            textoMeta += `📍 GPS: Falha na leitura`;
           }
         } else {
-          textoMeta += `📍 Sem GPS`;
+          textoMeta += `📍 GPS: Bloqueado pelo telemóvel (Use o botão abaixo)`;
         }
         resolve(textoMeta.trim());
       });
@@ -310,7 +371,7 @@ document.addEventListener('DOMContentLoaded', () => {
         } catch (error) { novasFotos[index] = null; } finally { resolve(); }
       };
       reader.readAsDataURL(file);
-    }));
+    });
 
     await Promise.all(promises);
     fotosSelecionadasParaRelatorio = [...fotosSelecionadasParaRelatorio, ...novasFotos.filter(f => f !== null)];
@@ -387,7 +448,6 @@ document.addEventListener('DOMContentLoaded', () => {
       const btnRemover = document.createElement('button'); btnRemover.innerHTML = '✖ Excluir'; btnRemover.classList.add('btn-acao-foto', 'btn-remover');
       btnRemover.onclick = () => { fotosSelecionadasParaRelatorio.splice(idx, 1); renderizarGaleria(); salvarRascunhoLocal(); };
 
-      // BOTÃO DE GPS REFINADO (Usa a classe .btn-gps do CSS)
       const btnGPSAtual = document.createElement('button');
       btnGPSAtual.innerHTML = '📍 Atualizar GPS pelo Celular';
       btnGPSAtual.classList.add('btn-acao-foto', 'btn-gps');
@@ -420,7 +480,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
       };
 
-      // Adicionando os 11 botões
       acoesDiv.append(btnSubir, btnDescer, btnGirarEsq, btnGirarDir, btnCrop, btnEditar, btnRestaurar, btnToggleLogo, btnToggleMeta, btnRemover, btnGPSAtual);
       itemPreviewDiv.appendChild(imgElement);
 
@@ -676,7 +735,30 @@ document.addEventListener('DOMContentLoaded', () => {
       corpoRelatorioDiv.appendChild(itemDiv);
     });
 
-    if (inputObservacoes.value.trim()) observacoesFinaisRelatorioDiv.innerHTML = `<h3>Observações Gerais</h3><p>${inputObservacoes.value.trim()}</p>`;
+    // --- RENDERIZAÇÃO DA ASSINATURA NO FINAL DO RELATÓRIO ---
+    let assinaturaHtml = '';
+    if (checkboxAssinatura.checked) {
+      const nomeStr = inputNomeFiscal.value.trim() || 'Fiscal/Inspetor';
+      const imgStr = assinaturaBase64 ? `<img src="${assinaturaBase64}" class="img-assinatura-pdf">` : `<div style="height: 50px;"></div>`;
+      assinaturaHtml = `
+        <div class="bloco-assinatura">
+          ${imgStr}
+          <div class="linha-assinatura"></div>
+          <strong>${nomeStr}</strong>
+          <span style="font-size: 0.85em; color: #555;">Sabesp</span>
+        </div>
+      `;
+    }
+
+    let obsFinalHtml = '';
+    if (inputObservacoes.value.trim()) {
+      obsFinalHtml += `<h3>Observações Gerais</h3><p>${inputObservacoes.value.trim()}</p>`;
+    }
+    if (assinaturaHtml) {
+      obsFinalHtml += assinaturaHtml;
+    }
+    observacoesFinaisRelatorioDiv.innerHTML = obsFinalHtml;
+
     areaRelatorio.style.display = 'block';
     if (ativarPreview) document.body.classList.add('preview-print');
     areaRelatorio.scrollIntoView({ behavior: 'smooth' });

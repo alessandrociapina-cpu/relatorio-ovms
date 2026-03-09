@@ -18,12 +18,11 @@ document.addEventListener('DOMContentLoaded', () => {
   const imgLogoBase = new Image();
   imgLogoBase.src = 'sabesp-logo.png';
 
-  // Controles de Projeto (Save/Load)
   const btnSalvarProjeto = document.getElementById('btnSalvarProjeto');
   const inputCarregarProjeto = document.getElementById('inputCarregarProjeto');
   const autoSaveStatus = document.getElementById('autoSaveStatus');
 
-  // --- NOVA LÓGICA DE ASSINATURA ---
+  // Assinatura
   const checkboxAssinatura = document.getElementById('incluirAssinatura');
   const inputImagemAssinatura = document.getElementById('imagemAssinatura');
   const btnAssinaturaLabel = document.getElementById('btnAssinaturaLabel');
@@ -67,7 +66,6 @@ document.addEventListener('DOMContentLoaded', () => {
     salvarRascunhoLocal();
   });
 
-  // Controles de Marca e Metadados
   const checkboxMarca = document.getElementById('usarMarcaDagua');
   const divOpcoesMarca = document.getElementById('opcoesMarcaDagua');
   const selectPosicaoMarca = document.getElementById('posicaoMarcaDagua');
@@ -79,7 +77,6 @@ document.addEventListener('DOMContentLoaded', () => {
   const selectFonte = document.getElementById('fonteRelatorio');
   const selectTamanhoFonte = document.getElementById('tamanhoFonteRelatorio');
 
-  // EDITOR DE IMAGENS (DESENHO)
   const modalEditor = document.getElementById('modalEditor');
   const canvasEditor = document.getElementById('canvasEditor');
   const ctxEditor = canvasEditor.getContext('2d');
@@ -371,7 +368,7 @@ document.addEventListener('DOMContentLoaded', () => {
         } catch (error) { novasFotos[index] = null; } finally { resolve(); }
       };
       reader.readAsDataURL(file);
-    });
+    }));
 
     await Promise.all(promises);
     fotosSelecionadasParaRelatorio = [...fotosSelecionadasParaRelatorio, ...novasFotos.filter(f => f !== null)];
@@ -735,7 +732,6 @@ document.addEventListener('DOMContentLoaded', () => {
       corpoRelatorioDiv.appendChild(itemDiv);
     });
 
-    // --- RENDERIZAÇÃO DA ASSINATURA NO FINAL DO RELATÓRIO ---
     let assinaturaHtml = '';
     if (checkboxAssinatura.checked) {
       const nomeStr = inputNomeFiscal.value.trim() || 'Fiscal/Inspetor';

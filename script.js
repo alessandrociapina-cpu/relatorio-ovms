@@ -22,7 +22,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const inputCarregarProjeto = document.getElementById('inputCarregarProjeto');
   const autoSaveStatus = document.getElementById('autoSaveStatus');
 
-  // Assinatura
+  // Lógica da Assinatura
   const checkboxAssinatura = document.getElementById('incluirAssinatura');
   const inputImagemAssinatura = document.getElementById('imagemAssinatura');
   const btnAssinaturaLabel = document.getElementById('btnAssinaturaLabel');
@@ -154,17 +154,29 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
+  // ==========================================
+  // NOVA LÓGICA DE SALVAMENTO COM 5 SEGUNDOS
+  // ==========================================
+  let timeoutSalvarRascunho; 
+
   function salvarRascunhoLocal() {
-    try {
-      const estado = exportarEstado();
-      localStorage.setItem('ovms_rascunho', JSON.stringify(estado));
-      const agora = new Date();
-      autoSaveStatus.textContent = `✔ Salvo às ${agora.getHours()}:${String(agora.getMinutes()).padStart(2, '0')}`;
-      autoSaveStatus.style.color = 'green';
-    } catch (e) {
-      autoSaveStatus.textContent = `⚠️ Rascunho pesado. Use "Baixar Projeto" para salvar!`;
-      autoSaveStatus.style.color = '#d9534f';
-    }
+    clearTimeout(timeoutSalvarRascunho);
+    
+    autoSaveStatus.textContent = 'A digitar... (aguardando para salvar)';
+    autoSaveStatus.style.color = '#6c757d';
+
+    timeoutSalvarRascunho = setTimeout(() => {
+      try {
+        const estado = exportarEstado();
+        localStorage.setItem('ovms_rascunho', JSON.stringify(estado));
+        const agora = new Date();
+        autoSaveStatus.textContent = `✔ Salvo às ${agora.getHours()}:${String(agora.getMinutes()).padStart(2, '0')}`;
+        autoSaveStatus.style.color = 'green';
+      } catch (e) {
+        autoSaveStatus.textContent = `⚠️ Rascunho pesado. Use "Baixar Projeto" para salvar!`;
+        autoSaveStatus.style.color = '#d9534f';
+      }
+    }, 5000); // <-- 5 segundos de atraso
   }
 
   formVistoria.addEventListener('input', salvarRascunhoLocal);
@@ -397,7 +409,10 @@ document.addEventListener('DOMContentLoaded', () => {
       const legendaTextarea = document.createElement('textarea');
       legendaTextarea.placeholder = `Legenda para ${fotoInfo.fileName}`;
       legendaTextarea.value = fotoInfo.textoLegenda || ''; 
-      legendaTextarea.addEventListener('input', (e) => { fotoInfo.textoLegenda = e.target.value; salvarRascunhoLocal(); });
+      legendaTextarea.addEventListener('input', (e) => { 
+        fotoInfo.textoLegenda = e.target.value; 
+        salvarRascunhoLocal(); 
+      });
 
       const acoesDiv = document.createElement('div');
       acoesDiv.classList.add('acoes-foto');
@@ -735,7 +750,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let assinaturaHtml = '';
     if (checkboxAssinatura.checked) {
       const nomeStr = inputNomeFiscal.value.trim() || 'Fiscal/Inspetor';
-      const imgStr = assinaturaBase64 ? `<img src="${assinaturaBase64}" class="img-assinatura-pdf">` : `<div style="height: 50px;"></div>`;
+      const imgStr = assinaturaBase64 ? `<img src="${assinaturaBase64}" class="assinatura-imagem-limpa">` : `<div style="height: 50px;"></div>`;
       assinaturaHtml = `
         <div class="bloco-assinatura">
           ${imgStr}

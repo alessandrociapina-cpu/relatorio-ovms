@@ -18,13 +18,14 @@
     <h1>Relatório Fotográfico - OVMS</h1>
     
     <div style="text-align: center; font-size: 0.8em; color: #6c757d; margin-top: -15px; margin-bottom: 20px;">
-      Versão 15 | Última atualização: 09/03/2026
+      Versão 16 | Última atualização: 09/03/2026
       <span class="info-tooltip-container" tabindex="0">
         <span class="info-icon">ℹ️</span>
         <span class="info-tooltip-text">
-          <b>Novidades da Versão 15:</b><br><br>
-          • Inclusão do campo de <b>Cargo do Fiscal</b> (completamente personalizável) que aparece automaticamente na assinatura do PDF.<br>
-          • Inclusão deste painel interativo de informações de atualização.
+          <b>Novidades da Versão 16:</b><br><br>
+          • Correção no campo de Cargo: a opção "Outros" agora abre corretamente a caixa de digitação.<br>
+          • Assinatura no PDF atualizada: o relatório agora exibe perfeitamente o Cargo do fiscal abaixo do nome em vez do texto genérico.<br>
+          • Implementação do motor "Network First" para garantir que as atualizações chegam a 100% dos utilizadores imediatamente.
         </span>
       </span>
     </div>
@@ -186,7 +187,6 @@
     </div>
 
     <hr>
-
     <div id="area-relatorio">
       <div id="cabecalho-relatorio"></div>
       <div id="corpo-relatorio" class="corpo-relatorio-grid"></div>
@@ -198,7 +198,6 @@
     <div class="modal-conteudo" style="max-width: 900px; width: 95%;">
       <h3>Desenhar e Apontar</h3>
       <p style="font-size: 0.9em; color: #555; margin-top: -10px;">Marque os pontos de atenção na foto.</p>
-      
       <div class="editor-toolbar" style="margin-bottom: 10px; display: flex; gap: 10px; align-items: center; flex-wrap: wrap; background: #f8f9fa; padding: 10px; border-radius: 5px; width: 100%; box-sizing: border-box; border: 1px solid #ddd;">
         <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap; flex-grow: 1;">
           <span style="font-weight: bold; color: #444;">Ferramenta:</span>

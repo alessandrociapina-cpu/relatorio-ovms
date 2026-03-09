@@ -1,4 +1,5 @@
-const CACHE_NAME = 'ovms-app-v12'; // MUDADO PARA v12
+const CACHE_NAME = 'ovms-app-v13'; 
+// MUDADO PARA v13
 const urlsToCache = [
   './',
   './index.html',
@@ -32,3 +33,4 @@ self.addEventListener('activate', event => {
 self.addEventListener('fetch', event => {
   event.respondWith(caches.match(event.request).then(response => response || fetch(event.request)));
 });
+

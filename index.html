@@ -18,7 +18,15 @@
     <h1>Relatório Fotográfico - OVMS</h1>
     
     <div style="text-align: center; font-size: 0.8em; color: #6c757d; margin-top: -15px; margin-bottom: 20px;">
-      Versão 14 | Última atualização: 09/03/2026
+      Versão 15 | Última atualização: 09/03/2026
+      <span class="info-tooltip-container" tabindex="0">
+        <span class="info-icon">ℹ️</span>
+        <span class="info-tooltip-text">
+          <b>Novidades da Versão 15:</b><br><br>
+          • Inclusão do campo de <b>Cargo do Fiscal</b> (completamente personalizável) que aparece automaticamente na assinatura do PDF.<br>
+          • Inclusão deste painel interativo de informações de atualização.
+        </span>
+      </span>
     </div>
 
     <div class="secao-projeto" style="margin-bottom: 25px; padding: 15px; background: #eef2f5; border-radius: 6px; border: 1px solid #ced4da; display: flex; flex-wrap: wrap; gap: 10px; align-items: center;">
@@ -56,6 +64,19 @@
             <label for="imagemAssinatura" class="botao-secundario" id="btnAssinaturaLabel" style="margin:0; display:none; font-size:0.75em; padding:4px 8px; background-color:#6c757d;">📎 Anexar Imagem</label>
             <span id="assinaturaStatus" style="font-size:0.8em; color:green; display:none; font-weight:bold;">✔ OK</span>
             <button type="button" id="btnRemoverAssinatura" style="display:none; background:transparent; border:none; color:#d9534f; cursor:pointer; font-size:1em; padding:0; font-weight:bold;" title="Remover imagem da assinatura">✖</button>
+          </div>
+        </div>
+
+        <div class="campo-simples">
+          <label for="cargoFiscal">Cargo do Fiscal/Inspetor:</label>
+          <div class="linha-cargo">
+            <select id="cargoFiscal" name="cargoFiscal" class="input-select-largo" style="flex-grow: 1; max-width: 350px;">
+              <option value="Engenheiro Civil" selected>Engenheiro Civil</option>
+              <option value="Engenheiro">Engenheiro</option>
+              <option value="Técnico em Sistemas de Saneamento">Técnico em Sistemas de Saneamento</option>
+              <option value="Outros">Outros (Digite ao lado)...</option>
+            </select>
+            <input type="text" id="cargoFiscalOutros" name="cargoFiscalOutros" placeholder="Digite o cargo..." style="display: none; flex-grow: 1; max-width: 350px;">
           </div>
         </div>
 
@@ -244,12 +265,10 @@
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
         navigator.serviceWorker.register('sw.js').then(reg => {
-          // Força a verificação de atualizações no GitHub sempre que o app é aberto
           reg.update(); 
         });
       });
 
-      // Se o sistema detectar um código novo, recarrega a página sozinho!
       let refreshing = false;
       navigator.serviceWorker.addEventListener('controllerchange', () => {
         if (!refreshing) {

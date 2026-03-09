@@ -28,7 +28,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   selectCargo.addEventListener('change', (e) => {
     if (e.target.value === 'Outros') {
-      inputCargoOutros.style.display = 'block';
+      inputCargoOutros.style.display = 'inline-block';
       inputCargoOutros.focus();
     } else {
       inputCargoOutros.style.display = 'none';
@@ -156,8 +156,10 @@ document.addEventListener('DOMContentLoaded', () => {
       
       if (estado.form.cargo) selectCargo.value = estado.form.cargo;
       if (estado.form.cargo === 'Outros') {
-        inputCargoOutros.style.display = 'block';
+        inputCargoOutros.style.display = 'inline-block';
         inputCargoOutros.value = estado.form.cargoOutros || '';
+      } else {
+        inputCargoOutros.style.display = 'none';
       }
 
       checkboxAssinatura.checked = estado.form.incluirAssinatura || false;
@@ -772,9 +774,8 @@ document.addEventListener('DOMContentLoaded', () => {
       const nomeStr = inputNomeFiscal.value.trim() || 'Fiscal/Inspetor';
       const imgStr = assinaturaBase64 ? `<img src="${assinaturaBase64}" class="assinatura-imagem-limpa">` : `<div style="height: 50px;"></div>`;
       
-      // NOVA LOGICA DE CARGO NO PDF
+      // NOVA LÓGICA DE CARGO NO PDF: Substitui estritamente o cargo abaixo do nome
       let cargoFinal = selectCargo.value === 'Outros' ? inputCargoOutros.value.trim() : selectCargo.value;
-      if (!cargoFinal) cargoFinal = 'Sabesp'; // Caso escrevam "Outros" e deixem a caixa vazia
 
       assinaturaHtml = `
         <div class="bloco-assinatura">

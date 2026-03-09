@@ -1,5 +1,4 @@
-const CACHE_NAME = 'ovms-app-v13'; 
-// MUDADO PARA v13
+const CACHE_NAME = 'ovms-app-v14'; 
 const urlsToCache = [
   './',
   './index.html',
@@ -13,7 +12,7 @@ const urlsToCache = [
 ];
 
 self.addEventListener('install', event => {
-  self.skipWaiting();
+  self.skipWaiting(); // Força a instalação imediata
   event.waitUntil(caches.open(CACHE_NAME).then(cache => cache.addAll(urlsToCache)));
 });
 
@@ -27,10 +26,21 @@ self.addEventListener('activate', event => {
       );
     })
   );
-  self.clients.claim();
+  self.clients.claim(); // Assume o controle do aplicativo imediatamente
 });
 
 self.addEventListener('fetch', event => {
-  event.respondWith(caches.match(event.request).then(response => response || fetch(event.request)));
-});
+  // ESTRATÉGIA INTELIGENTE: Se for a página principal (HTML), tenta ir à internet primeiro!
+  // Isso garante que o número da versão e a interface mudem instantaneamente.
+  if (event.request.mode === 'navigate' || (event.request.headers.get('accept') && event.request.headers.get('accept').includes('text/html'))) {
+    event.respondWith(
+      fetch(event.request).catch(() => caches.match(event.request)) // Se estiver sem internet, usa o cache (Offline)
+    );
+    return;
+  }
 
+  // Para imagens, CSS e JS: Cache-First (Mantém o carregamento do app instantâneo)
+  event.respondWith(
+    caches.match(event.request).then(response => response || fetch(event.request))
+  );
+});

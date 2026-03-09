@@ -1,3 +1,243 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Relatório Fotográfico</title>
+  
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#007bff">
+  
+  <script src="https://cdn.jsdelivr.net/npm/exif-js"></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.css" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.js"></script>
+  <link rel="stylesheet" href="style.css"/>
+</head>
+<body>
+  <div class="container">
+    <h1>Relatório Fotográfico - OVMS</h1>
+    
+    <div style="text-align: center; font-size: 0.8em; color: #6c757d; margin-top: -15px; margin-bottom: 20px;">
+      Versão 14 | Última atualização: 09/03/2026
+    </div>
+
+    <div class="secao-projeto" style="margin-bottom: 25px; padding: 15px; background: #eef2f5; border-radius: 6px; border: 1px solid #ced4da; display: flex; flex-wrap: wrap; gap: 10px; align-items: center;">
+      <span style="font-weight: bold; color: #495057; margin-right: 10px;">Gerenciar Rascunho:</span>
+      <button id="btnSalvarProjeto" class="botao-principal" style="background-color: #17a2b8;">💾 Baixar Projeto</button>
+      <label for="inputCarregarProjeto" class="botao-secundario" style="margin: 0; background-color: #6c757d; color: white; cursor: pointer;">📂 Carregar Projeto</label>
+      <input type="file" id="inputCarregarProjeto" accept=".json" style="display:none;">
+      <span id="autoSaveStatus" style="font-size: 0.85em; color: #6c757d; font-style: italic; margin-left: auto;">Nenhum rascunho salvo</span>
+    </div>
+
+    <div class="secao-entrada">
+      <h2>1. Informações da Vistoria</h2>
+      <form id="form-vistoria">
+        <div class="campo-simples">
+          <label for="localVistoria">Local da Vistoria:</label>
+          <input type="text" id="localVistoria" name="localVistoria" required>
+        </div>
+        <div class="campo-simples">
+          <label for="dataVistoria">Data da Vistoria:</label>
+          <input type="date" id="dataVistoria" name="dataVistoria" required>
+        </div>
+        <div class="campo-simples">
+          <label for="horaVistoria">Hora da Vistoria:</label>
+          <input type="time" id="horaVistoria" name="horaVistoria">
+        </div>
+        
+        <div class="linha-fiscal">
+          <div class="campo-nome">
+            <label for="nomeFiscal">Nome do Fiscal/Inspetor:</label>
+            <input type="text" id="nomeFiscal" name="nomeFiscal" required>
+          </div>
+          <div class="caixa-assinatura">
+            <label><input type="checkbox" id="incluirAssinatura"> 📝 Assinar no rodapé</label>
+            <input type="file" id="imagemAssinatura" accept="image/*" style="display:none;">
+            <label for="imagemAssinatura" class="botao-secundario" id="btnAssinaturaLabel" style="margin:0; display:none; font-size:0.75em; padding:4px 8px; background-color:#6c757d;">📎 Anexar Imagem</label>
+            <span id="assinaturaStatus" style="font-size:0.8em; color:green; display:none; font-weight:bold;">✔ OK</span>
+            <button type="button" id="btnRemoverAssinatura" style="display:none; background:transparent; border:none; color:#d9534f; cursor:pointer; font-size:1em; padding:0; font-weight:bold;" title="Remover imagem da assinatura">✖</button>
+          </div>
+        </div>
+
+        <fieldset class="opcoes-relatorio">
+          <legend>Opções de Layout e Impressão</legend>
+          <div class="grupo-opcao">
+            <span class="grupo-label">Layout de colunas:</span>
+            <label><input type="radio" name="layoutColunas" value="2" checked> 2 colunas (padrão)</label>
+            <label><input type="radio" name="layoutColunas" value="1"> 1 coluna (fotos maiores)</label>
+          </div>
+          <div class="grupo-opcao">
+            <span class="grupo-label">Qualidade das imagens:</span>
+            <label><input type="radio" name="qualidadeImagens" value="media" checked> Média — 1024 px</label>
+            <label><input type="radio" name="qualidadeImagens" value="maxima"> Máxima — 1600 px</label>
+          </div>
+          <div class="grupo-opcao">
+            <span class="grupo-label">Margens de impressão:</span>
+            <label><input type="radio" name="margensImpressao" value="menores"> Menores (5 mm)</label>
+            <label><input type="radio" name="margensImpressao" value="maiores" checked> Maiores (15 mm) (padrão)</label>
+          </div>
+          <div class="grupo-opcao">
+            <span class="grupo-label">Fonte:</span>
+            <select id="fonteRelatorio" class="input-select">
+              <option value="Tahoma, sans-serif" selected>Tahoma</option>
+              <option value="Arial, sans-serif">Arial</option>
+              <option value="'Times New Roman', Times, serif">Times New Roman</option>
+              <option value="Calibri, sans-serif">Calibri</option>
+              <option value="Verdana, sans-serif">Verdana</option>
+            </select>
+            <span class="grupo-label" style="margin-left: 15px;">Tamanho:</span>
+            <select id="tamanhoFonteRelatorio" class="input-select">
+              <option value="9">9 pt</option>
+              <option value="10">10 pt</option>
+              <option value="11">11 pt</option>
+              <option value="12" selected>12 pt</option>
+              <option value="14">14 pt</option>
+            </select>
+          </div>
+        </fieldset>
+
+        <fieldset class="opcoes-relatorio">
+          <legend>Marca d'água (Logo)</legend>
+          <div class="grupo-opcao">
+            <label><input type="checkbox" id="usarMarcaDagua" checked> Inserir logo nas imagens</label>
+          </div>
+          <div id="opcoesMarcaDagua" style="display: flex; flex-direction: column; gap: 8px; margin-top: 10px;">
+            <div class="grupo-opcao" style="margin: 0;">
+              <span class="grupo-label">Canto:</span>
+              <select id="posicaoMarcaDagua" class="input-select">
+                <option value="bottom-right">Inferior Direito</option>
+                <option value="bottom-left">Inferior Esquerdo</option>
+                <option value="top-right">Superior Direito</option>
+                <option value="top-left">Superior Esquerdo</option>
+              </select>
+              <span class="grupo-label" style="margin-left: 15px;">Tamanho:</span>
+              <select id="tamanhoMarcaDagua" class="input-select">
+                <option value="logo-pequeno">Pequeno (1/4)</option>
+                <option value="logo-medio">Médio (1/2)</option>
+                <option value="logo-grande">Grande (1/1)</option>
+              </select>
+            </div>
+            <div class="grupo-opcao" style="margin: 0;">
+              <span class="grupo-label">Transparência:</span>
+              <input type="range" id="opacidadeMarcaDagua" min="10" max="100" value="70">
+              <span id="valorOpacidade" style="display:inline-block; width: 40px; font-weight:bold;">70%</span>
+            </div>
+          </div>
+        </fieldset>
+
+        <fieldset class="opcoes-relatorio">
+          <legend>Metadados e Segurança</legend>
+          <div class="grupo-opcao">
+            <label><input type="checkbox" id="usarMetadados" checked> Exibir Data, Hora e Coordenadas GPS nas fotos</label>
+          </div>
+          <p style="font-size: 0.85em; color: #d9534f; margin: 8px 0 0 0; line-height: 1.4; background-color: #fdf2f2; padding: 10px; border-left: 4px solid #d9534f; border-radius: 4px;">
+            <strong>⚠️ AVISO DE METADADOS:</strong> Se enviar uma foto pelo WhatsApp, o aplicativo apaga os dados de GPS.
+          </p>
+          <p style="font-size: 0.85em; color: #0c5460; margin: 10px 0 0 0; line-height: 1.4; background-color: #d1ecf1; padding: 10px; border-left: 4px solid #0c5460; border-radius: 4px;">
+            <strong>🔒 SEGURANÇA:</strong> Todo o processamento das imagens e geração do PDF ocorre na memória do seu navegador. 100% Offline.
+          </p>
+        </fieldset>
+      </form>
+    </div>
+
+    <div class="secao-fotos">
+      <h2>2. Seleção de Fotos e Legendas</h2>
+      <div style="display: flex; gap: 10px; margin-bottom: 15px; flex-wrap: wrap;">
+        <input type="file" id="selecionarFotos" accept="image/*" multiple style="display: none;">
+        <label for="selecionarFotos" class="botao-upload">Selecionar Fotos</label>
+        
+        <input type="file" id="selecionarVideo" accept="video/*" style="display: none;">
+        <label for="selecionarVideo" class="botao-secundario" style="background-color: #6c757d; color: white;">Extrair de Vídeo</label>
+      </div>
+      <div id="galeria-fotos-legenda" class="galeria-preview"></div>
+    </div>
+
+    <div class="secao-observacoes">
+      <h2>3. Observações Gerais</h2>
+      <textarea id="observacoesGerais" placeholder="Descreva aqui as observações gerais, serviços realizados..."></textarea>
+    </div>
+
+    <div class="secao-acao">
+      <button id="btnGerarRelatorio" class="botao-principal">Gerar Relatório</button>
+      <button id="btnGerarPDF" class="botao-secundario" title="Gera um PDF via caixa de impressão do navegador.">Gerar PDF</button>
+      <button id="btnAlternarPreview" class="botao-texto" title="Alterna a visualização de impressão na tela">Alternar pré-visualização</button>
+      <small class="nota-pdf">Para PDF, use “Salvar como PDF” (Chrome/Edge). <strong>Não utilizar CutePDF.</strong></small>
+    </div>
+
+    <hr>
+
+    <div id="area-relatorio">
+      <div id="cabecalho-relatorio"></div>
+      <div id="corpo-relatorio" class="corpo-relatorio-grid"></div>
+      <div id="observacoes-finais-relatorio"></div>
+    </div>
+  </div>
+
+  <div id="modalEditor" class="modal-oculto">
+    <div class="modal-conteudo" style="max-width: 900px; width: 95%;">
+      <h3>Desenhar e Apontar</h3>
+      <p style="font-size: 0.9em; color: #555; margin-top: -10px;">Marque os pontos de atenção na foto.</p>
+      
+      <div class="editor-toolbar" style="margin-bottom: 10px; display: flex; gap: 10px; align-items: center; flex-wrap: wrap; background: #f8f9fa; padding: 10px; border-radius: 5px; width: 100%; box-sizing: border-box; border: 1px solid #ddd;">
+        <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap; flex-grow: 1;">
+          <span style="font-weight: bold; color: #444;">Ferramenta:</span>
+          <label style="cursor: pointer;"><input type="radio" name="ferramentaEdicao" value="seta" checked> ↗️ Seta</label>
+          <label style="cursor: pointer;"><input type="radio" name="ferramentaEdicao" value="circulo"> ⭕ Elipse</label>
+          <label style="cursor: pointer;"><input type="radio" name="ferramentaEdicao" value="texto"> 🔠 Texto</label>
+          <input type="text" id="textoEdicao" placeholder="1. Digite o texto e 2. Clique na foto" style="display:none; padding: 6px; border: 1px solid #ccc; border-radius: 4px; flex-grow: 1; min-width: 200px;">
+        </div>
+        <div style="border-left: 2px solid #ddd; padding-left: 15px; display: flex; gap: 5px; align-items: center;">
+          <span style="font-weight: bold; color: #444; margin-right: 5px;">Zoom:</span>
+          <button id="btnZoomOut" class="botao-secundario" style="padding: 2px 10px; font-weight: bold; margin: 0;">-</button>
+          <span id="zoomLabel" style="min-width: 45px; text-align: center; font-weight: bold;">100%</span>
+          <button id="btnZoomIn" class="botao-secundario" style="padding: 2px 10px; font-weight: bold; margin: 0;">+</button>
+        </div>
+      </div>
+      <div class="canvas-container" style="height: 60vh; width: 100%; background: #e9ecef; border: 1px solid #ccc; overflow: auto; text-align: center; margin-bottom: 15px; border-radius: 5px;">
+        <canvas id="canvasEditor" style="max-width: 100%; max-height: 60vh; margin: auto; display: block;"></canvas>
+      </div>
+      <div class="modal-acoes">
+        <button id="btnSalvarEdicao" class="botao-principal">Salvar Imagem</button>
+        <button id="btnDesfazerSeta" class="botao-secundario">Desfazer Última</button>
+        <button id="btnFecharModal" class="botao-texto">Cancelar</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="modalCrop" class="modal-oculto">
+    <div class="modal-conteudo" style="max-width: 900px; width: 95%;">
+      <h3>Recortar Imagem</h3>
+      <p style="font-size: 0.9em; color: #555; margin-top: -10px;">Ajuste a área para focar no detalhe principal da patologia.</p>
+      <div style="height: 60vh; width: 100%; background: #e9ecef; border: 1px solid #ccc; display: flex; justify-content: center; align-items: center; overflow: hidden; margin-bottom: 15px; border-radius: 5px;">
+        <img id="imgCrop" style="max-width: 100%; max-height: 100%; display: block;" src="">
+      </div>
+      <div class="modal-acoes">
+        <button id="btnAplicarCrop" class="botao-principal">Aplicar Recorte</button>
+        <button id="btnFecharCrop" class="botao-texto">Cancelar</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="modalVideo" class="modal-oculto">
+    <div class="modal-conteudo">
+      <h3>Extrair Frame do Vídeo</h3>
+      <p style="font-size: 0.9em; color: #555; margin-top: -10px;">Use os controles para encontrar o momento exato e clique em Capturar.</p>
+      <div class="video-container" style="text-align: center; background: #000; margin-bottom: 15px; border-radius: 4px; width: 100%;">
+        <video id="videoPlayer" style="max-width: 100%; max-height: 50vh;" controls></video>
+      </div>
+      <div class="video-controles" style="display: flex; gap: 10px; align-items: center; margin-bottom: 15px; width: 100%;">
+        <button id="btnVideoRewind" class="botao-secundario" style="padding: 5px 10px;">⏪ -0.1s</button>
+        <input type="range" id="videoSlider" min="0" max="100" value="0" step="0.01" style="flex-grow: 1; cursor: pointer;">
+        <button id="btnVideoForward" class="botao-secundario" style="padding: 5px 10px;">+0.1s ⏩</button>
+      </div>
+      <div class="modal-acoes">
+        <button id="btnCapturarFrame" class="botao-principal" style="background-color: #28a745;">📸 Capturar Frame</button>
+        <button id="btnFecharModalVideo" class="botao-secundario">Concluir e Fechar</button>
+      </div>
+      <p id="msgFrameCapturado" style="color: green; font-weight: bold; display: none; margin-top: 10px; text-align: center;">✔ Frame capturado e adicionado à galeria!</p>
+    </div>
+  </div>
+
   <script src="script.js"></script>
   
   <script>

@@ -274,8 +274,26 @@ document.addEventListener('DOMContentLoaded', () => {
   const radiosMargens = formVistoria.querySelectorAll('input[name="margensImpressao"]');
 
   inputSelecionarFotos.addEventListener('change', handleFotosSelecionadas);
+  
   btnGerarRelatorio.addEventListener('click', (e) => { e.preventDefault(); gerarRelatorio(true); });
-  btnGerarPDF.addEventListener('click', async (e) => { e.preventDefault(); await gerarRelatorio(true); setTimeout(() => window.print(), 100); });
+  
+  // ===== LÓGICA ATUALIZADA DO BOTÃO DE PDF (TÍTULO DINÂMICO PARA CABEÇALHO) =====
+  btnGerarPDF.addEventListener('click', async (e) => { 
+    e.preventDefault(); 
+    await gerarRelatorio(true); 
+    
+    // Altera temporariamente o título do documento para o Cabeçalho do PDF ficar bonito
+    const tituloOriginal = document.title;
+    let nomeObra = inputLocalVistoria.value.trim();
+    document.title = nomeObra ? `Relatório Fotográfico - ${nomeObra}` : 'Relatório Fotográfico - OVMS';
+    
+    setTimeout(() => { 
+      window.print(); 
+      // Retorna o título original após abrir a caixa de impressão
+      document.title = tituloOriginal;
+    }, 500); 
+  });
+
   btnAlternarPreview.addEventListener('click', () => { document.body.classList.toggle('preview-print'); areaRelatorio.scrollIntoView({ behavior: 'smooth', block: 'start' }); });
 
   function lerMetadadosExif(file) {
@@ -774,7 +792,6 @@ document.addEventListener('DOMContentLoaded', () => {
       const nomeStr = inputNomeFiscal.value.trim() || 'Fiscal/Inspetor';
       const imgStr = assinaturaBase64 ? `<img src="${assinaturaBase64}" class="assinatura-imagem-limpa">` : `<div style="height: 50px;"></div>`;
       
-      // NOVA LÓGICA DE CARGO NO PDF: Substitui estritamente o cargo abaixo do nome
       let cargoFinal = selectCargo.value === 'Outros' ? inputCargoOutros.value.trim() : selectCargo.value;
 
       assinaturaHtml = `

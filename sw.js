@@ -1,4 +1,4 @@
-const CACHE_NAME = 'ovms-app-v11'; 
+const CACHE_NAME = 'ovms-app-v12'; // MUDADO PARA v12
 const urlsToCache = [
   './',
   './index.html',

@@ -28,33 +28,30 @@
     <div class="secao-entrada">
       <h2>1. Informações da Vistoria</h2>
       <form id="form-vistoria">
-        <div>
+        <div class="campo-simples">
           <label for="localVistoria">Local da Vistoria:</label>
           <input type="text" id="localVistoria" name="localVistoria" required>
         </div>
-        <div>
+        <div class="campo-simples">
           <label for="dataVistoria">Data da Vistoria:</label>
           <input type="date" id="dataVistoria" name="dataVistoria" required>
         </div>
-        <div>
+        <div class="campo-simples">
           <label for="horaVistoria">Hora da Vistoria:</label>
           <input type="time" id="horaVistoria" name="horaVistoria">
         </div>
         
-        <div>
-          <label for="nomeFiscal">Nome do Fiscal/Inspetor:</label>
-          <div style="display: flex; flex-wrap: wrap; gap: 10px; align-items: center;">
-            <input type="text" id="nomeFiscal" name="nomeFiscal" required style="flex-grow: 1; margin-bottom: 0; min-width: 200px;">
-            
-            <div style="background: #eef2f5; padding: 6px 12px; border-radius: 4px; border: 1px solid #ccc; display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
-              <label style="margin:0; cursor:pointer; display:flex; align-items:center; gap:5px; font-weight: normal; font-size: 0.9em;">
-                <input type="checkbox" id="incluirAssinatura"> 📝 Assinar no rodapé
-              </label>
-              <input type="file" id="imagemAssinatura" accept="image/*" style="display:none;">
-              <label for="imagemAssinatura" class="botao-secundario" id="btnAssinaturaLabel" style="margin:0; display:none; font-size:0.75em; padding:4px 8px; background-color:#6c757d;">📎 Anexar Imagem</label>
-              <span id="assinaturaStatus" style="font-size:0.8em; color:green; display:none; font-weight:bold;">✔ Carregada</span>
-              <button type="button" id="btnRemoverAssinatura" style="display:none; background:transparent; border:none; color:#d9534f; cursor:pointer; font-size:1em; padding:0; font-weight:bold;" title="Remover imagem da assinatura">✖</button>
-            </div>
+        <div class="linha-fiscal">
+          <div class="campo-nome">
+            <label for="nomeFiscal">Nome do Fiscal/Inspetor:</label>
+            <input type="text" id="nomeFiscal" name="nomeFiscal" required>
+          </div>
+          <div class="caixa-assinatura">
+            <label><input type="checkbox" id="incluirAssinatura"> 📝 Assinar no rodapé</label>
+            <input type="file" id="imagemAssinatura" accept="image/*" style="display:none;">
+            <label for="imagemAssinatura" class="botao-secundario" id="btnAssinaturaLabel" style="margin:0; display:none; font-size:0.75em; padding:4px 8px; background-color:#6c757d;">📎 Anexar Imagem</label>
+            <span id="assinaturaStatus" style="font-size:0.8em; color:green; display:none; font-weight:bold;">✔ OK</span>
+            <button type="button" id="btnRemoverAssinatura" style="display:none; background:transparent; border:none; color:#d9534f; cursor:pointer; font-size:1em; padding:0; font-weight:bold;" title="Remover imagem da assinatura">✖</button>
           </div>
         </div>
 
@@ -130,10 +127,10 @@
             <label><input type="checkbox" id="usarMetadados" checked> Exibir Data, Hora e Coordenadas GPS nas fotos</label>
           </div>
           <p style="font-size: 0.85em; color: #d9534f; margin: 8px 0 0 0; line-height: 1.4; background-color: #fdf2f2; padding: 10px; border-left: 4px solid #d9534f; border-radius: 4px;">
-            <strong>⚠️ AVISO DE METADADOS:</strong> Se você enviar uma foto pelo WhatsApp, o aplicativo "limpa" os dados de GPS e Data para economizar espaço e proteger a privacidade. Portanto, a leitura automática só vai funcionar se a foto for original.
+            <strong>⚠️ AVISO DE METADADOS:</strong> Se enviar uma foto pelo WhatsApp, o aplicativo apaga os dados de GPS.
           </p>
           <p style="font-size: 0.85em; color: #0c5460; margin: 10px 0 0 0; line-height: 1.4; background-color: #d1ecf1; padding: 10px; border-left: 4px solid #0c5460; border-radius: 4px;">
-            <strong>🔒 SEGURANÇA DA INFORMAÇÃO:</strong> Este sistema opera de forma local <strong>(Client-Side)</strong>. Todo o processamento das imagens e geração do PDF ocorre na memória do seu navegador. Nenhuma foto é enviada para servidores externos.
+            <strong>🔒 SEGURANÇA:</strong> Todo o processamento das imagens e geração do PDF ocorre na memória do seu navegador. 100% Offline.
           </p>
         </fieldset>
       </form>
@@ -144,7 +141,6 @@
       <div style="display: flex; gap: 10px; margin-bottom: 15px; flex-wrap: wrap;">
         <input type="file" id="selecionarFotos" accept="image/*" multiple style="display: none;">
         <label for="selecionarFotos" class="botao-upload">Selecionar Fotos</label>
-
         <input type="file" id="selecionarVideo" accept="video/*" style="display: none;">
         <label for="selecionarVideo" class="botao-secundario" style="background-color: #6c757d; color: white;">Extrair de Vídeo</label>
       </div>
@@ -164,7 +160,6 @@
     </div>
 
     <hr>
-
     <div id="area-relatorio">
       <div id="cabecalho-relatorio"></div>
       <div id="corpo-relatorio" class="corpo-relatorio-grid"></div>
@@ -176,7 +171,6 @@
     <div class="modal-conteudo" style="max-width: 900px; width: 95%;">
       <h3>Desenhar e Apontar</h3>
       <p style="font-size: 0.9em; color: #555; margin-top: -10px;">Marque os pontos de atenção na foto.</p>
-      
       <div class="editor-toolbar" style="margin-bottom: 10px; display: flex; gap: 10px; align-items: center; flex-wrap: wrap; background: #f8f9fa; padding: 10px; border-radius: 5px; width: 100%; box-sizing: border-box; border: 1px solid #ddd;">
         <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap; flex-grow: 1;">
           <span style="font-weight: bold; color: #444;">Ferramenta:</span>

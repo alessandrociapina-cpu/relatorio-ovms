@@ -1,6 +1,4 @@
-const CACHE_NAME = 'ovms-app-v8'; // MUDADO PARA v8
-// ... resto do arquivo sw.js anterior ...
-
+const CACHE_NAME = 'ovms-app-v11'; 
 const urlsToCache = [
   './',
   './index.html',
@@ -34,4 +32,3 @@ self.addEventListener('activate', event => {
 self.addEventListener('fetch', event => {
   event.respondWith(caches.match(event.request).then(response => response || fetch(event.request)));
 });
-

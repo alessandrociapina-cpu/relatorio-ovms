@@ -1,4 +1,4 @@
-const CACHE_NAME = 'ovms-app-v16'; 
+const CACHE_NAME = 'ovms-app-v17'; 
 
 self.addEventListener('install', event => {
   self.skipWaiting();
@@ -17,22 +17,14 @@ self.addEventListener('activate', event => {
   self.clients.claim();
 });
 
-// Estratégia "Network First": Tenta sempre buscar o arquivo da internet primeiro.
-// Se falhar (modo Offline), ele busca do cache.
 self.addEventListener('fetch', event => {
+  if (event.request.mode === 'navigate' || (event.request.headers.get('accept') && event.request.headers.get('accept').includes('text/html'))) {
+    event.respondWith(
+      fetch(event.request).catch(() => caches.match(event.request))
+    );
+    return;
+  }
   event.respondWith(
-    fetch(event.request)
-      .then(response => {
-        // Atualiza o cache silenciosamente com a versão mais nova
-        const clone = response.clone();
-        caches.open(CACHE_NAME).then(cache => {
-          cache.put(event.request, clone);
-        });
-        return response;
-      })
-      .catch(() => {
-        // Sem internet? Usa o cache salvo.
-        return caches.match(event.request);
-      })
+    caches.match(event.request).then(response => response || fetch(event.request))
   );
 });

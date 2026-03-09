@@ -22,6 +22,22 @@ document.addEventListener('DOMContentLoaded', () => {
   const inputCarregarProjeto = document.getElementById('inputCarregarProjeto');
   const autoSaveStatus = document.getElementById('autoSaveStatus');
 
+  // Lógica do Cargo do Fiscal
+  const selectCargo = document.getElementById('cargoFiscal');
+  const inputCargoOutros = document.getElementById('cargoFiscalOutros');
+
+  selectCargo.addEventListener('change', (e) => {
+    if (e.target.value === 'Outros') {
+      inputCargoOutros.style.display = 'block';
+      inputCargoOutros.focus();
+    } else {
+      inputCargoOutros.style.display = 'none';
+      inputCargoOutros.value = '';
+    }
+    salvarRascunhoLocal();
+  });
+  inputCargoOutros.addEventListener('input', salvarRascunhoLocal);
+
   // Lógica da Assinatura
   const checkboxAssinatura = document.getElementById('incluirAssinatura');
   const inputImagemAssinatura = document.getElementById('imagemAssinatura');
@@ -124,7 +140,9 @@ document.addEventListener('DOMContentLoaded', () => {
         local: inputLocalVistoria.value, data: inputDataVistoria.value, hora: inputHoraVistoria.value,
         fiscal: inputNomeFiscal.value, obs: inputObservacoes.value,
         incluirAssinatura: checkboxAssinatura.checked,
-        assinaturaUrl: assinaturaBase64
+        assinaturaUrl: assinaturaBase64,
+        cargo: selectCargo.value,
+        cargoOutros: inputCargoOutros.value
       },
       fotos: fotosSelecionadasParaRelatorio
     };
@@ -136,6 +154,12 @@ document.addEventListener('DOMContentLoaded', () => {
       inputHoraVistoria.value = estado.form.hora || ''; inputNomeFiscal.value = estado.form.fiscal || '';
       inputObservacoes.value = estado.form.obs || '';
       
+      if (estado.form.cargo) selectCargo.value = estado.form.cargo;
+      if (estado.form.cargo === 'Outros') {
+        inputCargoOutros.style.display = 'block';
+        inputCargoOutros.value = estado.form.cargoOutros || '';
+      }
+
       checkboxAssinatura.checked = estado.form.incluirAssinatura || false;
       assinaturaBase64 = estado.form.assinaturaUrl || null;
       
@@ -154,14 +178,10 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  // ==========================================
-  // NOVA LÓGICA DE SALVAMENTO COM 5 SEGUNDOS
-  // ==========================================
   let timeoutSalvarRascunho; 
 
   function salvarRascunhoLocal() {
     clearTimeout(timeoutSalvarRascunho);
-    
     autoSaveStatus.textContent = 'A digitar... (aguardando para salvar)';
     autoSaveStatus.style.color = '#6c757d';
 
@@ -176,7 +196,7 @@ document.addEventListener('DOMContentLoaded', () => {
         autoSaveStatus.textContent = `⚠️ Rascunho pesado. Use "Baixar Projeto" para salvar!`;
         autoSaveStatus.style.color = '#d9534f';
       }
-    }, 5000); // <-- 5 segundos de atraso
+    }, 5000); 
   }
 
   formVistoria.addEventListener('input', salvarRascunhoLocal);
@@ -751,12 +771,17 @@ document.addEventListener('DOMContentLoaded', () => {
     if (checkboxAssinatura.checked) {
       const nomeStr = inputNomeFiscal.value.trim() || 'Fiscal/Inspetor';
       const imgStr = assinaturaBase64 ? `<img src="${assinaturaBase64}" class="assinatura-imagem-limpa">` : `<div style="height: 50px;"></div>`;
+      
+      // NOVA LOGICA DE CARGO NO PDF
+      let cargoFinal = selectCargo.value === 'Outros' ? inputCargoOutros.value.trim() : selectCargo.value;
+      if (!cargoFinal) cargoFinal = 'Sabesp'; // Caso escrevam "Outros" e deixem a caixa vazia
+
       assinaturaHtml = `
         <div class="bloco-assinatura">
           ${imgStr}
           <div class="linha-assinatura"></div>
           <strong>${nomeStr}</strong>
-          <span style="font-size: 0.85em; color: #555;">Sabesp</span>
+          <span style="font-size: 0.85em; color: #555;">${cargoFinal}</span>
         </div>
       `;
     }

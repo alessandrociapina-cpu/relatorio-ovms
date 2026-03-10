@@ -1,345 +1,87 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Relatório Fotográfico</title>
-  
-  <link rel="manifest" href="manifest.json">
-  <meta name="theme-color" content="#007bff">
-  
-  <script src="https://cdn.jsdelivr.net/npm/exif-js"></script>
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.css" rel="stylesheet">
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.js"></script>
-  <link rel="stylesheet" href="style.css"/>
-</head>
-<body>
-  <div class="container">
-    <h1>Relatório Fotográfico - OVMS</h1>
-    
-    <div style="text-align: center; font-size: 0.8em; color: #6c757d; margin-top: -15px; margin-bottom: 20px;">
-      Versão 19 | Última atualização: 10/03/2026
-      <span class="info-tooltip-container" tabindex="0">
-        <span class="info-icon">ℹ️</span>
-        <span class="info-tooltip-text" style="width: 320px; max-height: 350px; overflow-y: auto; text-align: left;">
-          <b>Novidades da Versão 19:</b><br><br>
-          • <b>Documentação Integrada:</b> Foi adicionado um botão para visualizar a Documentação Técnica, Histórico de Atualizações e Avaliação de Segurança diretamente no sistema.
-        </span>
-      </span>
-    </div>
-
-    <div class="secao-projeto" style="margin-bottom: 25px; padding: 15px; background: #eef2f5; border-radius: 6px; border: 1px solid #ced4da; display: flex; flex-wrap: wrap; gap: 10px; align-items: center;">
-      <span style="font-weight: bold; color: #495057; margin-right: 10px;">Gerenciar Rascunho:</span>
-      <button id="btnSalvarProjeto" class="botao-principal" style="background-color: #17a2b8;">💾 Baixar Projeto</button>
-      <label for="inputCarregarProjeto" class="botao-secundario" style="margin: 0; background-color: #6c757d; color: white; cursor: pointer;">📂 Carregar Projeto</label>
-      <input type="file" id="inputCarregarProjeto" accept=".json" style="display:none;">
-      
-      <button id="btnVerDocs" class="botao-secundario" style="background-color: #343a40; color: white; margin-left: auto;">📄 Documentação</button>
-      
-      <span id="autoSaveStatus" style="font-size: 0.85em; color: #6c757d; font-style: italic; margin-left: 10px; width: 100%; text-align: right;">Nenhum rascunho salvo</span>
-    </div>
-
-    <div class="secao-entrada">
-      <h2>1. Informações da Vistoria</h2>
-      <form id="form-vistoria">
-        <div class="campo-simples">
-          <label for="localVistoria">Local da Vistoria:</label>
-          <input type="text" id="localVistoria" name="localVistoria" required>
-        </div>
-        <div class="campo-simples">
-          <label for="dataVistoria">Data da Vistoria:</label>
-          <input type="date" id="dataVistoria" name="dataVistoria" required>
-        </div>
-        <div class="campo-simples">
-          <label for="horaVistoria">Hora da Vistoria:</label>
-          <input type="time" id="horaVistoria" name="horaVistoria">
-        </div>
-        
-        <div class="linha-fiscal">
-          <div class="campo-nome">
-            <label for="nomeFiscal">Nome do Fiscal/Inspetor:</label>
-            <input type="text" id="nomeFiscal" name="nomeFiscal" required>
-          </div>
-          <div class="caixa-assinatura">
-            <label><input type="checkbox" id="incluirAssinatura"> 📝 Assinar no rodapé</label>
-            <input type="file" id="imagemAssinatura" accept="image/*" style="display:none;">
-            <label for="imagemAssinatura" class="botao-secundario" id="btnAssinaturaLabel" style="margin:0; display:none; font-size:0.75em; padding:4px 8px; background-color:#6c757d;">📎 Anexar Imagem</label>
-            <span id="assinaturaStatus" style="font-size:0.8em; color:green; display:none; font-weight:bold;">✔ OK</span>
-            <button type="button" id="btnRemoverAssinatura" style="display:none; background:transparent; border:none; color:#d9534f; cursor:pointer; font-size:1em; padding:0; font-weight:bold;" title="Remover imagem da assinatura">✖</button>
-          </div>
-        </div>
-
-        <div class="campo-simples">
-          <label for="cargoFiscal">Cargo do Fiscal/Inspetor:</label>
-          <div class="linha-cargo">
-            <select id="cargoFiscal" name="cargoFiscal" class="input-select-largo" style="flex-grow: 1; max-width: 350px;">
-              <option value="Engenheiro Civil" selected>Engenheiro Civil</option>
-              <option value="Engenheiro">Engenheiro</option>
-              <option value="Técnico em Sistemas de Saneamento">Técnico em Sistemas de Saneamento</option>
-              <option value="Outros">Outros (Digite ao lado)...</option>
-            </select>
-            <input type="text" id="cargoFiscalOutros" name="cargoFiscalOutros" placeholder="Digite o cargo..." style="display: none; flex-grow: 1; max-width: 350px;">
-          </div>
-        </div>
-
-        <fieldset class="opcoes-relatorio">
-          <legend>Opções de Layout e Impressão</legend>
-          <div class="grupo-opcao">
-            <span class="grupo-label">Layout de colunas:</span>
-            <label><input type="radio" name="layoutColunas" value="2" checked> 2 colunas (padrão)</label>
-            <label><input type="radio" name="layoutColunas" value="1"> 1 coluna (fotos maiores)</label>
-          </div>
-          <div class="grupo-opcao">
-            <span class="grupo-label">Qualidade das imagens:</span>
-            <label><input type="radio" name="qualidadeImagens" value="media" checked> Média — 1024 px</label>
-            <label><input type="radio" name="qualidadeImagens" value="maxima"> Máxima — 1600 px</label>
-          </div>
-          <div class="grupo-opcao">
-            <span class="grupo-label">Margens de impressão:</span>
-            <label><input type="radio" name="margensImpressao" value="menores"> Menores (5 mm)</label>
-            <label><input type="radio" name="margensImpressao" value="maiores" checked> Maiores (15 mm) (padrão)</label>
-          </div>
-          <div class="grupo-opcao">
-            <span class="grupo-label">Fonte:</span>
-            <select id="fonteRelatorio" class="input-select">
-              <option value="Tahoma, sans-serif" selected>Tahoma</option>
-              <option value="Arial, sans-serif">Arial</option>
-              <option value="'Times New Roman', Times, serif">Times New Roman</option>
-              <option value="Calibri, sans-serif">Calibri</option>
-              <option value="Verdana, sans-serif">Verdana</option>
-            </select>
-            <span class="grupo-label" style="margin-left: 15px;">Tamanho:</span>
-            <select id="tamanhoFonteRelatorio" class="input-select">
-              <option value="9">9 pt</option>
-              <option value="10">10 pt</option>
-              <option value="11">11 pt</option>
-              <option value="12" selected>12 pt</option>
-              <option value="14">14 pt</option>
-            </select>
-          </div>
-        </fieldset>
-
-        <fieldset class="opcoes-relatorio">
-          <legend>Marca d'água (Logo)</legend>
-          <div class="grupo-opcao">
-            <label><input type="checkbox" id="usarMarcaDagua" checked> Inserir logo nas imagens</label>
-          </div>
-          <div id="opcoesMarcaDagua" style="display: flex; flex-direction: column; gap: 8px; margin-top: 10px;">
-            <div class="grupo-opcao" style="margin: 0;">
-              <span class="grupo-label">Canto:</span>
-              <select id="posicaoMarcaDagua" class="input-select">
-                <option value="bottom-right">Inferior Direito</option>
-                <option value="bottom-left">Inferior Esquerdo</option>
-                <option value="top-right">Superior Direito</option>
-                <option value="top-left">Superior Esquerdo</option>
-              </select>
-              <span class="grupo-label" style="margin-left: 15px;">Tamanho:</span>
-              <select id="tamanhoMarcaDagua" class="input-select">
-                <option value="logo-pequeno">Pequeno (1/4)</option>
-                <option value="logo-medio">Médio (1/2)</option>
-                <option value="logo-grande">Grande (1/1)</option>
-              </select>
-            </div>
-            <div class="grupo-opcao" style="margin: 0;">
-              <span class="grupo-label">Transparência:</span>
-              <input type="range" id="opacidadeMarcaDagua" min="10" max="100" value="70">
-              <span id="valorOpacidade" style="display:inline-block; width: 40px; font-weight:bold;">70%</span>
-            </div>
-          </div>
-        </fieldset>
-
-        <fieldset class="opcoes-relatorio">
-          <legend>Metadados e Segurança</legend>
-          <div class="grupo-opcao">
-            <label><input type="checkbox" id="usarMetadados" checked> Exibir Data, Hora e Coordenadas GPS nas fotos</label>
-          </div>
-          <p style="font-size: 0.85em; color: #d9534f; margin: 8px 0 0 0; line-height: 1.4; background-color: #fdf2f2; padding: 10px; border-left: 4px solid #d9534f; border-radius: 4px;">
-            <strong>⚠️ AVISO DE METADADOS:</strong> Se enviar uma foto pelo WhatsApp, o aplicativo apaga os dados de GPS.
-          </p>
-          <p style="font-size: 0.85em; color: #0c5460; margin: 10px 0 0 0; line-height: 1.4; background-color: #d1ecf1; padding: 10px; border-left: 4px solid #0c5460; border-radius: 4px;">
-            <strong>🔒 SEGURANÇA:</strong> Todo o processamento das imagens e geração do PDF ocorre na memória do seu navegador. 100% Offline.
-          </p>
-        </fieldset>
-      </form>
-    </div>
-
-    <div class="secao-fotos">
-      <h2>2. Seleção de Fotos e Legendas</h2>
-      <div style="display: flex; gap: 10px; margin-bottom: 15px; flex-wrap: wrap;">
-        <input type="file" id="selecionarFotos" accept="image/*" multiple style="display: none;">
-        <label for="selecionarFotos" class="botao-upload">Selecionar Fotos</label>
-        
-        <input type="file" id="selecionarVideo" accept="video/*" style="display: none;">
-        <label for="selecionarVideo" class="botao-secundario" style="background-color: #6c757d; color: white;">Extrair de Vídeo</label>
-      </div>
-      <div id="galeria-fotos-legenda" class="galeria-preview"></div>
-    </div>
-
-    <div class="secao-observacoes">
-      <h2>3. Observações Gerais</h2>
-      <textarea id="observacoesGerais" placeholder="Descreva aqui as observações gerais, serviços realizados..."></textarea>
-    </div>
-
-    <div class="secao-acao">
-      <button id="btnGerarRelatorio" class="botao-principal">Gerar Relatório</button>
-      <button id="btnGerarPDF" class="botao-secundario" title="Gera um PDF via caixa de impressão do navegador.">Gerar PDF</button>
-      <button id="btnAlternarPreview" class="botao-texto" title="Alterna a visualização de impressão na tela">Alternar pré-visualização</button>
-      <small class="nota-pdf">Para mostrar <strong>Números de Página</strong>, marque "Cabeçalhos e rodapés" na hora de salvar o PDF.</small>
-    </div>
-
-    <hr>
-    <div id="area-relatorio">
-      <div id="cabecalho-relatorio"></div>
-      <div id="corpo-relatorio" class="corpo-relatorio-grid"></div>
-      <div id="observacoes-finais-relatorio"></div>
-    </div>
-  </div>
-
-  <div id="modalDocs" class="modal-oculto">
-    <div class="modal-conteudo" style="max-width: 850px; width: 95%;">
-      <h3 style="margin-top: 0; color: #007bff;">Documentação do Sistema</h3>
-      <div style="width: 100%; height: 60vh; overflow-y: auto; text-align: justify; background: #f8f9fa; padding: 20px; border: 1px solid #ccc; border-radius: 5px; font-size: 0.95em; line-height: 1.6; color: #333; box-sizing: border-box;">
-        
-        <h4 style="color: #333; border-bottom: 1px solid #ddd; padding-bottom: 5px;">1. Visão Geral</h4>
-        <p>O Sistema de Relatório Fotográfico OVMS é uma aplicação web progressiva (PWA) projetada para a elaboração de laudos periciais e relatórios de vistoria em campo. A ferramenta permite o preenchimento de dados de inspeção, processamento de imagens (com extração de metadados geográficos), edição visual, e geração de documentos em formato PDF padronizado.</p>
-        <p>A sua principal característica é o funcionamento <strong>100% Client-Side</strong> (processamento local) e <strong>Offline-First</strong>, garantindo alta disponibilidade em locais sem internet e adequação às políticas de segurança da informação.</p>
-
-        <h4 style="color: #333; border-bottom: 1px solid #ddd; padding-bottom: 5px;">2. Arquitetura e Tecnologias</h4>
-        <ul style="padding-left: 20px;">
-          <li><strong>Linguagens:</strong> HTML5, CSS3, JavaScript (ES6+).</li>
-          <li><strong>PWA:</strong> Utiliza manifesto e Service Worker para instalação nativa no Windows, Android e iOS.</li>
-          <li><strong>Bibliotecas de Terceiros:</strong> <code>exif-js</code> (metadados geográficos) e <code>cropper.js</code> (recorte visual).</li>
-        </ul>
-
-        <h4 style="color: #333; border-bottom: 1px solid #ddd; padding-bottom: 5px;">3. Arquivos e Componentes Utilizados</h4>
-        <ul style="padding-left: 20px;">
-          <li style="margin-bottom: 8px;"><strong>index.html:</strong> Contém a estrutura semântica da interface, painéis de formulário, contêineres de impressão dinâmicos, modais flutuantes e o gatilho de atualização automática (Network First).</li>
-          <li style="margin-bottom: 8px;"><strong>style.css:</strong> Define a identidade visual, responsividade avançada para dispositivos móveis e as regras estritas de formatação de quebra de páginas em impressão de PDFs (<code>@media print</code>).</li>
-          <li style="margin-bottom: 8px;"><strong>script.js:</strong> O núcleo lógico da aplicação. Controla a manipulação do DOM, o processamento de imagens via Canvas (marca d'água, desenho, redimensionamento), sistema de assinatura digital e a gestão assíncrona do Auto-Save.</li>
-          <li style="margin-bottom: 8px;"><strong>sw.js:</strong> Arquivo do <i>Service Worker</i> que gerencia o motor de cache inteligente e garante o funcionamento Offline da ferramenta após o primeiro carregamento.</li>
-          <li style="margin-bottom: 8px;"><strong>manifest.json:</strong> Arquivo de propriedades do PWA que fornece o nome, cores de tema e diretrizes para os sistemas operativos instalarem o sistema na Área de Trabalho ou ecrã inicial.</li>
-          <li style="margin-bottom: 8px;"><strong>exif.js / exif-js.txt:</strong> Biblioteca open-source matemática para decodificar dados ocultos das fotografias (como Latitude e Longitude).</li>
-          <li style="margin-bottom: 8px;"><strong>cropper.min.js / cropper.min.css:</strong> Framework visual e folha de estilos para o módulo de reenquadramento de fotografias.</li>
-          <li style="margin-bottom: 8px;"><strong>sabesp-logo.png:</strong> Arquivo base do logotipo injetado no cabeçalho e na rotina de sobreposição transparente das fotos.</li>
-          <li><strong>icon-192.png / icon-512.png:</strong> Conjunto de ícones oficiais em diferentes resoluções necessários para a interface PWA e ícones de atalho do sistema operativo.</li>
-        </ul>
-
-        <h4 style="color: #333; border-bottom: 1px solid #ddd; padding-bottom: 5px;">4. Funcionalidades Principais</h4>
-        <ul style="padding-left: 20px;">
-          <li><strong>Processamento de Imagens:</strong> Redimensionamento automático no lado do cliente para poupar memória do dispositivo.</li>
-          <li><strong>Recuperação de GPS:</strong> Leitura universal de coordenadas EXIF e <i>fallback</i> para captura nativa da antena em caso de censura do SO móvel.</li>
-          <li><strong>Laboratório de Edição:</strong> Modais para rotacionar, recortar e desenhar vetores (setas, texto) diretamente sobre evidências.</li>
-          <li><strong>Extração de Vídeo:</strong> Leitor para capturar frames fotográficos diretamente de gravações em campo.</li>
-          <li><strong>Gestão de Rascunho (Auto-Save):</strong> Implementação de temporizador (<i>Debounce</i> de 5s) para salvamento silencioso sem causar engasgos em celulares. Exportação física do projeto em <code>.json</code>.</li>
-          <li><strong>Motor Dinâmico de PDF:</strong> Injeção dinâmica do título do documento na hora da impressão para gerar rodapés limpos e enumerados nativamente pelo navegador.</li>
-        </ul>
-
-        <h4 style="color: #333; border-bottom: 1px solid #ddd; padding-bottom: 5px;">Apêndice A: Histórico de Atualizações</h4>
-        <ul style="padding-left: 20px;">
-          <li><strong>v1 a v3:</strong> Correção do Bug "Null Island". Fotos sem GPS ou do WhatsApp não quebram mais a função de leitura gerando 0.000000.</li>
-          <li><strong>v4 a v5:</strong> Contorno de Censura de Privacidade Mobile. Inserção de botão para aceder ao GPS do navegador quando o sistema operativo móvel apaga os metadados da foto submetida.</li>
-          <li><strong>v6 a v9:</strong> Otimização Responsiva e Assinatura Digital de Peritos, com redimensionamento inteligente na linha.</li>
-          <li><strong>v10 a v11:</strong> Resolução do Bug de "Lag/Engasgo". Implementação do <i>Debounce</i> de 5 segundos no Auto-Save durante a digitação de legendas.</li>
-          <li><strong>v12 a v16:</strong> Implementação do Motor de Atualização (<i>Network First</i>), que quebra o cache teimoso e força as atualizações nos dispositivos da equipa. Implementação do seletor flexível do Cargo do Fiscal na assinatura do PDF.</li>
-          <li><strong>v17 a v18:</strong> Alteração temporária dinâmica no título (<code>document.title</code>) para gerar paginação automática e nativa na caixa de impressão (Cabeçalhos limpos). Criação de janelas flutuantes interativas (Tooltips) informativas.</li>
-          <li><strong>v19:</strong> Inserção do módulo de Documentação Técnica e Revisão Corporativa integradas à aplicação.</li>
-        </ul>
-
-        <h4 style="color: #333; border-bottom: 1px solid #ddd; padding-bottom: 5px;">Apêndice B: Verificação de Segurança Corporativa</h4>
-        <p><strong>1. Zero Transmissão Externa:</strong> A aplicação é estritamente Client-Side. Nenhum dado ou foto sai da máquina local em direção à internet, garantindo compliance automático com LGPD e sigilo de informações de campo.</p>
-        <p><strong>2. Imunidade a Firewalls:</strong> O sistema possui arquitetura para funcionamento local, sobrevivendo a bloqueios de rede restritivos através da sua instalação Sandbox como App (PWA).</p>
-        <p><strong>3. Bibliotecas de Terceiros:</strong> Todos os scripts auxiliares (<i>exif</i> e <i>cropper</i>) executam exclusivamente funções matemáticas estáticas no navegador. O sistema está livre de telemetrias externas ou mecanismos espiões (<i>trackers</i>).</p>
-        <p><strong>Conclusão:</strong> A arquitetura descentralizada (PWA Offline) configura um ambiente de risco extremamente baixo para adoção corporativa, com alta resiliência contra vazamentos de informações e excelente isolamento técnico.</p>
-
-      </div>
-      <div class="modal-acoes" style="margin-top: 15px;">
-        <button id="btnFecharDocs" class="botao-principal">Fechar Documentação</button>
-      </div>
-    </div>
-  </div>
-
-  <div id="modalEditor" class="modal-oculto">
-    <div class="modal-conteudo" style="max-width: 900px; width: 95%;">
-      <h3>Desenhar e Apontar</h3>
-      <p style="font-size: 0.9em; color: #555; margin-top: -10px;">Marque os pontos de atenção na foto.</p>
-      <div class="editor-toolbar" style="margin-bottom: 10px; display: flex; gap: 10px; align-items: center; flex-wrap: wrap; background: #f8f9fa; padding: 10px; border-radius: 5px; width: 100%; box-sizing: border-box; border: 1px solid #ddd;">
-        <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap; flex-grow: 1;">
-          <span style="font-weight: bold; color: #444;">Ferramenta:</span>
-          <label style="cursor: pointer;"><input type="radio" name="ferramentaEdicao" value="seta" checked> ↗️ Seta</label>
-          <label style="cursor: pointer;"><input type="radio" name="ferramentaEdicao" value="circulo"> ⭕ Elipse</label>
-          <label style="cursor: pointer;"><input type="radio" name="ferramentaEdicao" value="texto"> 🔠 Texto</label>
-          <input type="text" id="textoEdicao" placeholder="1. Digite o texto e 2. Clique na foto" style="display:none; padding: 6px; border: 1px solid #ccc; border-radius: 4px; flex-grow: 1; min-width: 200px;">
-        </div>
-        <div style="border-left: 2px solid #ddd; padding-left: 15px; display: flex; gap: 5px; align-items: center;">
-          <span style="font-weight: bold; color: #444; margin-right: 5px;">Zoom:</span>
-          <button id="btnZoomOut" class="botao-secundario" style="padding: 2px 10px; font-weight: bold; margin: 0;">-</button>
-          <span id="zoomLabel" style="min-width: 45px; text-align: center; font-weight: bold;">100%</span>
-          <button id="btnZoomIn" class="botao-secundario" style="padding: 2px 10px; font-weight: bold; margin: 0;">+</button>
-        </div>
-      </div>
-      <div class="canvas-container" style="height: 60vh; width: 100%; background: #e9ecef; border: 1px solid #ccc; overflow: auto; text-align: center; margin-bottom: 15px; border-radius: 5px;">
-        <canvas id="canvasEditor" style="max-width: 100%; max-height: 60vh; margin: auto; display: block;"></canvas>
-      </div>
-      <div class="modal-acoes">
-        <button id="btnSalvarEdicao" class="botao-principal">Salvar Imagem</button>
-        <button id="btnDesfazerSeta" class="botao-secundario">Desfazer Última</button>
-        <button id="btnFecharModal" class="botao-texto">Cancelar</button>
-      </div>
-    </div>
-  </div>
-
-  <div id="modalCrop" class="modal-oculto">
-    <div class="modal-conteudo" style="max-width: 900px; width: 95%;">
-      <h3>Recortar Imagem</h3>
-      <p style="font-size: 0.9em; color: #555; margin-top: -10px;">Ajuste a área para focar no detalhe principal da patologia.</p>
-      <div style="height: 60vh; width: 100%; background: #e9ecef; border: 1px solid #ccc; display: flex; justify-content: center; align-items: center; overflow: hidden; margin-bottom: 15px; border-radius: 5px;">
-        <img id="imgCrop" style="max-width: 100%; max-height: 100%; display: block;" src="">
-      </div>
-      <div class="modal-acoes">
-        <button id="btnAplicarCrop" class="botao-principal">Aplicar Recorte</button>
-        <button id="btnFecharCrop" class="botao-texto">Cancelar</button>
-      </div>
-    </div>
-  </div>
-
-  <div id="modalVideo" class="modal-oculto">
-    <div class="modal-conteudo">
-      <h3>Extrair Frame do Vídeo</h3>
-      <p style="font-size: 0.9em; color: #555; margin-top: -10px;">Use os controles para encontrar o momento exato e clique em Capturar.</p>
-      <div class="video-container" style="text-align: center; background: #000; margin-bottom: 15px; border-radius: 4px; width: 100%;">
-        <video id="videoPlayer" style="max-width: 100%; max-height: 50vh;" controls></video>
-      </div>
-      <div class="video-controles" style="display: flex; gap: 10px; align-items: center; margin-bottom: 15px; width: 100%;">
-        <button id="btnVideoRewind" class="botao-secundario" style="padding: 5px 10px;">⏪ -0.1s</button>
-        <input type="range" id="videoSlider" min="0" max="100" value="0" step="0.01" style="flex-grow: 1; cursor: pointer;">
-        <button id="btnVideoForward" class="botao-secundario" style="padding: 5px 10px;">+0.1s ⏩</button>
-      </div>
-      <div class="modal-acoes">
-        <button id="btnCapturarFrame" class="botao-principal" style="background-color: #28a745;">📸 Capturar Frame</button>
-        <button id="btnFecharModalVideo" class="botao-secundario">Concluir e Fechar</button>
-      </div>
-      <p id="msgFrameCapturado" style="color: green; font-weight: bold; display: none; margin-top: 10px; text-align: center;">✔ Frame capturado e adicionado à galeria!</p>
-    </div>
-  </div>
-
-  <script src="script.js"></script>
-  
-  <script>
-    if ('serviceWorker' in navigator) {
-      window.addEventListener('load', () => {
-        navigator.serviceWorker.register('sw.js').then(reg => {
-          reg.update(); 
-        });
-      });
-
-      let refreshing = false;
-      navigator.serviceWorker.addEventListener('controllerchange', () => {
-        if (!refreshing) {
-          refreshing = true;
-          window.location.reload(); 
-        }
-      });
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Documentação - Relatório OVMS</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    .doc-container {
+      max-width: 850px;
+      margin: 40px auto;
+      background: #fff;
+      padding: 30px;
+      border-radius: 8px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+      line-height: 1.6;
+      color: #333;
     }
-  </script>
+    .doc-container h2 { text-align: center; color: #007bff; margin-top: 0; border-bottom: 2px solid #eee; padding-bottom: 15px; }
+    .doc-container h4 { color: #333; border-bottom: 1px solid #ddd; padding-bottom: 5px; margin-top: 30px; }
+    .doc-container ul { padding-left: 20px; }
+    .doc-container li { margin-bottom: 8px; }
+    .doc-container p { text-align: justify; }
+  </style>
+</head>
+<body style="background-color: #f4f4f4;">
+  <div class="doc-container">
+    <h2>📄 Documentação Técnica do Sistema</h2>
+    
+    <h4>1. Visão Geral</h4>
+    <p>O Sistema de Relatório Fotográfico OVMS é uma aplicação web progressiva (PWA) projetada para a elaboração de laudos periciais e relatórios de vistoria em campo. A ferramenta permite o preenchimento de dados de inspeção, processamento de imagens (com extração de metadados geográficos), edição visual, e geração de documentos em formato PDF padronizado.</p>
+    <p>A sua principal característica é o funcionamento <strong>100% Client-Side</strong> (processamento local) e <strong>Offline-First</strong>, garantindo alta disponibilidade em locais sem internet e adequação às políticas de segurança da informação.</p>
+
+    <h4>2. Arquitetura e Tecnologias</h4>
+    <ul>
+      <li><strong>Linguagens:</strong> HTML5, CSS3, JavaScript (ES6+).</li>
+      <li><strong>PWA:</strong> Utiliza manifesto e Service Worker para instalação nativa no Windows, Android e iOS.</li>
+      <li><strong>Bibliotecas de Terceiros:</strong> <code>exif-js</code> (metadados geográficos) e <code>cropper.js</code> (recorte visual).</li>
+    </ul>
+
+    <h4>3. Arquivos e Componentes Utilizados</h4>
+    <ul>
+      <li><strong>index.html:</strong> Contém a estrutura semântica da interface, painéis de formulário, contêineres de impressão dinâmicos, modais flutuantes e o gatilho de atualização automática (Network First).</li>
+      <li><strong>style.css:</strong> Define a identidade visual, responsividade avançada para dispositivos móveis e as regras estritas de formatação de quebra de páginas em impressão de PDFs (<code>@media print</code>).</li>
+      <li><strong>script.js:</strong> O núcleo lógico da aplicação. Controla a manipulação do DOM, o processamento de imagens via Canvas (marca d'água, desenho, redimensionamento), sistema de assinatura digital e a gestão assíncrona do Auto-Save.</li>
+      <li><strong>sw.js:</strong> Arquivo do <i>Service Worker</i> que gerencia o motor de cache inteligente e garante o funcionamento Offline da ferramenta após o primeiro carregamento.</li>
+      <li><strong>documentacao.html:</strong> Página dedicada à documentação técnica e histórico de versões.</li>
+      <li><strong>manifest.json:</strong> Arquivo de propriedades do PWA que fornece o nome, cores de tema e diretrizes para os sistemas operativos instalarem o sistema na Área de Trabalho ou ecrã inicial.</li>
+      <li><strong>exif.js / exif-js.txt:</strong> Biblioteca open-source matemática para decodificar dados ocultos das fotografias (como Latitude e Longitude).</li>
+      <li><strong>cropper.min.js / cropper.min.css:</strong> Framework visual e folha de estilos para o módulo de reenquadramento de fotografias.</li>
+      <li><strong>sabesp-logo.png:</strong> Arquivo base do logotipo injetado no cabeçalho e na rotina de sobreposição transparente das fotos.</li>
+      <li><strong>icon-192.png / icon-512.png:</strong> Conjunto de ícones oficiais em diferentes resoluções necessários para a interface PWA.</li>
+    </ul>
+
+    <h4>4. Funcionalidades Principais</h4>
+    <ul>
+      <li><strong>Processamento de Imagens:</strong> Redimensionamento automático no lado do cliente para poupar memória do dispositivo.</li>
+      <li><strong>Recuperação de GPS:</strong> Leitura universal de coordenadas EXIF e <i>fallback</i> para captura nativa da antena em caso de censura do SO móvel.</li>
+      <li><strong>Laboratório de Edição:</strong> Modais para rotacionar, recortar e desenhar vetores (setas, texto) diretamente sobre evidências.</li>
+      <li><strong>Extração de Vídeo:</strong> Leitor para capturar frames fotográficos diretamente de gravações em campo.</li>
+      <li><strong>Gestão de Rascunho (Auto-Save):</strong> Implementação de temporizador (<i>Debounce</i> de 5s) para salvamento silencioso sem causar engasgos em celulares. Exportação física do projeto em <code>.json</code>.</li>
+      <li><strong>Motor Dinâmico de PDF:</strong> Injeção dinâmica do título do documento na hora da impressão para gerar rodapés limpos e enumerados nativamente pelo navegador.</li>
+    </ul>
+
+    <h4>Apêndice A: Histórico de Atualizações</h4>
+    <ul>
+      <li><strong>v1 a v3:</strong> Correção do Bug "Null Island". Fotos sem GPS ou do WhatsApp não quebram mais a função de leitura gerando 0.000000.</li>
+      <li><strong>v4 a v5:</strong> Contorno de Censura de Privacidade Mobile. Inserção de botão para aceder ao GPS do navegador quando o sistema operativo móvel apaga os metadados da foto.</li>
+      <li><strong>v6 a v9:</strong> Otimização Responsiva e Assinatura Digital de Peritos, com redimensionamento inteligente na linha.</li>
+      <li><strong>v10 a v11:</strong> Resolução do Bug de "Lag/Engasgo". Implementação do <i>Debounce</i> de 5 segundos no Auto-Save durante a digitação de legendas.</li>
+      <li><strong>v12 a v16:</strong> Implementação do Motor de Atualização (<i>Network First</i>), que quebra o cache teimoso e força as atualizações nos dispositivos da equipa. Implementação do seletor flexível do Cargo do Fiscal na assinatura do PDF.</li>
+      <li><strong>v17 a v18:</strong> Alteração temporária dinâmica no título (<code>document.title</code>) para gerar paginação automática e nativa na caixa de impressão (Cabeçalhos limpos). Criação de janelas flutuantes interativas (Tooltips).</li>
+      <li><strong>v19 a v20:</strong> Inserção do módulo de Documentação Técnica isolado em página própria (Aba/Janela separada).</li>
+    </ul>
+
+    <h4>Apêndice B: Verificação de Segurança Corporativa</h4>
+    <p><strong>1. Zero Transmissão Externa:</strong> A aplicação é estritamente Client-Side. Nenhum dado ou foto sai da máquina local em direção à internet, garantindo compliance automático com LGPD e sigilo de informações de campo.</p>
+    <p><strong>2. Imunidade a Firewalls:</strong> O sistema possui arquitetura para funcionamento local, sobrevivendo a bloqueios de rede restritivos através da sua instalação Sandbox como App (PWA).</p>
+    <p><strong>3. Bibliotecas de Terceiros:</strong> Todos os scripts auxiliares (<i>exif</i> e <i>cropper</i>) executam exclusivamente funções matemáticas estáticas no navegador. O sistema está livre de telemetrias externas ou mecanismos espiões (<i>trackers</i>).</p>
+    <p><strong>Conclusão:</strong> A arquitetura descentralizada (PWA Offline) configura um ambiente de risco extremamente baixo para adoção corporativa, com alta resiliência contra vazamentos de informações e excelente isolamento técnico.</p>
+    
+    <div style="text-align: center; margin-top: 40px;">
+      <button onclick="window.close()" class="botao-secundario">Fechar Guia</button>
+    </div>
+  </div>
 </body>
 </html>

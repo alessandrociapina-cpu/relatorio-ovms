@@ -42,10 +42,13 @@ document.addEventListener('DOMContentLoaded', () => {
   const btnAssinaturaLabel = document.getElementById('btnAssinaturaLabel');
   const assinaturaStatus = document.getElementById('assinaturaStatus');
   const btnRemoverAssinatura = document.getElementById('btnRemoverAssinatura');
+  const dicaAssinatura = document.getElementById('dicaAssinatura');
   let assinaturaBase64 = null;
 
   checkboxAssinatura.addEventListener('change', (e) => {
     btnAssinaturaLabel.style.display = e.target.checked ? 'inline-block' : 'none';
+    dicaAssinatura.style.display = e.target.checked ? 'block' : 'none';
+    
     if (!e.target.checked) {
       assinaturaBase64 = null;
       inputImagemAssinatura.value = '';
@@ -131,7 +134,6 @@ document.addEventListener('DOMContentLoaded', () => {
     activeBtn.style.backgroundColor = '#28a745';
   }
 
-  // Correção Aplicada: Adicionado o e.preventDefault() para garantir que os botões não recarregam a página
   btnCropLivre.addEventListener('click', (e) => { e.preventDefault(); if(cropperInstancia) { cropperInstancia.setAspectRatio(NaN); setCropActiveBtn(btnCropLivre); } });
   btnCrop43.addEventListener('click', (e) => { e.preventDefault(); if(cropperInstancia) { cropperInstancia.setAspectRatio(4/3); setCropActiveBtn(btnCrop43); } });
   btnCrop34.addEventListener('click', (e) => { e.preventDefault(); if(cropperInstancia) { cropperInstancia.setAspectRatio(3/4); setCropActiveBtn(btnCrop34); } });
@@ -181,6 +183,8 @@ document.addEventListener('DOMContentLoaded', () => {
       assinaturaBase64 = estado.form.assinaturaUrl || null;
       
       btnAssinaturaLabel.style.display = checkboxAssinatura.checked ? 'inline-block' : 'none';
+      dicaAssinatura.style.display = checkboxAssinatura.checked ? 'block' : 'none';
+      
       if(assinaturaBase64 && checkboxAssinatura.checked) {
          assinaturaStatus.style.display = 'inline-block';
          btnRemoverAssinatura.style.display = 'inline-block';

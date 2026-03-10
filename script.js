@@ -22,7 +22,6 @@ document.addEventListener('DOMContentLoaded', () => {
   const inputCarregarProjeto = document.getElementById('inputCarregarProjeto');
   const autoSaveStatus = document.getElementById('autoSaveStatus');
 
-  // Lógica do Cargo do Fiscal
   const selectCargo = document.getElementById('cargoFiscal');
   const inputCargoOutros = document.getElementById('cargoFiscalOutros');
 
@@ -38,7 +37,6 @@ document.addEventListener('DOMContentLoaded', () => {
   });
   inputCargoOutros.addEventListener('input', salvarRascunhoLocal);
 
-  // Lógica da Assinatura
   const checkboxAssinatura = document.getElementById('incluirAssinatura');
   const inputImagemAssinatura = document.getElementById('imagemAssinatura');
   const btnAssinaturaLabel = document.getElementById('btnAssinaturaLabel');
@@ -118,8 +116,25 @@ document.addEventListener('DOMContentLoaded', () => {
   const imgCrop = document.getElementById('imgCrop');
   const btnAplicarCrop = document.getElementById('btnAplicarCrop');
   const btnFecharCrop = document.getElementById('btnFecharCrop');
+  
+  // BOTÕES DE PROPORÇÃO DO CROP
+  const btnCropLivre = document.getElementById('btnCropLivre');
+  const btnCrop43 = document.getElementById('btnCrop43');
+  const btnCrop34 = document.getElementById('btnCrop34');
+  
   let cropperInstancia = null;
   let fotoAtualCropIndex = null;
+
+  function setCropActiveBtn(activeBtn) {
+    [btnCropLivre, btnCrop43, btnCrop34].forEach(btn => {
+      btn.style.backgroundColor = '#6c757d';
+    });
+    activeBtn.style.backgroundColor = '#28a745';
+  }
+
+  btnCropLivre.addEventListener('click', () => { if(cropperInstancia) { cropperInstancia.setAspectRatio(NaN); setCropActiveBtn(btnCropLivre); } });
+  btnCrop43.addEventListener('click', () => { if(cropperInstancia) { cropperInstancia.setAspectRatio(4/3); setCropActiveBtn(btnCrop43); } });
+  btnCrop34.addEventListener('click', () => { if(cropperInstancia) { cropperInstancia.setAspectRatio(3/4); setCropActiveBtn(btnCrop34); } });
 
   const inputSelecionarVideo = document.getElementById('selecionarVideo');
   const modalVideo = document.getElementById('modalVideo');
@@ -557,6 +572,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const foto = fotosSelecionadasParaRelatorio[index];
     imgCrop.src = foto.previewDataUrl; 
     modalCrop.classList.remove('modal-oculto');
+    
+    // Zera o estado dos botões sempre que abrir o modal
+    setCropActiveBtn(btnCropLivre);
 
     imgCrop.onload = () => {
       if(cropperInstancia) cropperInstancia.destroy();

@@ -1,7 +1,20 @@
-const CACHE_NAME = 'ovms-app-v19'; 
+const CACHE_NAME = 'ovms-app-v20'; 
+const urlsToCache = [
+  './',
+  './index.html',
+  './documentacao.html',
+  './style.css',
+  './script.js',
+  './manifest.json',
+  './sabesp-logo.png',
+  'https://cdn.jsdelivr.net/npm/exif-js',
+  'https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.css',
+  'https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.js'
+];
 
 self.addEventListener('install', event => {
   self.skipWaiting();
+  event.waitUntil(caches.open(CACHE_NAME).then(cache => cache.addAll(urlsToCache)));
 });
 
 self.addEventListener('activate', event => {

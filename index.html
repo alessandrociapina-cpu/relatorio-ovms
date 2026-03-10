@@ -18,14 +18,14 @@
     <h1>Relatório Fotográfico - OVMS</h1>
     
     <div class="versao-info" style="text-align: center; font-size: 0.8em; color: #6c757d; margin-top: -15px; margin-bottom: 20px;">
-      Versão 24 | Última atualização: 10/03/2026
+      Versão 25 | Última atualização: 10/03/2026
       <span class="info-tooltip-container" tabindex="0">
         <span class="info-icon">ℹ️</span>
         <span class="info-tooltip-text" style="width: 320px; max-height: 350px; overflow-y: auto; text-align: left;">
           <b>Últimas Atualizações:</b><br><br>
-          <b>v24:</b> Correção de Bug nos botões de proporção (4:3 e 3:4) da ferramenta de Recorte. Atualização da documentação técnica e inclusão de "travão" para não recarregar a tela.<br><br>
-          <b>v23:</b> Adicionado aviso orientativo sobre captura em 4:3 paisagem e botões inteligentes de Crop.<br><br>
-          <b>v22:</b> Retorno do histórico flutuante com bloqueio total na impressão em PDF.
+          <b>v25:</b> Avisos de Metadados e Segurança detalhados. Inclusão de dica flutuante para tratar assinaturas transparentes com a ferramenta remove.bg.<br><br>
+          <b>v24:</b> Correção de Bug nos botões de proporção (4:3 e 3:4) da ferramenta de Recorte.<br><br>
+          <b>v23:</b> Adicionado aviso orientativo sobre captura em 4:3 paisagem e botões inteligentes de Crop.
         </span>
       </span>
     </div>
@@ -79,12 +79,16 @@
           </div>
         </div>
 
-        <div class="caixa-assinatura">
+        <div class="caixa-assinatura" style="flex-wrap: wrap;">
           <label><input type="checkbox" id="incluirAssinatura"> 📝 Assinar no rodapé</label>
           <input type="file" id="imagemAssinatura" accept="image/*" style="display:none;">
           <label for="imagemAssinatura" class="botao-secundario" id="btnAssinaturaLabel" style="margin:0; display:none; font-size:0.75em; padding:4px 8px; background-color:#6c757d;">📎 Anexar Imagem</label>
           <span id="assinaturaStatus" style="font-size:0.8em; color:green; display:none; font-weight:bold;">✔ OK</span>
           <button type="button" id="btnRemoverAssinatura" style="display:none; background:transparent; border:none; color:#d9534f; cursor:pointer; font-size:1em; padding:0; font-weight:bold;" title="Remover imagem da assinatura">✖</button>
+          
+          <div id="dicaAssinatura" style="display:none; font-size: 0.85em; color: #555; background: #fff3cd; padding: 10px; border-left: 4px solid #ffeeba; border-radius: 4px; margin-top: 10px; width: 100%; box-sizing: border-box; line-height: 1.5;">
+            <strong>💡 Dica Profissional:</strong> Para a assinatura não esconder a linha do documento, utilize uma foto com <strong>fundo transparente</strong>. Você pode remover o fundo branco da sua assinatura facilmente e de graça através do site <a href="https://www.remove.bg/pt-br" target="_blank" rel="noopener noreferrer" style="color: #007bff; font-weight: bold;">remove.bg</a> antes de anexá-la aqui.
+          </div>
         </div>
 
         <fieldset class="opcoes-relatorio">
@@ -158,12 +162,20 @@
           <div class="grupo-opcao">
             <label><input type="checkbox" id="usarMetadados" checked> Exibir Data, Hora e Coordenadas GPS nas fotos</label>
           </div>
-          <p style="font-size: 0.85em; color: #d9534f; margin: 8px 0 0 0; line-height: 1.4; background-color: #fdf2f2; padding: 10px; border-left: 4px solid #d9534f; border-radius: 4px;">
-            <strong>⚠️ AVISO DE METADADOS:</strong> Se enviar uma foto pelo WhatsApp, o aplicativo apaga os dados de GPS.
-          </p>
-          <p style="font-size: 0.85em; color: #0c5460; margin: 10px 0 0 0; line-height: 1.4; background-color: #d1ecf1; padding: 10px; border-left: 4px solid #0c5460; border-radius: 4px;">
-            <strong>🔒 SEGURANÇA:</strong> Todo o processamento das imagens e geração do PDF ocorre na memória do seu navegador. 100% Offline.
-          </p>
+          
+          <div style="font-size: 0.85em; color: #856404; margin: 12px 0 0 0; line-height: 1.5; background-color: #fff3cd; padding: 12px; border-left: 4px solid #ffeeba; border-radius: 4px;">
+            <strong>⚠️ AVISO DE METADADOS E PERDA DE GPS:</strong>
+            <ul style="margin: 8px 0 0 20px; padding: 0;">
+              <li style="margin-bottom: 5px;">Aplicativos como <strong>WhatsApp</strong> apagam automaticamente os dados de localização (GPS) das fotos por segurança. Ao utilizar fotos recebidas por eles, o sistema não conseguirá ler o GPS original.</li>
+              <li style="margin-bottom: 5px;"><strong>Uso em Computador (Desktop):</strong> Prefira transferir as fotografias do telemóvel para o PC via <strong>Cabo USB</strong> ou em anexo original por <strong>E-mail</strong>, preservando assim a localização intacta.</li>
+              <li><strong>Uso no Campo (Celular):</strong> Caso a foto fique sem GPS devido a restrições do sistema do telemóvel, basta clicar no botão <strong>"📍 Atualizar GPS pelo Celular"</strong>, logo abaixo da foto inserida, para forçar a captura das coordenadas atuais no terreno.</li>
+            </ul>
+          </div>
+          
+          <div style="font-size: 0.85em; color: #0c5460; margin: 12px 0 0 0; line-height: 1.5; background-color: #d1ecf1; padding: 12px; border-left: 4px solid #17a2b8; border-radius: 4px;">
+            <strong>🔒 SEGURANÇA E PRIVACIDADE:</strong>
+            <p style="margin: 5px 0 0 0;">Este sistema opera com arquitetura <i>100% Client-Side (Offline)</i>. Isso significa que todo o processamento de imagens, recortes e geração do PDF final acontece <strong>exclusivamente na memória do seu próprio dispositivo</strong>. Nenhuma foto, informação de vistoria, assinatura ou localização GPS é enviada para a internet ou salva em servidores externos, garantindo sigilo absoluto, adequação corporativa e cumprimento estrito da LGPD.</p>
+          </div>
         </fieldset>
       </form>
     </div>

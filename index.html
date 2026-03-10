@@ -17,13 +17,14 @@
   <div class="container">
     <h1>Relatório Fotográfico - OVMS</h1>
     
-    <div style="text-align: center; font-size: 0.8em; color: #6c757d; margin-top: -15px; margin-bottom: 20px;">
-      Versão 20 | Última atualização: 10/03/2026
+    <div class="versao-info" style="text-align: center; font-size: 0.8em; color: #6c757d; margin-top: -15px; margin-bottom: 20px;">
+      Versão 21 | Última atualização: 10/03/2026
       <span class="info-tooltip-container" tabindex="0">
         <span class="info-icon">ℹ️</span>
         <span class="info-tooltip-text" style="width: 320px; max-height: 350px; overflow-y: auto; text-align: left;">
-          <b>Novidades da Versão 20:</b><br><br>
-          • <b>Documentação Separada:</b> A documentação técnica e o histórico de atualizações agora abrem em uma nova guia dedicada, permitindo leitura simultânea durante o preenchimento do relatório.
+          <b>Novidades da Versão 21:</b><br><br>
+          • <b>Otimização de Layout:</b> Data/Hora e Nome/Cargo agora ocupam campos menores partilhando a mesma linha, ganhando espaço vertical no ecrã.<br>
+          • <b>Limpeza na Impressão:</b> O texto da versão foi configurado para não aparecer na impressão final.
         </span>
       </span>
     </div>
@@ -46,40 +47,43 @@
           <label for="localVistoria">Local da Vistoria:</label>
           <input type="text" id="localVistoria" name="localVistoria" required>
         </div>
-        <div class="campo-simples">
-          <label for="dataVistoria">Data da Vistoria:</label>
-          <input type="date" id="dataVistoria" name="dataVistoria" required>
-        </div>
-        <div class="campo-simples">
-          <label for="horaVistoria">Hora da Vistoria:</label>
-          <input type="time" id="horaVistoria" name="horaVistoria">
+        
+        <div class="linha-dupla">
+          <div class="campo-metade">
+            <label for="dataVistoria">Data da Vistoria:</label>
+            <input type="date" id="dataVistoria" name="dataVistoria" required>
+          </div>
+          <div class="campo-metade">
+            <label for="horaVistoria">Hora da Vistoria:</label>
+            <input type="time" id="horaVistoria" name="horaVistoria">
+          </div>
         </div>
         
-        <div class="linha-fiscal">
-          <div class="campo-nome">
+        <div class="linha-dupla">
+          <div class="campo-metade">
             <label for="nomeFiscal">Nome do Fiscal/Inspetor:</label>
             <input type="text" id="nomeFiscal" name="nomeFiscal" required>
           </div>
-          <div class="caixa-assinatura">
-            <label><input type="checkbox" id="incluirAssinatura"> 📝 Assinar no rodapé</label>
-            <input type="file" id="imagemAssinatura" accept="image/*" style="display:none;">
-            <label for="imagemAssinatura" class="botao-secundario" id="btnAssinaturaLabel" style="margin:0; display:none; font-size:0.75em; padding:4px 8px; background-color:#6c757d;">📎 Anexar Imagem</label>
-            <span id="assinaturaStatus" style="font-size:0.8em; color:green; display:none; font-weight:bold;">✔ OK</span>
-            <button type="button" id="btnRemoverAssinatura" style="display:none; background:transparent; border:none; color:#d9534f; cursor:pointer; font-size:1em; padding:0; font-weight:bold;" title="Remover imagem da assinatura">✖</button>
+          <div class="campo-metade">
+            <label for="cargoFiscal">Cargo do Fiscal/Inspetor:</label>
+            <div style="display: flex; gap: 5px;">
+              <select id="cargoFiscal" name="cargoFiscal" class="input-select-largo" style="flex-grow: 1;">
+                <option value="Engenheiro Civil" selected>Engenheiro Civil</option>
+                <option value="Engenheiro">Engenheiro</option>
+                <option value="Técnico em Sistemas de Saneamento">Técnico em Sist. Saneamento</option>
+                <option value="Outros">Outros...</option>
+              </select>
+              <input type="text" id="cargoFiscalOutros" name="cargoFiscalOutros" placeholder="Qual?" style="display: none; flex-grow: 1; max-width: 150px;">
+            </div>
           </div>
         </div>
 
-        <div class="campo-simples">
-          <label for="cargoFiscal">Cargo do Fiscal/Inspetor:</label>
-          <div class="linha-cargo">
-            <select id="cargoFiscal" name="cargoFiscal" class="input-select-largo" style="flex-grow: 1; max-width: 350px;">
-              <option value="Engenheiro Civil" selected>Engenheiro Civil</option>
-              <option value="Engenheiro">Engenheiro</option>
-              <option value="Técnico em Sistemas de Saneamento">Técnico em Sistemas de Saneamento</option>
-              <option value="Outros">Outros (Digite ao lado)...</option>
-            </select>
-            <input type="text" id="cargoFiscalOutros" name="cargoFiscalOutros" placeholder="Digite o cargo..." style="display: none; flex-grow: 1; max-width: 350px;">
-          </div>
+        <div class="caixa-assinatura">
+          <label><input type="checkbox" id="incluirAssinatura"> 📝 Assinar no rodapé</label>
+          <input type="file" id="imagemAssinatura" accept="image/*" style="display:none;">
+          <label for="imagemAssinatura" class="botao-secundario" id="btnAssinaturaLabel" style="margin:0; display:none; font-size:0.75em; padding:4px 8px; background-color:#6c757d;">📎 Anexar Imagem</label>
+          <span id="assinaturaStatus" style="font-size:0.8em; color:green; display:none; font-weight:bold;">✔ OK</span>
+          <button type="button" id="btnRemoverAssinatura" style="display:none; background:transparent; border:none; color:#d9534f; cursor:pointer; font-size:1em; padding:0; font-weight:bold;" title="Remover imagem da assinatura">✖</button>
         </div>
 
         <fieldset class="opcoes-relatorio">
@@ -184,7 +188,7 @@
       <button id="btnGerarRelatorio" class="botao-principal">Gerar Relatório</button>
       <button id="btnGerarPDF" class="botao-secundario" title="Gera um PDF via caixa de impressão do navegador.">Gerar PDF</button>
       <button id="btnAlternarPreview" class="botao-texto" title="Alterna a visualização de impressão na tela">Alternar pré-visualização</button>
-      <small class="nota-pdf">Para mostrar <strong>Números de Página</strong>, marque "Cabeçalhos e rodapés" na hora de salvar o PDF.</small>
+      <small class="nota-pdf">Atenção: Se marcar "Cabeçalhos e rodapés" para exibir o número da página, o navegador imprimirá também o seu link da web por padrão.</small>
     </div>
 
     <hr>

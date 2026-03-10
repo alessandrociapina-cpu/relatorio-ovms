@@ -352,13 +352,13 @@ document.addEventListener('DOMContentLoaded', () => {
             if (calcLat !== 0 && calcLng !== 0 && !isNaN(calcLat) && !isNaN(calcLng)) {
               textoMeta += `📍 GPS: ${calcLat.toFixed(6)}, ${calcLng.toFixed(6)}`;
             } else {
-              textoMeta += `📍 GPS: Removido pelo sistema do telemóvel`;
+              textoMeta += `📍 GPS: Removido pelo sistema do aparelho celular`;
             }
           } catch (e) {
             textoMeta += `📍 GPS: Falha na leitura`;
           }
         } else {
-          textoMeta += `📍 GPS: Bloqueado pelo telemóvel (Use o botão abaixo)`;
+          textoMeta += `📍 GPS: Bloqueado pelo aparelho celular (Use o botão abaixo)`;
         }
         resolve(textoMeta.trim());
       });
@@ -414,7 +414,7 @@ document.addEventListener('DOMContentLoaded', () => {
   async function handleFotosSelecionadas(event) {
     const files = event.target.files;
     if (files.length === 0) return;
-    galeriaPreview.innerHTML = '<h4>A processar imagens... Por favor, aguarde.</h4>';
+    galeriaPreview.innerHTML = '<h4>Processando imagens... Por favor, aguarde.</h4>';
     const sortedFiles = Array.from(files).sort((a, b) => a.name.localeCompare(b.name, undefined, { numeric: true }));
     const novasFotos = new Array(sortedFiles.length);
 
@@ -519,11 +519,11 @@ document.addEventListener('DOMContentLoaded', () => {
       const btnGPSAtual = document.createElement('button');
       btnGPSAtual.innerHTML = '📍 Atualizar GPS pelo Celular';
       btnGPSAtual.classList.add('btn-acao-foto', 'btn-gps');
-      btnGPSAtual.title = 'Usa a antena GPS do telemóvel para preencher a localização';
+      btnGPSAtual.title = 'Usa a antena GPS do aparelho celular para preencher a localização';
       
       btnGPSAtual.onclick = () => {
         if(navigator.geolocation) {
-          btnGPSAtual.innerHTML = '⏳ A procurar...';
+          btnGPSAtual.innerHTML = '⏳ Procurando...';
           navigator.geolocation.getCurrentPosition(
             (pos) => {
               const nLat = pos.coords.latitude.toFixed(6);

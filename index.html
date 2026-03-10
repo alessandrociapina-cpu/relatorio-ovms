@@ -18,14 +18,12 @@
     <h1>Relatório Fotográfico - OVMS</h1>
     
     <div style="text-align: center; font-size: 0.8em; color: #6c757d; margin-top: -15px; margin-bottom: 20px;">
-      Versão 18 | Última atualização: 09/03/2026
+      Versão 19 | Última atualização: 10/03/2026
       <span class="info-tooltip-container" tabindex="0">
         <span class="info-icon">ℹ️</span>
         <span class="info-tooltip-text" style="width: 320px; max-height: 350px; overflow-y: auto; text-align: left;">
-          <b>Histórico de Atualizações:</b><br><br>
-          <b>v18:</b> Atualização do painel de informações para exibir o histórico das últimas 3 versões para acompanhamento da equipa.<br><br>
-          <b>v17:</b> Título dinâmico no navegador para garantir um cabeçalho limpo no PC (preparação para a numeração nativa de páginas).<br><br>
-          <b>v16:</b> Novo motor de atualização (Network First) para garantir que a equipa recebe as atualizações instantaneamente, e correção na impressão do Cargo do Fiscal.
+          <b>Novidades da Versão 19:</b><br><br>
+          • <b>Documentação Integrada:</b> Foi adicionado um botão para visualizar a Documentação Técnica, Histórico de Atualizações e Avaliação de Segurança diretamente no sistema.
         </span>
       </span>
     </div>
@@ -35,7 +33,10 @@
       <button id="btnSalvarProjeto" class="botao-principal" style="background-color: #17a2b8;">💾 Baixar Projeto</button>
       <label for="inputCarregarProjeto" class="botao-secundario" style="margin: 0; background-color: #6c757d; color: white; cursor: pointer;">📂 Carregar Projeto</label>
       <input type="file" id="inputCarregarProjeto" accept=".json" style="display:none;">
-      <span id="autoSaveStatus" style="font-size: 0.85em; color: #6c757d; font-style: italic; margin-left: auto;">Nenhum rascunho salvo</span>
+      
+      <button id="btnVerDocs" class="botao-secundario" style="background-color: #343a40; color: white; margin-left: auto;">📄 Documentação</button>
+      
+      <span id="autoSaveStatus" style="font-size: 0.85em; color: #6c757d; font-style: italic; margin-left: 10px; width: 100%; text-align: right;">Nenhum rascunho salvo</span>
     </div>
 
     <div class="secao-entrada">
@@ -183,7 +184,7 @@
       <button id="btnGerarRelatorio" class="botao-principal">Gerar Relatório</button>
       <button id="btnGerarPDF" class="botao-secundario" title="Gera um PDF via caixa de impressão do navegador.">Gerar PDF</button>
       <button id="btnAlternarPreview" class="botao-texto" title="Alterna a visualização de impressão na tela">Alternar pré-visualização</button>
-      <small class="nota-pdf">Para mostrar <strong>Números de Página</strong>, marque "Cabeçalhos e rodapés" na hora de salvar o PDF (apenas PC).</small>
+      <small class="nota-pdf">Para mostrar <strong>Números de Página</strong>, marque "Cabeçalhos e rodapés" na hora de salvar o PDF.</small>
     </div>
 
     <hr>
@@ -191,6 +192,69 @@
       <div id="cabecalho-relatorio"></div>
       <div id="corpo-relatorio" class="corpo-relatorio-grid"></div>
       <div id="observacoes-finais-relatorio"></div>
+    </div>
+  </div>
+
+  <div id="modalDocs" class="modal-oculto">
+    <div class="modal-conteudo" style="max-width: 850px; width: 95%;">
+      <h3 style="margin-top: 0; color: #007bff;">Documentação do Sistema</h3>
+      <div style="width: 100%; height: 60vh; overflow-y: auto; text-align: justify; background: #f8f9fa; padding: 20px; border: 1px solid #ccc; border-radius: 5px; font-size: 0.95em; line-height: 1.6; color: #333; box-sizing: border-box;">
+        
+        <h4 style="color: #333; border-bottom: 1px solid #ddd; padding-bottom: 5px;">1. Visão Geral</h4>
+        <p>O Sistema de Relatório Fotográfico OVMS é uma aplicação web progressiva (PWA) projetada para a elaboração de laudos periciais e relatórios de vistoria em campo. A ferramenta permite o preenchimento de dados de inspeção, processamento de imagens (com extração de metadados geográficos), edição visual, e geração de documentos em formato PDF padronizado.</p>
+        <p>A sua principal característica é o funcionamento <strong>100% Client-Side</strong> (processamento local) e <strong>Offline-First</strong>, garantindo alta disponibilidade em locais sem internet e adequação às políticas de segurança da informação.</p>
+
+        <h4 style="color: #333; border-bottom: 1px solid #ddd; padding-bottom: 5px;">2. Arquitetura e Tecnologias</h4>
+        <ul style="padding-left: 20px;">
+          <li><strong>Linguagens:</strong> HTML5, CSS3, JavaScript (ES6+).</li>
+          <li><strong>PWA:</strong> Utiliza manifesto e Service Worker para instalação nativa no Windows, Android e iOS.</li>
+          <li><strong>Bibliotecas de Terceiros:</strong> <code>exif-js</code> (metadados geográficos) e <code>cropper.js</code> (recorte visual).</li>
+        </ul>
+
+        <h4 style="color: #333; border-bottom: 1px solid #ddd; padding-bottom: 5px;">3. Arquivos e Componentes Utilizados</h4>
+        <ul style="padding-left: 20px;">
+          <li style="margin-bottom: 8px;"><strong>index.html:</strong> Contém a estrutura semântica da interface, painéis de formulário, contêineres de impressão dinâmicos, modais flutuantes e o gatilho de atualização automática (Network First).</li>
+          <li style="margin-bottom: 8px;"><strong>style.css:</strong> Define a identidade visual, responsividade avançada para dispositivos móveis e as regras estritas de formatação de quebra de páginas em impressão de PDFs (<code>@media print</code>).</li>
+          <li style="margin-bottom: 8px;"><strong>script.js:</strong> O núcleo lógico da aplicação. Controla a manipulação do DOM, o processamento de imagens via Canvas (marca d'água, desenho, redimensionamento), sistema de assinatura digital e a gestão assíncrona do Auto-Save.</li>
+          <li style="margin-bottom: 8px;"><strong>sw.js:</strong> Arquivo do <i>Service Worker</i> que gerencia o motor de cache inteligente e garante o funcionamento Offline da ferramenta após o primeiro carregamento.</li>
+          <li style="margin-bottom: 8px;"><strong>manifest.json:</strong> Arquivo de propriedades do PWA que fornece o nome, cores de tema e diretrizes para os sistemas operativos instalarem o sistema na Área de Trabalho ou ecrã inicial.</li>
+          <li style="margin-bottom: 8px;"><strong>exif.js / exif-js.txt:</strong> Biblioteca open-source matemática para decodificar dados ocultos das fotografias (como Latitude e Longitude).</li>
+          <li style="margin-bottom: 8px;"><strong>cropper.min.js / cropper.min.css:</strong> Framework visual e folha de estilos para o módulo de reenquadramento de fotografias.</li>
+          <li style="margin-bottom: 8px;"><strong>sabesp-logo.png:</strong> Arquivo base do logotipo injetado no cabeçalho e na rotina de sobreposição transparente das fotos.</li>
+          <li><strong>icon-192.png / icon-512.png:</strong> Conjunto de ícones oficiais em diferentes resoluções necessários para a interface PWA e ícones de atalho do sistema operativo.</li>
+        </ul>
+
+        <h4 style="color: #333; border-bottom: 1px solid #ddd; padding-bottom: 5px;">4. Funcionalidades Principais</h4>
+        <ul style="padding-left: 20px;">
+          <li><strong>Processamento de Imagens:</strong> Redimensionamento automático no lado do cliente para poupar memória do dispositivo.</li>
+          <li><strong>Recuperação de GPS:</strong> Leitura universal de coordenadas EXIF e <i>fallback</i> para captura nativa da antena em caso de censura do SO móvel.</li>
+          <li><strong>Laboratório de Edição:</strong> Modais para rotacionar, recortar e desenhar vetores (setas, texto) diretamente sobre evidências.</li>
+          <li><strong>Extração de Vídeo:</strong> Leitor para capturar frames fotográficos diretamente de gravações em campo.</li>
+          <li><strong>Gestão de Rascunho (Auto-Save):</strong> Implementação de temporizador (<i>Debounce</i> de 5s) para salvamento silencioso sem causar engasgos em celulares. Exportação física do projeto em <code>.json</code>.</li>
+          <li><strong>Motor Dinâmico de PDF:</strong> Injeção dinâmica do título do documento na hora da impressão para gerar rodapés limpos e enumerados nativamente pelo navegador.</li>
+        </ul>
+
+        <h4 style="color: #333; border-bottom: 1px solid #ddd; padding-bottom: 5px;">Apêndice A: Histórico de Atualizações</h4>
+        <ul style="padding-left: 20px;">
+          <li><strong>v1 a v3:</strong> Correção do Bug "Null Island". Fotos sem GPS ou do WhatsApp não quebram mais a função de leitura gerando 0.000000.</li>
+          <li><strong>v4 a v5:</strong> Contorno de Censura de Privacidade Mobile. Inserção de botão para aceder ao GPS do navegador quando o sistema operativo móvel apaga os metadados da foto submetida.</li>
+          <li><strong>v6 a v9:</strong> Otimização Responsiva e Assinatura Digital de Peritos, com redimensionamento inteligente na linha.</li>
+          <li><strong>v10 a v11:</strong> Resolução do Bug de "Lag/Engasgo". Implementação do <i>Debounce</i> de 5 segundos no Auto-Save durante a digitação de legendas.</li>
+          <li><strong>v12 a v16:</strong> Implementação do Motor de Atualização (<i>Network First</i>), que quebra o cache teimoso e força as atualizações nos dispositivos da equipa. Implementação do seletor flexível do Cargo do Fiscal na assinatura do PDF.</li>
+          <li><strong>v17 a v18:</strong> Alteração temporária dinâmica no título (<code>document.title</code>) para gerar paginação automática e nativa na caixa de impressão (Cabeçalhos limpos). Criação de janelas flutuantes interativas (Tooltips) informativas.</li>
+          <li><strong>v19:</strong> Inserção do módulo de Documentação Técnica e Revisão Corporativa integradas à aplicação.</li>
+        </ul>
+
+        <h4 style="color: #333; border-bottom: 1px solid #ddd; padding-bottom: 5px;">Apêndice B: Verificação de Segurança Corporativa</h4>
+        <p><strong>1. Zero Transmissão Externa:</strong> A aplicação é estritamente Client-Side. Nenhum dado ou foto sai da máquina local em direção à internet, garantindo compliance automático com LGPD e sigilo de informações de campo.</p>
+        <p><strong>2. Imunidade a Firewalls:</strong> O sistema possui arquitetura para funcionamento local, sobrevivendo a bloqueios de rede restritivos através da sua instalação Sandbox como App (PWA).</p>
+        <p><strong>3. Bibliotecas de Terceiros:</strong> Todos os scripts auxiliares (<i>exif</i> e <i>cropper</i>) executam exclusivamente funções matemáticas estáticas no navegador. O sistema está livre de telemetrias externas ou mecanismos espiões (<i>trackers</i>).</p>
+        <p><strong>Conclusão:</strong> A arquitetura descentralizada (PWA Offline) configura um ambiente de risco extremamente baixo para adoção corporativa, com alta resiliência contra vazamentos de informações e excelente isolamento técnico.</p>
+
+      </div>
+      <div class="modal-acoes" style="margin-top: 15px;">
+        <button id="btnFecharDocs" class="botao-principal">Fechar Documentação</button>
+      </div>
     </div>
   </div>
 

@@ -22,6 +22,21 @@ document.addEventListener('DOMContentLoaded', () => {
   const inputCarregarProjeto = document.getElementById('inputCarregarProjeto');
   const autoSaveStatus = document.getElementById('autoSaveStatus');
 
+  // Lógica da Documentação
+  const btnVerDocs = document.getElementById('btnVerDocs');
+  const modalDocs = document.getElementById('modalDocs');
+  const btnFecharDocs = document.getElementById('btnFecharDocs');
+
+  btnVerDocs.addEventListener('click', (e) => {
+    e.preventDefault();
+    modalDocs.classList.remove('modal-oculto');
+  });
+
+  btnFecharDocs.addEventListener('click', (e) => {
+    e.preventDefault();
+    modalDocs.classList.add('modal-oculto');
+  });
+
   // Lógica do Cargo do Fiscal
   const selectCargo = document.getElementById('cargoFiscal');
   const inputCargoOutros = document.getElementById('cargoFiscalOutros');
@@ -277,19 +292,16 @@ document.addEventListener('DOMContentLoaded', () => {
   
   btnGerarRelatorio.addEventListener('click', (e) => { e.preventDefault(); gerarRelatorio(true); });
   
-  // ===== LÓGICA ATUALIZADA DO BOTÃO DE PDF (TÍTULO DINÂMICO PARA CABEÇALHO) =====
   btnGerarPDF.addEventListener('click', async (e) => { 
     e.preventDefault(); 
     await gerarRelatorio(true); 
     
-    // Altera temporariamente o título do documento para o Cabeçalho do PDF ficar bonito
     const tituloOriginal = document.title;
     let nomeObra = inputLocalVistoria.value.trim();
     document.title = nomeObra ? `Relatório Fotográfico - ${nomeObra}` : 'Relatório Fotográfico - OVMS';
     
     setTimeout(() => { 
       window.print(); 
-      // Retorna o título original após abrir a caixa de impressão
       document.title = tituloOriginal;
     }, 500); 
   });

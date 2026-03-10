@@ -18,14 +18,14 @@
     <h1>Relatório Fotográfico - OVMS</h1>
     
     <div class="versao-info" style="text-align: center; font-size: 0.8em; color: #6c757d; margin-top: -15px; margin-bottom: 20px;">
-      Versão 25 | Última atualização: 10/03/2026
+      Versão 26 | Última atualização: 10/03/2026
       <span class="info-tooltip-container" tabindex="0">
         <span class="info-icon">ℹ️</span>
         <span class="info-tooltip-text" style="width: 320px; max-height: 350px; overflow-y: auto; text-align: left;">
           <b>Últimas Atualizações:</b><br><br>
-          <b>v25:</b> Avisos de Metadados e Segurança detalhados. Inclusão de dica flutuante para tratar assinaturas transparentes com a ferramenta remove.bg.<br><br>
-          <b>v24:</b> Correção de Bug nos botões de proporção (4:3 e 3:4) da ferramenta de Recorte.<br><br>
-          <b>v23:</b> Adicionado aviso orientativo sobre captura em 4:3 paisagem e botões inteligentes de Crop.
+          <b>v26:</b> Otimização Visual: Dica de assinatura integrada ao próprio quadro. Remoção do negrito nas opções de layout. Botões de marca d'água alinhados na mesma linha. Revisão geral de textos para o padrão brasileiro ("aparelho celular").<br><br>
+          <b>v25:</b> Avisos de Metadados e Segurança detalhados, e dica do remove.bg para assinaturas.<br><br>
+          <b>v24:</b> Correção de Bug nos botões de proporção (4:3 e 3:4) do Recorte.
         </span>
       </span>
     </div>
@@ -79,37 +79,39 @@
           </div>
         </div>
 
-        <div class="caixa-assinatura" style="flex-wrap: wrap;">
-          <label><input type="checkbox" id="incluirAssinatura"> 📝 Assinar no rodapé</label>
-          <input type="file" id="imagemAssinatura" accept="image/*" style="display:none;">
-          <label for="imagemAssinatura" class="botao-secundario" id="btnAssinaturaLabel" style="margin:0; display:none; font-size:0.75em; padding:4px 8px; background-color:#6c757d;">📎 Anexar Imagem</label>
-          <span id="assinaturaStatus" style="font-size:0.8em; color:green; display:none; font-weight:bold;">✔ OK</span>
-          <button type="button" id="btnRemoverAssinatura" style="display:none; background:transparent; border:none; color:#d9534f; cursor:pointer; font-size:1em; padding:0; font-weight:bold;" title="Remover imagem da assinatura">✖</button>
+        <div class="caixa-assinatura">
+          <div class="caixa-assinatura-linha">
+            <label><input type="checkbox" id="incluirAssinatura"> 📝 Assinar no rodapé</label>
+            <input type="file" id="imagemAssinatura" accept="image/*" style="display:none;">
+            <label for="imagemAssinatura" class="botao-secundario" id="btnAssinaturaLabel" style="margin:0; display:none; font-size:0.75em; padding:4px 8px; background-color:#6c757d;">📎 Anexar Imagem</label>
+            <span id="assinaturaStatus" style="font-size:0.8em; color:green; display:none; font-weight:bold;">✔ OK</span>
+            <button type="button" id="btnRemoverAssinatura" style="display:none; background:transparent; border:none; color:#d9534f; cursor:pointer; font-size:1em; padding:0; font-weight:bold;" title="Remover imagem da assinatura">✖</button>
+          </div>
           
           <div id="dicaAssinatura" style="display:none; font-size: 0.85em; color: #555; background: #fff3cd; padding: 10px; border-left: 4px solid #ffeeba; border-radius: 4px; margin-top: 10px; width: 100%; box-sizing: border-box; line-height: 1.5;">
-            <strong>💡 Dica Profissional:</strong> Para a assinatura não esconder a linha do documento, utilize uma foto com <strong>fundo transparente</strong>. Você pode remover o fundo branco da sua assinatura facilmente e de graça através do site <a href="https://www.remove.bg/pt-br" target="_blank" rel="noopener noreferrer" style="color: #007bff; font-weight: bold;">remove.bg</a> antes de anexá-la aqui.
+            <strong>💡 Dica Profissional:</strong> Para a assinatura não esconder a linha do documento, utilize uma foto com <strong>fundo transparente</strong>. Você pode remover o fundo branco da sua assinatura facilmente através do site <a href="https://www.remove.bg/pt-br" target="_blank" rel="noopener noreferrer" style="color: #007bff; font-weight: bold;">remove.bg</a> antes de anexá-la.
           </div>
         </div>
 
         <fieldset class="opcoes-relatorio">
           <legend>Opções de Layout e Impressão</legend>
           <div class="grupo-opcao">
-            <span class="grupo-label">Layout de colunas:</span>
+            <span class="grupo-label" style="font-weight: normal;">Layout de colunas:</span>
             <label><input type="radio" name="layoutColunas" value="2" checked> 2 colunas (padrão)</label>
             <label><input type="radio" name="layoutColunas" value="1"> 1 coluna (fotos maiores)</label>
           </div>
           <div class="grupo-opcao">
-            <span class="grupo-label">Qualidade das imagens:</span>
+            <span class="grupo-label" style="font-weight: normal;">Qualidade das imagens:</span>
             <label><input type="radio" name="qualidadeImagens" value="media" checked> Média — 1024 px</label>
             <label><input type="radio" name="qualidadeImagens" value="maxima"> Máxima — 1600 px</label>
           </div>
           <div class="grupo-opcao">
-            <span class="grupo-label">Margens de impressão:</span>
+            <span class="grupo-label" style="font-weight: normal;">Margens de impressão:</span>
             <label><input type="radio" name="margensImpressao" value="menores"> Menores (5 mm)</label>
             <label><input type="radio" name="margensImpressao" value="maiores" checked> Maiores (15 mm) (padrão)</label>
           </div>
           <div class="grupo-opcao">
-            <span class="grupo-label">Fonte:</span>
+            <span class="grupo-label" style="font-weight: normal;">Fonte:</span>
             <select id="fonteRelatorio" class="input-select">
               <option value="Tahoma, sans-serif" selected>Tahoma</option>
               <option value="Arial, sans-serif">Arial</option>
@@ -117,7 +119,7 @@
               <option value="Calibri, sans-serif">Calibri</option>
               <option value="Verdana, sans-serif">Verdana</option>
             </select>
-            <span class="grupo-label" style="margin-left: 15px;">Tamanho:</span>
+            <span class="grupo-label" style="font-weight: normal; margin-left: 15px;">Tamanho:</span>
             <select id="tamanhoFonteRelatorio" class="input-select">
               <option value="9">9 pt</option>
               <option value="10">10 pt</option>
@@ -133,24 +135,29 @@
           <div class="grupo-opcao">
             <label><input type="checkbox" id="usarMarcaDagua" checked> Inserir logo nas imagens</label>
           </div>
-          <div id="opcoesMarcaDagua" style="display: flex; flex-direction: column; gap: 8px; margin-top: 10px;">
-            <div class="grupo-opcao" style="margin: 0;">
-              <span class="grupo-label">Canto:</span>
+          
+          <div id="opcoesMarcaDagua" style="display: flex; gap: 15px; margin-top: 10px; align-items: center; flex-wrap: wrap;">
+            <div style="display: flex; align-items: center; gap: 5px;">
+              <span class="grupo-label" style="font-weight: normal;">Canto:</span>
               <select id="posicaoMarcaDagua" class="input-select">
                 <option value="bottom-right">Inferior Direito</option>
                 <option value="bottom-left">Inferior Esquerdo</option>
                 <option value="top-right">Superior Direito</option>
                 <option value="top-left">Superior Esquerdo</option>
               </select>
-              <span class="grupo-label" style="margin-left: 15px;">Tamanho:</span>
+            </div>
+            
+            <div style="display: flex; align-items: center; gap: 5px;">
+              <span class="grupo-label" style="font-weight: normal;">Tamanho:</span>
               <select id="tamanhoMarcaDagua" class="input-select">
                 <option value="logo-pequeno">Pequeno (1/4)</option>
                 <option value="logo-medio">Médio (1/2)</option>
                 <option value="logo-grande">Grande (1/1)</option>
               </select>
             </div>
-            <div class="grupo-opcao" style="margin: 0;">
-              <span class="grupo-label">Transparência:</span>
+
+            <div style="display: flex; align-items: center; gap: 5px;">
+              <span class="grupo-label" style="font-weight: normal;">Transparência:</span>
               <input type="range" id="opacidadeMarcaDagua" min="10" max="100" value="70">
               <span id="valorOpacidade" style="display:inline-block; width: 40px; font-weight:bold;">70%</span>
             </div>
@@ -167,8 +174,8 @@
             <strong>⚠️ AVISO DE METADADOS E PERDA DE GPS:</strong>
             <ul style="margin: 8px 0 0 20px; padding: 0;">
               <li style="margin-bottom: 5px;">Aplicativos como <strong>WhatsApp</strong> apagam automaticamente os dados de localização (GPS) das fotos por segurança. Ao utilizar fotos recebidas por eles, o sistema não conseguirá ler o GPS original.</li>
-              <li style="margin-bottom: 5px;"><strong>Uso em Computador (Desktop):</strong> Prefira transferir as fotografias do telemóvel para o PC via <strong>Cabo USB</strong> ou em anexo original por <strong>E-mail</strong>, preservando assim a localização intacta.</li>
-              <li><strong>Uso no Campo (Celular):</strong> Caso a foto fique sem GPS devido a restrições do sistema do telemóvel, basta clicar no botão <strong>"📍 Atualizar GPS pelo Celular"</strong>, logo abaixo da foto inserida, para forçar a captura das coordenadas atuais no terreno.</li>
+              <li style="margin-bottom: 5px;"><strong>Uso em Computador (Desktop):</strong> Prefira transferir as fotografias do aparelho celular para o PC via <strong>Cabo USB</strong> ou em anexo original por <strong>E-mail</strong>, preservando assim a localização intacta.</li>
+              <li><strong>Uso no Campo (Celular):</strong> Caso a foto fique sem GPS devido a restrições do sistema do aparelho celular, basta clicar no botão <strong>"📍 Atualizar GPS pelo Celular"</strong>, logo abaixo da foto inserida, para forçar a captura das coordenadas atuais no terreno.</li>
             </ul>
           </div>
           
@@ -191,7 +198,7 @@
       </div>
 
       <div style="background-color: #eef2f5; color: #495057; padding: 12px; border-radius: 5px; font-size: 0.9em; margin-bottom: 20px; border-left: 4px solid #007bff; line-height: 1.5;">
-        <strong>💡 Dica de Captura:</strong> Para otimizar o espaço na folha A4 e evitar "buracos" no relatório, configure a câmera do seu celular para a <strong>proporção 4:3</strong> e dê preferência a tirar fotos com o <strong>celular deitado (modo paisagem)</strong>. Você também pode forçar a proporção 4:3 usando a ferramenta <strong>"✂️ Cortar"</strong> abaixo das fotos.
+        <strong>💡 Dica de Captura:</strong> Para otimizar o espaço na folha A4 e evitar "buracos" no relatório, configure a câmera do seu aparelho celular para a <strong>proporção 4:3</strong> e dê preferência a tirar fotos com o <strong>celular deitado (modo paisagem)</strong>. Você também pode forçar a proporção 4:3 usando a ferramenta <strong>"✂️ Cortar"</strong> abaixo das fotos.
       </div>
 
       <div id="galeria-fotos-legenda" class="galeria-preview"></div>

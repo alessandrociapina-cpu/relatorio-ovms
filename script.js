@@ -117,7 +117,6 @@ document.addEventListener('DOMContentLoaded', () => {
   const btnAplicarCrop = document.getElementById('btnAplicarCrop');
   const btnFecharCrop = document.getElementById('btnFecharCrop');
   
-  // BOTÕES DE PROPORÇÃO DO CROP
   const btnCropLivre = document.getElementById('btnCropLivre');
   const btnCrop43 = document.getElementById('btnCrop43');
   const btnCrop34 = document.getElementById('btnCrop34');
@@ -132,9 +131,10 @@ document.addEventListener('DOMContentLoaded', () => {
     activeBtn.style.backgroundColor = '#28a745';
   }
 
-  btnCropLivre.addEventListener('click', () => { if(cropperInstancia) { cropperInstancia.setAspectRatio(NaN); setCropActiveBtn(btnCropLivre); } });
-  btnCrop43.addEventListener('click', () => { if(cropperInstancia) { cropperInstancia.setAspectRatio(4/3); setCropActiveBtn(btnCrop43); } });
-  btnCrop34.addEventListener('click', () => { if(cropperInstancia) { cropperInstancia.setAspectRatio(3/4); setCropActiveBtn(btnCrop34); } });
+  // Correção Aplicada: Adicionado o e.preventDefault() para garantir que os botões não recarregam a página
+  btnCropLivre.addEventListener('click', (e) => { e.preventDefault(); if(cropperInstancia) { cropperInstancia.setAspectRatio(NaN); setCropActiveBtn(btnCropLivre); } });
+  btnCrop43.addEventListener('click', (e) => { e.preventDefault(); if(cropperInstancia) { cropperInstancia.setAspectRatio(4/3); setCropActiveBtn(btnCrop43); } });
+  btnCrop34.addEventListener('click', (e) => { e.preventDefault(); if(cropperInstancia) { cropperInstancia.setAspectRatio(3/4); setCropActiveBtn(btnCrop34); } });
 
   const inputSelecionarVideo = document.getElementById('selecionarVideo');
   const modalVideo = document.getElementById('modalVideo');
@@ -573,7 +573,6 @@ document.addEventListener('DOMContentLoaded', () => {
     imgCrop.src = foto.previewDataUrl; 
     modalCrop.classList.remove('modal-oculto');
     
-    // Zera o estado dos botões sempre que abrir o modal
     setCropActiveBtn(btnCropLivre);
 
     imgCrop.onload = () => {
@@ -596,14 +595,15 @@ document.addEventListener('DOMContentLoaded', () => {
     fotoAtualCropIndex = null;
   }
   
-  btnAplicarCrop.onclick = () => {
+  btnAplicarCrop.onclick = (e) => {
+    e.preventDefault();
     const canvasRecortado = cropperInstancia.getCroppedCanvas();
     const recortadaDataUrl = canvasRecortado.toDataURL('image/jpeg', 0.8);
     fotosSelecionadasParaRelatorio[fotoAtualCropIndex].previewDataUrl = recortadaDataUrl;
     fotosSelecionadasParaRelatorio[fotoAtualCropIndex].editedPreviewDataUrl = null; 
     renderizarGaleria(); salvarRascunhoLocal(); fecharCrop();
   };
-  btnFecharCrop.onclick = fecharCrop;
+  btnFecharCrop.onclick = (e) => { e.preventDefault(); fecharCrop(); };
 
   function abrirEditor(index) {
     fotoAtualEdicaoIndex = index;
@@ -685,7 +685,8 @@ document.addEventListener('DOMContentLoaded', () => {
   canvasEditor.addEventListener('mouseup', stopDrawing); canvasEditor.addEventListener('mouseout', stopDrawing);
   canvasEditor.addEventListener('touchstart', startDrawing, {passive: false}); canvasEditor.addEventListener('touchmove', draw, {passive: false}); canvasEditor.addEventListener('touchend', stopDrawing);
 
-  btnSalvarEdicao.addEventListener('click', () => {
+  btnSalvarEdicao.addEventListener('click', (e) => {
+    e.preventDefault();
     if (fotoAtualEdicaoIndex !== null) {
       fotosSelecionadasParaRelatorio[fotoAtualEdicaoIndex].editedPreviewDataUrl = canvasEditor.toDataURL('image/jpeg', 0.8);
       renderizarGaleria(); salvarRascunhoLocal();
@@ -693,7 +694,8 @@ document.addEventListener('DOMContentLoaded', () => {
     fecharEditor();
   });
 
-  btnDesfazerSeta.addEventListener('click', () => {
+  btnDesfazerSeta.addEventListener('click', (e) => {
+    e.preventDefault();
     if (historicoEdicao.length > 1) {
       historicoEdicao.pop(); 
       const imgAnterior = new Image();
@@ -702,7 +704,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  btnFecharModal.addEventListener('click', fecharEditor);
+  btnFecharModal.addEventListener('click', (e) => { e.preventDefault(); fecharEditor(); });
 
   inputSelecionarVideo.addEventListener('change', (e) => {
     const file = e.target.files[0]; if (!file) return;
@@ -713,10 +715,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
   videoPlayer.addEventListener('timeupdate', () => videoSlider.value = videoPlayer.currentTime);
   videoSlider.addEventListener('input', (e) => videoPlayer.currentTime = e.target.value);
-  btnVideoRewind.addEventListener('click', () => videoPlayer.currentTime = Math.max(0, videoPlayer.currentTime - 0.1));
-  btnVideoForward.addEventListener('click', () => videoPlayer.currentTime = Math.min(videoPlayer.duration, videoPlayer.currentTime + 0.1));
+  btnVideoRewind.addEventListener('click', (e) => { e.preventDefault(); videoPlayer.currentTime = Math.max(0, videoPlayer.currentTime - 0.1); });
+  btnVideoForward.addEventListener('click', (e) => { e.preventDefault(); videoPlayer.currentTime = Math.min(videoPlayer.duration, videoPlayer.currentTime + 0.1); });
 
-  btnCapturarFrame.addEventListener('click', async () => {
+  btnCapturarFrame.addEventListener('click', async (e) => {
+    e.preventDefault();
     const canvas = document.createElement('canvas');
     canvas.width = videoPlayer.videoWidth; canvas.height = videoPlayer.videoHeight;
     canvas.getContext('2d').drawImage(videoPlayer, 0, 0, canvas.width, canvas.height);
@@ -731,7 +734,7 @@ document.addEventListener('DOMContentLoaded', () => {
     renderizarGaleria(); salvarRascunhoLocal();
     msgFrameCapturado.style.display = 'block'; setTimeout(() => msgFrameCapturado.style.display = 'none', 2500);
   });
-  btnFecharModalVideo.addEventListener('click', () => { modalVideo.classList.add('modal-oculto'); videoPlayer.pause(); videoPlayer.src = ''; });
+  btnFecharModalVideo.addEventListener('click', (e) => { e.preventDefault(); modalVideo.classList.add('modal-oculto'); videoPlayer.pause(); videoPlayer.src = ''; });
 
   function getOpcoesRelatorio() {
     const layout = Array.from(radiosLayout).find(r => r.checked)?.value || '2';

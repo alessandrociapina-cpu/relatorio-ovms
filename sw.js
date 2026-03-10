@@ -1,4 +1,4 @@
-const CACHE_NAME = 'ovms-app-v23'; 
+const CACHE_NAME = 'ovms-app-v24'; 
 
 const urlsToCache = [
   './',

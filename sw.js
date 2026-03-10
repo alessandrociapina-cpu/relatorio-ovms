@@ -1,4 +1,4 @@
-const CACHE_NAME = 'ovms-app-v21'; 
+const CACHE_NAME = 'ovms-app-v22'; 
 
 self.addEventListener('install', event => {
   self.skipWaiting();

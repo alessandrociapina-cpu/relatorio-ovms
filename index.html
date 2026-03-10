@@ -18,21 +18,21 @@
     <h1>Relatório Fotográfico - OVMS</h1>
     
     <div class="versao-info" style="text-align: center; font-size: 0.8em; color: #6c757d; margin-top: -15px; margin-bottom: 20px;">
-      Versão 23 | Última atualização: 10/03/2026
+      Versão 24 | Última atualização: 10/03/2026
       <span class="info-tooltip-container" tabindex="0">
         <span class="info-icon">ℹ️</span>
         <span class="info-tooltip-text" style="width: 320px; max-height: 350px; overflow-y: auto; text-align: left;">
           <b>Últimas Atualizações:</b><br><br>
-          <b>v23:</b> Adicionado aviso orientativo sobre captura em 4:3 paisagem. A ferramenta de corte (Crop) agora possui botões inteligentes para forçar as proporções 4:3 e 3:4 nativamente.<br><br>
-          <b>v22:</b> Retorno do histórico flutuante à tela principal com bloqueio na impressão.<br><br>
-          <b>v21:</b> Otimização de Layout para campos na mesma linha (Data/Hora e Nome/Cargo).
+          <b>v24:</b> Correção de Bug nos botões de proporção (4:3 e 3:4) da ferramenta de Recorte. Atualização da documentação técnica e inclusão de "travão" para não recarregar a tela.<br><br>
+          <b>v23:</b> Adicionado aviso orientativo sobre captura em 4:3 paisagem e botões inteligentes de Crop.<br><br>
+          <b>v22:</b> Retorno do histórico flutuante com bloqueio total na impressão em PDF.
         </span>
       </span>
     </div>
 
     <div class="secao-projeto" style="margin-bottom: 25px; padding: 15px; background: #eef2f5; border-radius: 6px; border: 1px solid #ced4da; display: flex; flex-wrap: wrap; gap: 10px; align-items: center;">
       <span style="font-weight: bold; color: #495057; margin-right: 10px;">Gerenciar Rascunho:</span>
-      <button id="btnSalvarProjeto" class="botao-principal" style="background-color: #17a2b8;">💾 Baixar Projeto</button>
+      <button type="button" id="btnSalvarProjeto" class="botao-principal" style="background-color: #17a2b8;">💾 Baixar Projeto</button>
       <label for="inputCarregarProjeto" class="botao-secundario" style="margin: 0; background-color: #6c757d; color: white; cursor: pointer;">📂 Carregar Projeto</label>
       <input type="file" id="inputCarregarProjeto" accept=".json" style="display:none;">
       
@@ -191,9 +191,9 @@
     </div>
 
     <div class="secao-acao">
-      <button id="btnGerarRelatorio" class="botao-principal">Gerar Relatório</button>
-      <button id="btnGerarPDF" class="botao-secundario" title="Gera um PDF via caixa de impressão do navegador.">Gerar PDF</button>
-      <button id="btnAlternarPreview" class="botao-texto" title="Alterna a visualização de impressão na tela">Alternar pré-visualização</button>
+      <button type="button" id="btnGerarRelatorio" class="botao-principal">Gerar Relatório</button>
+      <button type="button" id="btnGerarPDF" class="botao-secundario" title="Gera um PDF via caixa de impressão do navegador.">Gerar PDF</button>
+      <button type="button" id="btnAlternarPreview" class="botao-texto" title="Alterna a visualização de impressão na tela">Alternar pré-visualização</button>
       <small class="nota-pdf">Atenção: Se marcar "Cabeçalhos e rodapés" para exibir o número da página, o navegador imprimirá também o seu link da web por padrão.</small>
     </div>
 
@@ -219,18 +219,18 @@
         </div>
         <div style="border-left: 2px solid #ddd; padding-left: 15px; display: flex; gap: 5px; align-items: center;">
           <span style="font-weight: bold; color: #444; margin-right: 5px;">Zoom:</span>
-          <button id="btnZoomOut" class="botao-secundario" style="padding: 2px 10px; font-weight: bold; margin: 0;">-</button>
+          <button type="button" id="btnZoomOut" class="botao-secundario" style="padding: 2px 10px; font-weight: bold; margin: 0;">-</button>
           <span id="zoomLabel" style="min-width: 45px; text-align: center; font-weight: bold;">100%</span>
-          <button id="btnZoomIn" class="botao-secundario" style="padding: 2px 10px; font-weight: bold; margin: 0;">+</button>
+          <button type="button" id="btnZoomIn" class="botao-secundario" style="padding: 2px 10px; font-weight: bold; margin: 0;">+</button>
         </div>
       </div>
       <div class="canvas-container" style="height: 60vh; width: 100%; background: #e9ecef; border: 1px solid #ccc; overflow: auto; text-align: center; margin-bottom: 15px; border-radius: 5px;">
         <canvas id="canvasEditor" style="max-width: 100%; max-height: 60vh; margin: auto; display: block;"></canvas>
       </div>
       <div class="modal-acoes">
-        <button id="btnSalvarEdicao" class="botao-principal">Salvar Imagem</button>
-        <button id="btnDesfazerSeta" class="botao-secundario">Desfazer Última</button>
-        <button id="btnFecharModal" class="botao-texto">Cancelar</button>
+        <button type="button" id="btnSalvarEdicao" class="botao-principal">Salvar Imagem</button>
+        <button type="button" id="btnDesfazerSeta" class="botao-secundario">Desfazer Última</button>
+        <button type="button" id="btnFecharModal" class="botao-texto">Cancelar</button>
       </div>
     </div>
   </div>
@@ -242,17 +242,17 @@
       
       <div style="display: flex; gap: 8px; margin-bottom: 12px; justify-content: center; flex-wrap: wrap;">
         <span style="font-weight: bold; color: #444; align-self: center; font-size: 0.9em; margin-right: 5px;">Formato:</span>
-        <button id="btnCropLivre" class="botao-secundario" style="margin: 0; padding: 5px 12px; font-size: 0.85em; background-color: #28a745;">Livre</button>
-        <button id="btnCrop43" class="botao-secundario" style="margin: 0; padding: 5px 12px; font-size: 0.85em; background-color: #6c757d;">Horizontal (4:3)</button>
-        <button id="btnCrop34" class="botao-secundario" style="margin: 0; padding: 5px 12px; font-size: 0.85em; background-color: #6c757d;">Vertical (3:4)</button>
+        <button type="button" id="btnCropLivre" class="botao-secundario" style="margin: 0; padding: 5px 12px; font-size: 0.85em; background-color: #28a745;">Livre</button>
+        <button type="button" id="btnCrop43" class="botao-secundario" style="margin: 0; padding: 5px 12px; font-size: 0.85em; background-color: #6c757d;">Horizontal (4:3)</button>
+        <button type="button" id="btnCrop34" class="botao-secundario" style="margin: 0; padding: 5px 12px; font-size: 0.85em; background-color: #6c757d;">Vertical (3:4)</button>
       </div>
 
       <div style="height: 60vh; width: 100%; background: #e9ecef; border: 1px solid #ccc; display: flex; justify-content: center; align-items: center; overflow: hidden; margin-bottom: 15px; border-radius: 5px;">
         <img id="imgCrop" style="max-width: 100%; max-height: 100%; display: block;" src="">
       </div>
       <div class="modal-acoes">
-        <button id="btnAplicarCrop" class="botao-principal">Aplicar Recorte</button>
-        <button id="btnFecharCrop" class="botao-texto">Cancelar</button>
+        <button type="button" id="btnAplicarCrop" class="botao-principal">Aplicar Recorte</button>
+        <button type="button" id="btnFecharCrop" class="botao-texto">Cancelar</button>
       </div>
     </div>
   </div>
@@ -265,13 +265,13 @@
         <video id="videoPlayer" style="max-width: 100%; max-height: 50vh;" controls></video>
       </div>
       <div class="video-controles" style="display: flex; gap: 10px; align-items: center; margin-bottom: 15px; width: 100%;">
-        <button id="btnVideoRewind" class="botao-secundario" style="padding: 5px 10px;">⏪ -0.1s</button>
+        <button type="button" id="btnVideoRewind" class="botao-secundario" style="padding: 5px 10px;">⏪ -0.1s</button>
         <input type="range" id="videoSlider" min="0" max="100" value="0" step="0.01" style="flex-grow: 1; cursor: pointer;">
-        <button id="btnVideoForward" class="botao-secundario" style="padding: 5px 10px;">+0.1s ⏩</button>
+        <button type="button" id="btnVideoForward" class="botao-secundario" style="padding: 5px 10px;">+0.1s ⏩</button>
       </div>
       <div class="modal-acoes">
-        <button id="btnCapturarFrame" class="botao-principal" style="background-color: #28a745;">📸 Capturar Frame</button>
-        <button id="btnFecharModalVideo" class="botao-secundario">Concluir e Fechar</button>
+        <button type="button" id="btnCapturarFrame" class="botao-principal" style="background-color: #28a745;">📸 Capturar Frame</button>
+        <button type="button" id="btnFecharModalVideo" class="botao-secundario">Concluir e Fechar</button>
       </div>
       <p id="msgFrameCapturado" style="color: green; font-weight: bold; display: none; margin-top: 10px; text-align: center;">✔ Frame capturado e adicionado à galeria!</p>
     </div>

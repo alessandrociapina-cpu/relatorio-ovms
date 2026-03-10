@@ -71,6 +71,8 @@
       <li><strong>v12 a v16:</strong> Implementação do Motor de Atualização (<i>Network First</i>), que quebra o cache teimoso e força as atualizações nos dispositivos da equipa. Implementação do seletor flexível do Cargo do Fiscal na assinatura do PDF.</li>
       <li><strong>v17 a v18:</strong> Alteração temporária dinâmica no título (<code>document.title</code>) para gerar paginação automática e nativa na caixa de impressão (Cabeçalhos limpos). Criação de janelas flutuantes interativas (Tooltips).</li>
       <li><strong>v19 a v20:</strong> Inserção do módulo de Documentação Técnica isolado em página própria (Aba/Janela separada).</li>
+      <li><strong>v21 a v23:</strong> Otimização de layout em linha (Data/Hora e Cargo). Ocultação nativa do cabeçalho da versão na impressão. Inclusão de dicas informativas sobre o uso de fotos em paisagem (4:3) para otimizar espaço A4.</li>
+      <li><strong>v24 (Atual):</strong> <i>Bugfix (Crop Buttons):</i> Correção do comportamento padrão de botões soltos no HTML. Adição da restrição <code>type="button"</code> e <code>e.preventDefault()</code> no <i>script.js</i> para evitar que o navegador cancele a ação ou recarregue a página na ferramenta de enquadramento (4:3 e 3:4).</li>
     </ul>
 
     <h4>Apêndice B: Verificação de Segurança Corporativa</h4>
@@ -80,7 +82,7 @@
     <p><strong>Conclusão:</strong> A arquitetura descentralizada (PWA Offline) configura um ambiente de risco extremamente baixo para adoção corporativa, com alta resiliência contra vazamentos de informações e excelente isolamento técnico.</p>
     
     <div style="text-align: center; margin-top: 40px;">
-      <button onclick="window.close()" class="botao-secundario">Fechar Guia</button>
+      <button onclick="window.close()" class="botao-secundario" style="background-color: #6c757d; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer;">Fechar Guia</button>
     </div>
   </div>
 </body>

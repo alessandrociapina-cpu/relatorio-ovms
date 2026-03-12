@@ -12,21 +12,21 @@
   <link href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.css" rel="stylesheet">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.js"></script>
   
-  <link rel="stylesheet" href="style.css?v=28"/>
+  <link rel="stylesheet" href="style.css?v=29"/>
 </head>
 <body>
   <div class="container">
     <h1>Relatório Fotográfico - OVMS</h1>
     
     <div class="versao-info" style="text-align: center; font-size: 0.8em; color: #6c757d; margin-top: -15px; margin-bottom: 20px;">
-      Versão 28 | Última atualização: 12/03/2026
+      Versão 29 | Última atualização: 12/03/2026
       <span class="info-tooltip-container" tabindex="0">
         <span class="info-icon">ℹ️</span>
         <span class="info-tooltip-text" style="width: 320px; max-height: 350px; overflow-y: auto; text-align: left;">
           <b>Últimas Atualizações:</b><br><br>
-          <b>v28 (Correção):</b> Forçada a quebra de cache ("Cache-Buster") e implementação do motor definitivo "Internet Primeiro" (Network First) para assegurar que a lógica do 2º Fiscal funciona em todos os aparelhos instantaneamente.<br><br>
-          <b>v27:</b> Adição do campo para inclusão de um 2º Fiscal. Sistema inteligente de dupla assinatura no PDF. Inclusão do campo global de Departamento.<br><br>
-          <b>v26:</b> Otimização Visual de dicas e campos de opções de layout.
+          <b>v29:</b> Atualização do departamento padrão para a unidade de São José dos Campos.<br><br>
+          <b>v28:</b> Forçada a quebra de cache e implementação do motor definitivo "Internet Primeiro" (Network First).<br><br>
+          <b>v27:</b> Adição do campo para inclusão de um 2º Fiscal e Sistema inteligente de dupla assinatura no PDF.
         </span>
       </span>
     </div>
@@ -107,7 +107,7 @@
           <label for="departamentoGlobal">Departamento (Para a Assinatura):</label>
           <div style="display: flex; gap: 5px;">
             <select id="departamentoGlobal" name="departamentoGlobal" class="input-select-largo" style="flex-grow: 1;">
-              <option value="Divisão de Manutenção e Serviços - OVMS" selected>Divisão de Manutenção e Serviços de São José dos Campos - OVMS</option>
+              <option value="Divisão de Manutenção e Serviços de São José dos Campos" selected>Divisão de Manutenção e Serviços de São José dos Campos</option>
               <option value="Outros">Outros (Digite ao lado)...</option>
             </select>
             <input type="text" id="departamentoGlobalOutros" name="departamentoGlobalOutros" placeholder="Qual o departamento?" style="display: none; flex-grow: 1; max-width: 250px;">
@@ -337,7 +337,7 @@
     </div>
   </div>
 
-  <script src="script.js?v=28"></script>
+  <script src="script.js?v=29"></script>
   
   <script>
     if ('serviceWorker' in navigator) {
@@ -358,4 +358,3 @@
   </script>
 </body>
 </html>
-

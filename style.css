@@ -59,7 +59,7 @@ hr { margin: 30px 0; border: 0; border-top: 1px solid #ddd; }
 .linha-dupla { display: flex; gap: 15px; margin-bottom: 15px; flex-wrap: wrap; }
 .campo-metade { flex: 1; min-width: 220px; }
 
-/* NOVA Caixa de Assinatura (Ajustada para a Dica ficar dentro) */
+/* Caixa de Assinatura */
 .caixa-assinatura { display: flex; flex-direction: column; background: #eef2f5; padding: 12px; border-radius: 4px; border: 1px solid #ced4da; height: auto; box-sizing: border-box; margin-bottom: 15px; width: 100%; }
 .caixa-assinatura-linha { display: flex; align-items: center; gap: 10px; width: 100%; flex-wrap: wrap; }
 .caixa-assinatura label { margin: 0; display: flex; align-items: center; gap: 5px; font-weight: normal; cursor: pointer; }
@@ -125,10 +125,18 @@ hr { margin: 30px 0; border: 0; border-top: 1px solid #ddd; }
 #observacoes-finais-relatorio h3 { font-size: 1.2em; color: #444; margin-bottom: 10px; text-align: left; }
 #observacoes-finais-relatorio p { color: #333; white-space: pre-wrap; text-align: justify; }
 
-/* Bloco de Assinatura (Relatório PDF) */
-.bloco-assinatura { margin-top: 40px; display: flex; flex-direction: column; align-items: center; page-break-inside: avoid; }
-.linha-assinatura { width: 280px; border-top: 1px solid #000; margin-top: 0px; margin-bottom: 5px; }
-.assinatura-imagem-limpa { max-width: 280px; height: auto; max-height: 60px; object-fit: contain; display: block; margin-bottom: 10px; }
+/* Blocos de Assinatura (Relatório PDF) */
+.assinaturas-container {
+  display: flex;
+  justify-content: center;
+  gap: 60px;
+  margin-top: 40px;
+  page-break-inside: avoid;
+  flex-wrap: wrap;
+}
+.bloco-assinatura { display: flex; flex-direction: column; align-items: center; text-align: center; }
+.linha-assinatura { width: 260px; border-top: 1px solid #000; margin-top: 0px; margin-bottom: 5px; }
+.assinatura-imagem-limpa { max-width: 260px; height: auto; max-height: 60px; object-fit: contain; display: block; margin-bottom: 10px; }
 
 /* ========================================= */
 /* OTIMIZAÇÕES PARA SMARTPHONES (MOBILE UX)  */

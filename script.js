@@ -3,7 +3,23 @@ document.addEventListener('DOMContentLoaded', () => {
   const inputLocalVistoria = document.getElementById('localVistoria');
   const inputDataVistoria = document.getElementById('dataVistoria');
   const inputHoraVistoria = document.getElementById('horaVistoria');
+  
+  // Fiscal 1
   const inputNomeFiscal = document.getElementById('nomeFiscal');
+  const selectCargo = document.getElementById('cargoFiscal');
+  const inputCargoOutros = document.getElementById('cargoFiscalOutros');
+
+  // Fiscal 2
+  const checkboxIncluirFiscal2 = document.getElementById('incluirFiscal2');
+  const blocoFiscal2 = document.getElementById('blocoFiscal2');
+  const inputNomeFiscal2 = document.getElementById('nomeFiscal2');
+  const selectCargo2 = document.getElementById('cargoFiscal2');
+  const inputCargoOutros2 = document.getElementById('cargoFiscalOutros2');
+
+  // Departamento
+  const selectDepartamento = document.getElementById('departamentoGlobal');
+  const inputDepartamentoOutros = document.getElementById('departamentoGlobalOutros');
+
   const inputSelecionarFotos = document.getElementById('selecionarFotos');
   const galeriaPreview = document.getElementById('galeria-fotos-legenda');
   const btnGerarRelatorio = document.getElementById('btnGerarRelatorio');
@@ -22,9 +38,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const inputCarregarProjeto = document.getElementById('inputCarregarProjeto');
   const autoSaveStatus = document.getElementById('autoSaveStatus');
 
-  const selectCargo = document.getElementById('cargoFiscal');
-  const inputCargoOutros = document.getElementById('cargoFiscalOutros');
-
+  // Lógica Cargo Fiscal 1
   selectCargo.addEventListener('change', (e) => {
     if (e.target.value === 'Outros') {
       inputCargoOutros.style.display = 'inline-block';
@@ -37,38 +51,112 @@ document.addEventListener('DOMContentLoaded', () => {
   });
   inputCargoOutros.addEventListener('input', salvarRascunhoLocal);
 
+  // Lógica Cargo Fiscal 2
+  selectCargo2.addEventListener('change', (e) => {
+    if (e.target.value === 'Outros') {
+      inputCargoOutros2.style.display = 'inline-block';
+      inputCargoOutros2.focus();
+    } else {
+      inputCargoOutros2.style.display = 'none';
+      inputCargoOutros2.value = '';
+    }
+    salvarRascunhoLocal();
+  });
+  inputCargoOutros2.addEventListener('input', salvarRascunhoLocal);
+
+  // Lógica Departamento
+  selectDepartamento.addEventListener('change', (e) => {
+    if (e.target.value === 'Outros') {
+      inputDepartamentoOutros.style.display = 'inline-block';
+      inputDepartamentoOutros.focus();
+    } else {
+      inputDepartamentoOutros.style.display = 'none';
+      inputDepartamentoOutros.value = '';
+    }
+    salvarRascunhoLocal();
+  });
+  inputDepartamentoOutros.addEventListener('input', salvarRascunhoLocal);
+
+  // Lógica da Assinatura 1 e 2
   const checkboxAssinatura = document.getElementById('incluirAssinatura');
+  const dicaAssinatura = document.getElementById('dicaAssinatura');
+  
   const inputImagemAssinatura = document.getElementById('imagemAssinatura');
   const btnAssinaturaLabel = document.getElementById('btnAssinaturaLabel');
   const assinaturaStatus = document.getElementById('assinaturaStatus');
   const btnRemoverAssinatura = document.getElementById('btnRemoverAssinatura');
-  const dicaAssinatura = document.getElementById('dicaAssinatura');
   let assinaturaBase64 = null;
 
-  checkboxAssinatura.addEventListener('change', (e) => {
-    btnAssinaturaLabel.style.display = e.target.checked ? 'inline-block' : 'none';
-    dicaAssinatura.style.display = e.target.checked ? 'block' : 'none';
+  const inputImagemAssinatura2 = document.getElementById('imagemAssinatura2');
+  const btnAssinaturaLabel2 = document.getElementById('btnAssinaturaLabel2');
+  const assinaturaStatus2 = document.getElementById('assinaturaStatus2');
+  const btnRemoverAssinatura2 = document.getElementById('btnRemoverAssinatura2');
+  let assinaturaBase64_2 = null;
+
+  function atualizarVisibilidadeAssinaturas() {
+    dicaAssinatura.style.display = checkboxAssinatura.checked ? 'block' : 'none';
     
-    if (!e.target.checked) {
-      assinaturaBase64 = null;
-      inputImagemAssinatura.value = '';
+    if (checkboxAssinatura.checked) {
+      btnAssinaturaLabel.style.display = 'inline-block';
+      btnAssinaturaLabel2.style.display = checkboxIncluirFiscal2.checked ? 'inline-block' : 'none';
+    } else {
+      btnAssinaturaLabel.style.display = 'none';
+      btnAssinaturaLabel2.style.display = 'none';
+    }
+
+    if (!checkboxAssinatura.checked) {
       assinaturaStatus.style.display = 'none';
       btnRemoverAssinatura.style.display = 'none';
-    } else if (assinaturaBase64) {
-      assinaturaStatus.style.display = 'inline-block';
-      btnRemoverAssinatura.style.display = 'inline-block';
+      assinaturaStatus2.style.display = 'none';
+      btnRemoverAssinatura2.style.display = 'none';
+    } else {
+      if (assinaturaBase64) {
+        assinaturaStatus.style.display = 'inline-block';
+        btnRemoverAssinatura.style.display = 'inline-block';
+      }
+      if (assinaturaBase64_2 && checkboxIncluirFiscal2.checked) {
+        assinaturaStatus2.style.display = 'inline-block';
+        btnRemoverAssinatura2.style.display = 'inline-block';
+      } else {
+        assinaturaStatus2.style.display = 'none';
+        btnRemoverAssinatura2.style.display = 'none';
+      }
     }
+  }
+
+  checkboxAssinatura.addEventListener('change', () => {
+    atualizarVisibilidadeAssinaturas();
     salvarRascunhoLocal();
   });
 
+  checkboxIncluirFiscal2.addEventListener('change', (e) => {
+    blocoFiscal2.style.display = e.target.checked ? 'flex' : 'none';
+    atualizarVisibilidadeAssinaturas();
+    salvarRascunhoLocal();
+  });
+
+  // Upload Foto 1
   inputImagemAssinatura.addEventListener('change', (e) => {
     const file = e.target.files[0];
     if (file) {
       const reader = new FileReader();
       reader.onload = (ev) => {
         assinaturaBase64 = ev.target.result;
-        assinaturaStatus.style.display = 'inline-block';
-        btnRemoverAssinatura.style.display = 'inline-block';
+        atualizarVisibilidadeAssinaturas();
+        salvarRascunhoLocal();
+      };
+      reader.readAsDataURL(file);
+    }
+  });
+
+  // Upload Foto 2
+  inputImagemAssinatura2.addEventListener('change', (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        assinaturaBase64_2 = ev.target.result;
+        atualizarVisibilidadeAssinaturas();
         salvarRascunhoLocal();
       };
       reader.readAsDataURL(file);
@@ -78,8 +166,14 @@ document.addEventListener('DOMContentLoaded', () => {
   btnRemoverAssinatura.addEventListener('click', () => {
     assinaturaBase64 = null;
     inputImagemAssinatura.value = '';
-    assinaturaStatus.style.display = 'none';
-    btnRemoverAssinatura.style.display = 'none';
+    atualizarVisibilidadeAssinaturas();
+    salvarRascunhoLocal();
+  });
+
+  btnRemoverAssinatura2.addEventListener('click', () => {
+    assinaturaBase64_2 = null;
+    inputImagemAssinatura2.value = '';
+    atualizarVisibilidadeAssinaturas();
     salvarRascunhoLocal();
   });
 
@@ -159,7 +253,16 @@ document.addEventListener('DOMContentLoaded', () => {
         incluirAssinatura: checkboxAssinatura.checked,
         assinaturaUrl: assinaturaBase64,
         cargo: selectCargo.value,
-        cargoOutros: inputCargoOutros.value
+        cargoOutros: inputCargoOutros.value,
+        
+        incluirFiscal2: checkboxIncluirFiscal2.checked,
+        nomeFiscal2: inputNomeFiscal2.value,
+        cargo2: selectCargo2.value,
+        cargoOutros2: inputCargoOutros2.value,
+        assinaturaUrl2: assinaturaBase64_2,
+        
+        departamento: selectDepartamento.value,
+        departamentoOutros: inputDepartamentoOutros.value
       },
       fotos: fotosSelecionadasParaRelatorio
     };
@@ -167,10 +270,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function carregarEstado(estado) {
     if(estado.form) {
-      inputLocalVistoria.value = estado.form.local || ''; inputDataVistoria.value = estado.form.data || '';
-      inputHoraVistoria.value = estado.form.hora || ''; inputNomeFiscal.value = estado.form.fiscal || '';
+      inputLocalVistoria.value = estado.form.local || ''; 
+      inputDataVistoria.value = estado.form.data || '';
+      inputHoraVistoria.value = estado.form.hora || ''; 
+      inputNomeFiscal.value = estado.form.fiscal || '';
       inputObservacoes.value = estado.form.obs || '';
       
+      // Fiscal 1
       if (estado.form.cargo) selectCargo.value = estado.form.cargo;
       if (estado.form.cargo === 'Outros') {
         inputCargoOutros.style.display = 'inline-block';
@@ -179,19 +285,34 @@ document.addEventListener('DOMContentLoaded', () => {
         inputCargoOutros.style.display = 'none';
       }
 
+      // Fiscal 2
+      checkboxIncluirFiscal2.checked = estado.form.incluirFiscal2 || false;
+      blocoFiscal2.style.display = checkboxIncluirFiscal2.checked ? 'flex' : 'none';
+      inputNomeFiscal2.value = estado.form.nomeFiscal2 || '';
+      
+      if (estado.form.cargo2) selectCargo2.value = estado.form.cargo2;
+      if (estado.form.cargo2 === 'Outros') {
+        inputCargoOutros2.style.display = 'inline-block';
+        inputCargoOutros2.value = estado.form.cargoOutros2 || '';
+      } else {
+        inputCargoOutros2.style.display = 'none';
+      }
+
+      // Departamento
+      if (estado.form.departamento) selectDepartamento.value = estado.form.departamento;
+      if (estado.form.departamento === 'Outros') {
+        inputDepartamentoOutros.style.display = 'inline-block';
+        inputDepartamentoOutros.value = estado.form.departamentoOutros || '';
+      } else {
+        inputDepartamentoOutros.style.display = 'none';
+      }
+
+      // Assinaturas
       checkboxAssinatura.checked = estado.form.incluirAssinatura || false;
       assinaturaBase64 = estado.form.assinaturaUrl || null;
+      assinaturaBase64_2 = estado.form.assinaturaUrl2 || null;
       
-      btnAssinaturaLabel.style.display = checkboxAssinatura.checked ? 'inline-block' : 'none';
-      dicaAssinatura.style.display = checkboxAssinatura.checked ? 'block' : 'none';
-      
-      if(assinaturaBase64 && checkboxAssinatura.checked) {
-         assinaturaStatus.style.display = 'inline-block';
-         btnRemoverAssinatura.style.display = 'inline-block';
-      } else {
-         assinaturaStatus.style.display = 'none';
-         btnRemoverAssinatura.style.display = 'none';
-      }
+      atualizarVisibilidadeAssinaturas();
     }
     if(estado.fotos) {
       fotosSelecionadasParaRelatorio = estado.fotos;
@@ -203,7 +324,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function salvarRascunhoLocal() {
     clearTimeout(timeoutSalvarRascunho);
-    autoSaveStatus.textContent = 'A digitar... (aguardando para salvar)';
+    autoSaveStatus.textContent = 'Digitando... (aguardando para salvar)';
     autoSaveStatus.style.color = '#6c757d';
 
     timeoutSalvarRascunho = setTimeout(() => {
@@ -783,7 +904,7 @@ document.addEventListener('DOMContentLoaded', () => {
         </div>
         <img src="sabesp-logo.png" alt="Logo" class="logo-relatorio-direito">
       </div>
-      <div class="info-vistoria"><p><strong>Local da Vistoria:</strong> ${local}</p><p><strong>Fiscal/Inspetor:</strong> ${inputNomeFiscal.value}</p><p><strong>Data da Vistoria:</strong> ${dataFormatada}</p>${horaHtml}</div>
+      <div class="info-vistoria"><p><strong>Local da Vistoria:</strong> ${local}</p><p><strong>Data da Vistoria:</strong> ${dataFormatada}</p>${horaHtml}</div>
     `;
 
     areaRelatorio.classList.remove('layout-1-col'); if (opt.layoutColunas === '1') areaRelatorio.classList.add('layout-1-col');
@@ -811,17 +932,45 @@ document.addEventListener('DOMContentLoaded', () => {
 
     let assinaturaHtml = '';
     if (checkboxAssinatura.checked) {
-      const nomeStr = inputNomeFiscal.value.trim() || 'Fiscal/Inspetor';
-      const imgStr = assinaturaBase64 ? `<img src="${assinaturaBase64}" class="assinatura-imagem-limpa">` : `<div style="height: 50px;"></div>`;
       
-      let cargoFinal = selectCargo.value === 'Outros' ? inputCargoOutros.value.trim() : selectCargo.value;
+      let deptoFinal = selectDepartamento.value === 'Outros' ? inputDepartamentoOutros.value.trim() : selectDepartamento.value;
+      if (!deptoFinal) deptoFinal = 'Sabesp';
+
+      const nome1 = inputNomeFiscal.value.trim() || '1º Fiscal/Inspetor';
+      const cargo1 = selectCargo.value === 'Outros' ? inputCargoOutros.value.trim() : selectCargo.value;
+      const img1 = assinaturaBase64 ? `<img src="${assinaturaBase64}" class="assinatura-imagem-limpa">` : `<div style="height: 50px;"></div>`;
+      
+      let bloco1 = `
+        <div class="bloco-assinatura">
+          ${img1}
+          <div class="linha-assinatura"></div>
+          <strong>${nome1}</strong>
+          <span style="font-size: 0.85em; color: #555;">${cargo1}</span>
+          <span style="font-size: 0.85em; color: #555;">${deptoFinal}</span>
+        </div>
+      `;
+
+      let bloco2 = '';
+      if (checkboxIncluirFiscal2.checked) {
+        const nome2 = inputNomeFiscal2.value.trim() || '2º Fiscal/Inspetor';
+        const cargo2 = selectCargo2.value === 'Outros' ? inputCargoOutros2.value.trim() : selectCargo2.value;
+        const img2 = assinaturaBase64_2 ? `<img src="${assinaturaBase64_2}" class="assinatura-imagem-limpa">` : `<div style="height: 50px;"></div>`;
+        
+        bloco2 = `
+          <div class="bloco-assinatura">
+            ${img2}
+            <div class="linha-assinatura"></div>
+            <strong>${nome2}</strong>
+            <span style="font-size: 0.85em; color: #555;">${cargo2}</span>
+            <span style="font-size: 0.85em; color: #555;">${deptoFinal}</span>
+          </div>
+        `;
+      }
 
       assinaturaHtml = `
-        <div class="bloco-assinatura">
-          ${imgStr}
-          <div class="linha-assinatura"></div>
-          <strong>${nomeStr}</strong>
-          <span style="font-size: 0.85em; color: #555;">${cargoFinal}</span>
+        <div class="assinaturas-container">
+          ${bloco1}
+          ${bloco2}
         </div>
       `;
     }

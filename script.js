@@ -8,6 +8,8 @@ document.addEventListener('DOMContentLoaded', () => {
   const inputNomeFiscal = document.getElementById('nomeFiscal');
   const selectCargo = document.getElementById('cargoFiscal');
   const inputCargoOutros = document.getElementById('cargoFiscalOutros');
+  const selectDepartamento = document.getElementById('departamentoFiscal');
+  const inputDepartamentoOutros = document.getElementById('departamentoFiscalOutros');
 
   // Fiscal 2
   const checkboxIncluirFiscal2 = document.getElementById('incluirFiscal2');
@@ -15,10 +17,8 @@ document.addEventListener('DOMContentLoaded', () => {
   const inputNomeFiscal2 = document.getElementById('nomeFiscal2');
   const selectCargo2 = document.getElementById('cargoFiscal2');
   const inputCargoOutros2 = document.getElementById('cargoFiscalOutros2');
-
-  // Departamento
-  const selectDepartamento = document.getElementById('departamentoGlobal');
-  const inputDepartamentoOutros = document.getElementById('departamentoGlobalOutros');
+  const selectDepartamento2 = document.getElementById('departamentoFiscal2');
+  const inputDepartamentoOutros2 = document.getElementById('departamentoFiscalOutros2');
 
   const inputSelecionarFotos = document.getElementById('selecionarFotos');
   const galeriaPreview = document.getElementById('galeria-fotos-legenda');
@@ -38,6 +38,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const inputCarregarProjeto = document.getElementById('inputCarregarProjeto');
   const autoSaveStatus = document.getElementById('autoSaveStatus');
 
+  // Lógica Cargo e Depto Fiscal 1
   selectCargo.addEventListener('change', (e) => {
     if (e.target.value === 'Outros') {
       inputCargoOutros.style.display = 'inline-block';
@@ -49,18 +50,6 @@ document.addEventListener('DOMContentLoaded', () => {
     salvarRascunhoLocal();
   });
   inputCargoOutros.addEventListener('input', salvarRascunhoLocal);
-
-  selectCargo2.addEventListener('change', (e) => {
-    if (e.target.value === 'Outros') {
-      inputCargoOutros2.style.display = 'inline-block';
-      inputCargoOutros2.focus();
-    } else {
-      inputCargoOutros2.style.display = 'none';
-      inputCargoOutros2.value = '';
-    }
-    salvarRascunhoLocal();
-  });
-  inputCargoOutros2.addEventListener('input', salvarRascunhoLocal);
 
   selectDepartamento.addEventListener('change', (e) => {
     if (e.target.value === 'Outros') {
@@ -74,6 +63,32 @@ document.addEventListener('DOMContentLoaded', () => {
   });
   inputDepartamentoOutros.addEventListener('input', salvarRascunhoLocal);
 
+  // Lógica Cargo e Depto Fiscal 2
+  selectCargo2.addEventListener('change', (e) => {
+    if (e.target.value === 'Outros') {
+      inputCargoOutros2.style.display = 'inline-block';
+      inputCargoOutros2.focus();
+    } else {
+      inputCargoOutros2.style.display = 'none';
+      inputCargoOutros2.value = '';
+    }
+    salvarRascunhoLocal();
+  });
+  inputCargoOutros2.addEventListener('input', salvarRascunhoLocal);
+
+  selectDepartamento2.addEventListener('change', (e) => {
+    if (e.target.value === 'Outros') {
+      inputDepartamentoOutros2.style.display = 'inline-block';
+      inputDepartamentoOutros2.focus();
+    } else {
+      inputDepartamentoOutros2.style.display = 'none';
+      inputDepartamentoOutros2.value = '';
+    }
+    salvarRascunhoLocal();
+  });
+  inputDepartamentoOutros2.addEventListener('input', salvarRascunhoLocal);
+
+  // Lógica da Assinatura 1 e 2
   const checkboxAssinatura = document.getElementById('incluirAssinatura');
   const dicaAssinatura = document.getElementById('dicaAssinatura');
   
@@ -248,15 +263,16 @@ document.addEventListener('DOMContentLoaded', () => {
         assinaturaUrl: assinaturaBase64,
         cargo: selectCargo.value,
         cargoOutros: inputCargoOutros.value,
+        departamento1: selectDepartamento.value,
+        departamentoOutros1: inputDepartamentoOutros.value,
         
         incluirFiscal2: checkboxIncluirFiscal2.checked,
         nomeFiscal2: inputNomeFiscal2.value,
         cargo2: selectCargo2.value,
         cargoOutros2: inputCargoOutros2.value,
-        assinaturaUrl2: assinaturaBase64_2,
-        
-        departamento: selectDepartamento.value,
-        departamentoOutros: inputDepartamentoOutros.value
+        departamento2: selectDepartamento2.value,
+        departamentoOutros2: inputDepartamentoOutros2.value,
+        assinaturaUrl2: assinaturaBase64_2
       },
       fotos: fotosSelecionadasParaRelatorio
     };
@@ -270,6 +286,7 @@ document.addEventListener('DOMContentLoaded', () => {
       inputNomeFiscal.value = estado.form.fiscal || '';
       inputObservacoes.value = estado.form.obs || '';
       
+      // Fiscal 1
       if (estado.form.cargo) selectCargo.value = estado.form.cargo;
       if (estado.form.cargo === 'Outros') {
         inputCargoOutros.style.display = 'inline-block';
@@ -278,6 +295,17 @@ document.addEventListener('DOMContentLoaded', () => {
         inputCargoOutros.style.display = 'none';
       }
 
+      if (estado.form.departamento1) selectDepartamento.value = estado.form.departamento1;
+      // Compatibilidade retroativa para projetos que usavam departamento global
+      if (estado.form.departamento && !estado.form.departamento1) selectDepartamento.value = estado.form.departamento;
+      if (selectDepartamento.value === 'Outros') {
+        inputDepartamentoOutros.style.display = 'inline-block';
+        inputDepartamentoOutros.value = estado.form.departamentoOutros1 || estado.form.departamentoOutros || '';
+      } else {
+        inputDepartamentoOutros.style.display = 'none';
+      }
+
+      // Fiscal 2
       checkboxIncluirFiscal2.checked = estado.form.incluirFiscal2 || false;
       blocoFiscal2.style.display = checkboxIncluirFiscal2.checked ? 'flex' : 'none';
       inputNomeFiscal2.value = estado.form.nomeFiscal2 || '';
@@ -290,12 +318,12 @@ document.addEventListener('DOMContentLoaded', () => {
         inputCargoOutros2.style.display = 'none';
       }
 
-      if (estado.form.departamento) selectDepartamento.value = estado.form.departamento;
-      if (estado.form.departamento === 'Outros') {
-        inputDepartamentoOutros.style.display = 'inline-block';
-        inputDepartamentoOutros.value = estado.form.departamentoOutros || '';
+      if (estado.form.departamento2) selectDepartamento2.value = estado.form.departamento2;
+      if (estado.form.departamento2 === 'Outros') {
+        inputDepartamentoOutros2.style.display = 'inline-block';
+        inputDepartamentoOutros2.value = estado.form.departamentoOutros2 || '';
       } else {
-        inputDepartamentoOutros.style.display = 'none';
+        inputDepartamentoOutros2.style.display = 'none';
       }
 
       checkboxAssinatura.checked = estado.form.incluirAssinatura || false;
@@ -923,8 +951,9 @@ document.addEventListener('DOMContentLoaded', () => {
     let assinaturaHtml = '';
     if (checkboxAssinatura.checked) {
       
-      let deptoFinal = selectDepartamento.value === 'Outros' ? inputDepartamentoOutros.value.trim() : selectDepartamento.value;
-      if (!deptoFinal) deptoFinal = 'Divisão de Manutenção e Serviços de São José dos Campos';
+      // DEPARTAMENTO 1
+      let deptoFinal1 = selectDepartamento.value === 'Outros' ? inputDepartamentoOutros.value.trim() : selectDepartamento.value;
+      if (!deptoFinal1) deptoFinal1 = 'Divisão de Manutenção e Serviços de São José dos Campos';
 
       const nome1 = inputNomeFiscal.value.trim() || '1º Fiscal/Inspetor';
       const cargo1 = selectCargo.value === 'Outros' ? inputCargoOutros.value.trim() : selectCargo.value;
@@ -936,12 +965,17 @@ document.addEventListener('DOMContentLoaded', () => {
           <div class="linha-assinatura"></div>
           <strong>${nome1}</strong>
           <span style="font-size: 0.85em; color: #555;">${cargo1}</span>
-          <span style="font-size: 0.85em; color: #555;">${deptoFinal}</span>
+          <span style="font-size: 0.85em; color: #555;">${deptoFinal1}</span>
         </div>
       `;
 
       let bloco2 = '';
       if (checkboxIncluirFiscal2.checked) {
+        
+        // DEPARTAMENTO 2
+        let deptoFinal2 = selectDepartamento2.value === 'Outros' ? inputDepartamentoOutros2.value.trim() : selectDepartamento2.value;
+        if (!deptoFinal2) deptoFinal2 = 'Divisão de Manutenção e Serviços de São José dos Campos';
+        
         const nome2 = inputNomeFiscal2.value.trim() || '2º Fiscal/Inspetor';
         const cargo2 = selectCargo2.value === 'Outros' ? inputCargoOutros2.value.trim() : selectCargo2.value;
         const img2 = assinaturaBase64_2 ? `<img src="${assinaturaBase64_2}" class="assinatura-imagem-limpa">` : `<div style="height: 50px;"></div>`;
@@ -952,7 +986,7 @@ document.addEventListener('DOMContentLoaded', () => {
             <div class="linha-assinatura"></div>
             <strong>${nome2}</strong>
             <span style="font-size: 0.85em; color: #555;">${cargo2}</span>
-            <span style="font-size: 0.85em; color: #555;">${deptoFinal}</span>
+            <span style="font-size: 0.85em; color: #555;">${deptoFinal2}</span>
           </div>
         `;
       }

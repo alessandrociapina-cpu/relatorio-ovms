@@ -12,21 +12,21 @@
   <link href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.css" rel="stylesheet">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.js"></script>
   
-  <link rel="stylesheet" href="style.css?v=29"/>
+  <link rel="stylesheet" href="style.css?v=30"/>
 </head>
 <body>
   <div class="container">
     <h1>Relatório Fotográfico - OVMS</h1>
     
     <div class="versao-info" style="text-align: center; font-size: 0.8em; color: #6c757d; margin-top: -15px; margin-bottom: 20px;">
-      Versão 29 | Última atualização: 12/03/2026
+      Versão 30 | Última atualização: 12/03/2026
       <span class="info-tooltip-container" tabindex="0">
         <span class="info-icon">ℹ️</span>
         <span class="info-tooltip-text" style="width: 320px; max-height: 350px; overflow-y: auto; text-align: left;">
           <b>Últimas Atualizações:</b><br><br>
-          <b>v29:</b> Atualização do departamento padrão para a unidade de São José dos Campos.<br><br>
-          <b>v28:</b> Forçada a quebra de cache e implementação do motor definitivo "Internet Primeiro" (Network First).<br><br>
-          <b>v27:</b> Adição do campo para inclusão de um 2º Fiscal e Sistema inteligente de dupla assinatura no PDF.
+          <b>v30:</b> Departamentos independentes. Agora é possível escolher um departamento diferente para cada fiscal.<br><br>
+          <b>v29:</b> Atualização do departamento padrão para São José dos Campos.<br><br>
+          <b>v28:</b> Forçada quebra de cache e motor definitivo "Network First".
         </span>
       </span>
     </div>
@@ -61,7 +61,7 @@
           </div>
         </div>
         
-        <div class="linha-dupla">
+        <div class="linha-dupla" style="margin-bottom: 10px;">
           <div class="campo-metade">
             <label for="nomeFiscal">Nome do 1º Fiscal/Inspetor:</label>
             <input type="text" id="nomeFiscal" name="nomeFiscal" required>
@@ -79,38 +79,49 @@
             </div>
           </div>
         </div>
+        <div class="campo-simples" style="margin-top: 0; margin-bottom: 25px;">
+          <label for="departamentoFiscal">Departamento (1º Fiscal):</label>
+          <div style="display: flex; gap: 5px;">
+            <select id="departamentoFiscal" name="departamentoFiscal" class="input-select-largo" style="flex-grow: 1;">
+              <option value="Divisão de Manutenção e Serviços de São José dos Campos" selected>Divisão de Manutenção e Serviços de São José dos Campos</option>
+              <option value="Outros">Outros (Digite ao lado)...</option>
+            </select>
+            <input type="text" id="departamentoFiscalOutros" name="departamentoFiscalOutros" placeholder="Qual o departamento?" style="display: none; flex-grow: 1; max-width: 250px;">
+          </div>
+        </div>
 
         <div class="campo-simples" style="margin-top: -5px; margin-bottom: 20px;">
           <label style="cursor: pointer; color: #007bff; display: inline-block; font-weight: normal;"><input type="checkbox" id="incluirFiscal2"> ➕ Adicionar 2º Fiscal/Inspetor</label>
         </div>
 
-        <div class="linha-dupla" id="blocoFiscal2" style="display: none; background: #fdfdfd; border-left: 3px solid #007bff; padding: 10px; border-radius: 4px;">
-          <div class="campo-metade">
-            <label for="nomeFiscal2">Nome do 2º Fiscal/Inspetor:</label>
-            <input type="text" id="nomeFiscal2" name="nomeFiscal2">
-          </div>
-          <div class="campo-metade">
-            <label for="cargoFiscal2">Cargo do 2º Fiscal:</label>
-            <div style="display: flex; gap: 5px;">
-              <select id="cargoFiscal2" name="cargoFiscal2" class="input-select-largo" style="flex-grow: 1;">
-                <option value="Engenheiro Civil" selected>Engenheiro Civil</option>
-                <option value="Engenheiro">Engenheiro</option>
-                <option value="Técnico em Sistemas de Saneamento">Técnico em Sist. Saneamento</option>
-                <option value="Outros">Outros...</option>
-              </select>
-              <input type="text" id="cargoFiscalOutros2" name="cargoFiscalOutros2" placeholder="Qual?" style="display: none; flex-grow: 1; max-width: 150px;">
+        <div id="blocoFiscal2" style="display: none; flex-direction: column; background: #fdfdfd; border-left: 3px solid #007bff; padding: 15px; border-radius: 4px; margin-bottom: 15px;">
+          <div class="linha-dupla" style="margin-bottom: 10px;">
+            <div class="campo-metade">
+              <label for="nomeFiscal2">Nome do 2º Fiscal/Inspetor:</label>
+              <input type="text" id="nomeFiscal2" name="nomeFiscal2">
+            </div>
+            <div class="campo-metade">
+              <label for="cargoFiscal2">Cargo do 2º Fiscal:</label>
+              <div style="display: flex; gap: 5px;">
+                <select id="cargoFiscal2" name="cargoFiscal2" class="input-select-largo" style="flex-grow: 1;">
+                  <option value="Engenheiro Civil" selected>Engenheiro Civil</option>
+                  <option value="Engenheiro">Engenheiro</option>
+                  <option value="Técnico em Sistemas de Saneamento">Técnico em Sist. Saneamento</option>
+                  <option value="Outros">Outros...</option>
+                </select>
+                <input type="text" id="cargoFiscalOutros2" name="cargoFiscalOutros2" placeholder="Qual?" style="display: none; flex-grow: 1; max-width: 150px;">
+              </div>
             </div>
           </div>
-        </div>
-
-        <div class="campo-simples">
-          <label for="departamentoGlobal">Departamento (Para a Assinatura):</label>
-          <div style="display: flex; gap: 5px;">
-            <select id="departamentoGlobal" name="departamentoGlobal" class="input-select-largo" style="flex-grow: 1;">
-              <option value="Divisão de Manutenção e Serviços de São José dos Campos" selected>Divisão de Manutenção e Serviços de São José dos Campos</option>
-              <option value="Outros">Outros (Digite ao lado)...</option>
-            </select>
-            <input type="text" id="departamentoGlobalOutros" name="departamentoGlobalOutros" placeholder="Qual o departamento?" style="display: none; flex-grow: 1; max-width: 250px;">
+          <div class="campo-simples" style="margin-bottom: 0;">
+            <label for="departamentoFiscal2">Departamento (2º Fiscal):</label>
+            <div style="display: flex; gap: 5px;">
+              <select id="departamentoFiscal2" name="departamentoFiscal2" class="input-select-largo" style="flex-grow: 1;">
+                <option value="Divisão de Manutenção e Serviços de São José dos Campos" selected>Divisão de Manutenção e Serviços de São José dos Campos</option>
+                <option value="Outros">Outros (Digite ao lado)...</option>
+              </select>
+              <input type="text" id="departamentoFiscalOutros2" name="departamentoFiscalOutros2" placeholder="Qual o departamento?" style="display: none; flex-grow: 1; max-width: 250px;">
+            </div>
           </div>
         </div>
 
@@ -337,7 +348,7 @@
     </div>
   </div>
 
-  <script src="script.js?v=29"></script>
+  <script src="script.js?v=30"></script>
   
   <script>
     if ('serviceWorker' in navigator) {

@@ -11,21 +11,22 @@
   <script src="https://cdn.jsdelivr.net/npm/exif-js"></script>
   <link href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.css" rel="stylesheet">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.js"></script>
-  <link rel="stylesheet" href="style.css"/>
+  
+  <link rel="stylesheet" href="style.css?v=28"/>
 </head>
 <body>
   <div class="container">
     <h1>Relatório Fotográfico - OVMS</h1>
     
     <div class="versao-info" style="text-align: center; font-size: 0.8em; color: #6c757d; margin-top: -15px; margin-bottom: 20px;">
-      Versão 27 | Última atualização: 10/03/2026
+      Versão 28 | Última atualização: 12/03/2026
       <span class="info-tooltip-container" tabindex="0">
         <span class="info-icon">ℹ️</span>
         <span class="info-tooltip-text" style="width: 320px; max-height: 350px; overflow-y: auto; text-align: left;">
           <b>Últimas Atualizações:</b><br><br>
-          <b>v27:</b> Adição do campo para inclusão de um 2º Fiscal. Sistema inteligente de dupla assinatura no PDF (lado a lado). Inclusão do campo global de Departamento editável.<br><br>
-          <b>v26:</b> Otimização Visual de dicas e campos de opções de layout. Adequação da linguagem ao padrão pt-BR ("aparelho celular").<br><br>
-          <b>v25:</b> Avisos de Metadados e Segurança detalhados, e dica do remove.bg para assinaturas.
+          <b>v28 (Correção):</b> Forçada a quebra de cache ("Cache-Buster") e implementação do motor definitivo "Internet Primeiro" (Network First) para assegurar que a lógica do 2º Fiscal funciona em todos os aparelhos instantaneamente.<br><br>
+          <b>v27:</b> Adição do campo para inclusão de um 2º Fiscal. Sistema inteligente de dupla assinatura no PDF. Inclusão do campo global de Departamento.<br><br>
+          <b>v26:</b> Otimização Visual de dicas e campos de opções de layout.
         </span>
       </span>
     </div>
@@ -336,7 +337,7 @@
     </div>
   </div>
 
-  <script src="script.js"></script>
+  <script src="script.js?v=28"></script>
   
   <script>
     if ('serviceWorker' in navigator) {

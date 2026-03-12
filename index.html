@@ -18,14 +18,14 @@
     <h1>Relatório Fotográfico - OVMS</h1>
     
     <div class="versao-info" style="text-align: center; font-size: 0.8em; color: #6c757d; margin-top: -15px; margin-bottom: 20px;">
-      Versão 26 | Última atualização: 10/03/2026
+      Versão 27 | Última atualização: 10/03/2026
       <span class="info-tooltip-container" tabindex="0">
         <span class="info-icon">ℹ️</span>
         <span class="info-tooltip-text" style="width: 320px; max-height: 350px; overflow-y: auto; text-align: left;">
           <b>Últimas Atualizações:</b><br><br>
-          <b>v26:</b> Otimização Visual: Dica de assinatura integrada ao próprio quadro. Remoção do negrito nas opções de layout. Botões de marca d'água alinhados na mesma linha. Revisão geral de textos para o padrão brasileiro ("aparelho celular").<br><br>
-          <b>v25:</b> Avisos de Metadados e Segurança detalhados, e dica do remove.bg para assinaturas.<br><br>
-          <b>v24:</b> Correção de Bug nos botões de proporção (4:3 e 3:4) do Recorte.
+          <b>v27:</b> Adição do campo para inclusão de um 2º Fiscal. Sistema inteligente de dupla assinatura no PDF (lado a lado). Inclusão do campo global de Departamento editável.<br><br>
+          <b>v26:</b> Otimização Visual de dicas e campos de opções de layout. Adequação da linguagem ao padrão pt-BR ("aparelho celular").<br><br>
+          <b>v25:</b> Avisos de Metadados e Segurança detalhados, e dica do remove.bg para assinaturas.
         </span>
       </span>
     </div>
@@ -62,11 +62,11 @@
         
         <div class="linha-dupla">
           <div class="campo-metade">
-            <label for="nomeFiscal">Nome do Fiscal/Inspetor:</label>
+            <label for="nomeFiscal">Nome do 1º Fiscal/Inspetor:</label>
             <input type="text" id="nomeFiscal" name="nomeFiscal" required>
           </div>
           <div class="campo-metade">
-            <label for="cargoFiscal">Cargo do Fiscal/Inspetor:</label>
+            <label for="cargoFiscal">Cargo do 1º Fiscal:</label>
             <div style="display: flex; gap: 5px;">
               <select id="cargoFiscal" name="cargoFiscal" class="input-select-largo" style="flex-grow: 1;">
                 <option value="Engenheiro Civil" selected>Engenheiro Civil</option>
@@ -79,13 +79,53 @@
           </div>
         </div>
 
+        <div class="campo-simples" style="margin-top: -5px; margin-bottom: 20px;">
+          <label style="cursor: pointer; color: #007bff; display: inline-block; font-weight: normal;"><input type="checkbox" id="incluirFiscal2"> ➕ Adicionar 2º Fiscal/Inspetor</label>
+        </div>
+
+        <div class="linha-dupla" id="blocoFiscal2" style="display: none; background: #fdfdfd; border-left: 3px solid #007bff; padding: 10px; border-radius: 4px;">
+          <div class="campo-metade">
+            <label for="nomeFiscal2">Nome do 2º Fiscal/Inspetor:</label>
+            <input type="text" id="nomeFiscal2" name="nomeFiscal2">
+          </div>
+          <div class="campo-metade">
+            <label for="cargoFiscal2">Cargo do 2º Fiscal:</label>
+            <div style="display: flex; gap: 5px;">
+              <select id="cargoFiscal2" name="cargoFiscal2" class="input-select-largo" style="flex-grow: 1;">
+                <option value="Engenheiro Civil" selected>Engenheiro Civil</option>
+                <option value="Engenheiro">Engenheiro</option>
+                <option value="Técnico em Sistemas de Saneamento">Técnico em Sist. Saneamento</option>
+                <option value="Outros">Outros...</option>
+              </select>
+              <input type="text" id="cargoFiscalOutros2" name="cargoFiscalOutros2" placeholder="Qual?" style="display: none; flex-grow: 1; max-width: 150px;">
+            </div>
+          </div>
+        </div>
+
+        <div class="campo-simples">
+          <label for="departamentoGlobal">Departamento (Para a Assinatura):</label>
+          <div style="display: flex; gap: 5px;">
+            <select id="departamentoGlobal" name="departamentoGlobal" class="input-select-largo" style="flex-grow: 1;">
+              <option value="Divisão de Manutenção e Serviços - OVMS" selected>Divisão de Manutenção e Serviços - OVMS</option>
+              <option value="Outros">Outros (Digite ao lado)...</option>
+            </select>
+            <input type="text" id="departamentoGlobalOutros" name="departamentoGlobalOutros" placeholder="Qual o departamento?" style="display: none; flex-grow: 1; max-width: 250px;">
+          </div>
+        </div>
+
         <div class="caixa-assinatura">
           <div class="caixa-assinatura-linha">
             <label><input type="checkbox" id="incluirAssinatura"> 📝 Assinar no rodapé</label>
+            
             <input type="file" id="imagemAssinatura" accept="image/*" style="display:none;">
-            <label for="imagemAssinatura" class="botao-secundario" id="btnAssinaturaLabel" style="margin:0; display:none; font-size:0.75em; padding:4px 8px; background-color:#6c757d;">📎 Anexar Imagem</label>
-            <span id="assinaturaStatus" style="font-size:0.8em; color:green; display:none; font-weight:bold;">✔ OK</span>
-            <button type="button" id="btnRemoverAssinatura" style="display:none; background:transparent; border:none; color:#d9534f; cursor:pointer; font-size:1em; padding:0; font-weight:bold;" title="Remover imagem da assinatura">✖</button>
+            <label for="imagemAssinatura" class="botao-secundario" id="btnAssinaturaLabel" style="margin:0; display:none; font-size:0.75em; padding:4px 8px; background-color:#6c757d;">📎 Anexar Assinatura 1</label>
+            <span id="assinaturaStatus" style="font-size:0.8em; color:green; display:none; font-weight:bold;">✔ 1</span>
+            <button type="button" id="btnRemoverAssinatura" style="display:none; background:transparent; border:none; color:#d9534f; cursor:pointer; font-size:1em; padding:0; font-weight:bold;" title="Remover imagem da assinatura 1">✖</button>
+
+            <input type="file" id="imagemAssinatura2" accept="image/*" style="display:none;">
+            <label for="imagemAssinatura2" class="botao-secundario" id="btnAssinaturaLabel2" style="margin:0; display:none; font-size:0.75em; padding:4px 8px; background-color:#6c757d;">📎 Anexar Assinatura 2</label>
+            <span id="assinaturaStatus2" style="font-size:0.8em; color:green; display:none; font-weight:bold;">✔ 2</span>
+            <button type="button" id="btnRemoverAssinatura2" style="display:none; background:transparent; border:none; color:#d9534f; cursor:pointer; font-size:1em; padding:0; font-weight:bold;" title="Remover imagem da assinatura 2">✖</button>
           </div>
           
           <div id="dicaAssinatura" style="display:none; font-size: 0.85em; color: #555; background: #fff3cd; padding: 10px; border-left: 4px solid #ffeeba; border-radius: 4px; margin-top: 10px; width: 100%; box-sizing: border-box; line-height: 1.5;">

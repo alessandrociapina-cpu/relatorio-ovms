@@ -1,11 +1,11 @@
-const CACHE_NAME = 'ovms-app-v27'; 
+const CACHE_NAME = 'ovms-app-v28'; 
 
 const urlsToCache = [
   './',
   './index.html',
   './documentacao.html',
-  './style.css',
-  './script.js',
+  './style.css?v=28',
+  './script.js?v=28',
   './manifest.json',
   './sabesp-logo.png',
   'https://cdn.jsdelivr.net/npm/exif-js',
@@ -31,14 +31,24 @@ self.addEventListener('activate', event => {
   self.clients.claim();
 });
 
+// O Motor Definitivo: 100% NETWORK FIRST para todos os ficheiros!
 self.addEventListener('fetch', event => {
-  if (event.request.mode === 'navigate' || (event.request.headers.get('accept') && event.request.headers.get('accept').includes('text/html'))) {
-    event.respondWith(
-      fetch(event.request).catch(() => caches.match(event.request))
-    );
-    return;
-  }
+  // Ignora requisições que não sejam GET (segurança padrão)
+  if (event.request.method !== 'GET') return;
+
   event.respondWith(
-    caches.match(event.request).then(response => response || fetch(event.request))
+    fetch(event.request)
+      .then(response => {
+        // Se a internet funcionou, guarda a versão mais nova escondido no cache
+        const clone = response.clone();
+        caches.open(CACHE_NAME).then(cache => {
+          cache.put(event.request, clone);
+        });
+        return response;
+      })
+      .catch(() => {
+        // Se falhou (telemóvel sem internet/offline na obra), usa o que tem no cache
+        return caches.match(event.request);
+      })
   );
 });

@@ -255,6 +255,9 @@ document.addEventListener('DOMContentLoaded', () => {
   let fotosSelecionadasParaRelatorio = [];
 
   function exportarEstado() {
+    // Recolher as opções de layout na altura da gravação (Borda)
+    const borda = Array.from(document.querySelectorAll('input[name="bordaFotos"]')).find(r => r.checked)?.value || 'nenhuma';
+    
     return {
       form: {
         local: inputLocalVistoria.value, data: inputDataVistoria.value, hora: inputHoraVistoria.value,
@@ -272,7 +275,9 @@ document.addEventListener('DOMContentLoaded', () => {
         cargoOutros2: inputCargoOutros2.value,
         departamento2: selectDepartamento2.value,
         departamentoOutros2: inputDepartamentoOutros2.value,
-        assinaturaUrl2: assinaturaBase64_2
+        assinaturaUrl2: assinaturaBase64_2,
+        
+        bordaFotos: borda
       },
       fotos: fotosSelecionadasParaRelatorio
     };
@@ -296,7 +301,7 @@ document.addEventListener('DOMContentLoaded', () => {
       }
 
       if (estado.form.departamento1) selectDepartamento.value = estado.form.departamento1;
-      // Compatibilidade retroativa para projetos que usavam departamento global
+      // Retrocompatibilidade
       if (estado.form.departamento && !estado.form.departamento1) selectDepartamento.value = estado.form.departamento;
       if (selectDepartamento.value === 'Outros') {
         inputDepartamentoOutros.style.display = 'inline-block';
@@ -326,9 +331,16 @@ document.addEventListener('DOMContentLoaded', () => {
         inputDepartamentoOutros2.style.display = 'none';
       }
 
+      // Assinaturas
       checkboxAssinatura.checked = estado.form.incluirAssinatura || false;
       assinaturaBase64 = estado.form.assinaturaUrl || null;
       assinaturaBase64_2 = estado.form.assinaturaUrl2 || null;
+      
+      // Borda
+      if (estado.form.bordaFotos) {
+        const rb = document.querySelector(`input[name="bordaFotos"][value="${estado.form.bordaFotos}"]`);
+        if (rb) rb.checked = true;
+      }
       
       atualizarVisibilidadeAssinaturas();
     }
@@ -426,6 +438,10 @@ document.addEventListener('DOMContentLoaded', () => {
   checkboxMarca.addEventListener('change', (e) => { divOpcoesMarca.style.display = e.target.checked ? 'flex' : 'none'; renderizarGaleria(); });
   rangeOpacidadeMarca.addEventListener('input', (e) => spanValorOpacidade.textContent = `${e.target.value}%`);
   checkboxMetadados.addEventListener('change', () => renderizarGaleria());
+
+  // Adicionado Listener para salvar Rascunho quando as Bordas mudarem
+  const radiosBordaFotos = document.querySelectorAll('input[name="bordaFotos"]');
+  radiosBordaFotos.forEach(r => r.addEventListener('change', salvarRascunhoLocal));
 
   const radiosLayout = formVistoria.querySelectorAll('input[name="layoutColunas"]');
   const radiosQualidade = formVistoria.querySelectorAll('input[name="qualidadeImagens"]');
@@ -883,13 +899,18 @@ document.addEventListener('DOMContentLoaded', () => {
     const layout = Array.from(radiosLayout).find(r => r.checked)?.value || '2';
     const qualidade = Array.from(radiosQualidade).find(r => r.checked)?.value || 'media';
     const margens = Array.from(radiosMargens).find(r => r.checked)?.value || 'maiores';
+    
+    // Ler a nova opção de borda
+    const borda = Array.from(document.querySelectorAll('input[name="bordaFotos"]')).find(r => r.checked)?.value || 'nenhuma';
+    
     const mapaQualidade = { media: { largura: 1024, qualidade: 0.7 }, maxima: { largura: 1600, qualidade: 0.8 } };
     const mapaMargens = { menores: 5, maiores: 15 };
     return {
       layoutColunas: layout, largura: mapaQualidade[qualidade].largura, qualidade: mapaQualidade[qualidade].qualidade,
       margensMm: mapaMargens[margens], usarMarca: checkboxMarca.checked, posMarca: selectPosicaoMarca.value, 
       tamMarca: selectTamanhoMarca.value, opacMarca: parseInt(rangeOpacidadeMarca.value, 10) / 100, 
-      fonte: selectFonte.value, tamanhoFonte: selectTamanhoFonte.value, usarMetadados: checkboxMetadados.checked
+      fonte: selectFonte.value, tamanhoFonte: selectTamanhoFonte.value, usarMetadados: checkboxMetadados.checked,
+      bordaFotos: borda // Injetando a configuração de borda
     };
   }
 
@@ -936,7 +957,18 @@ document.addEventListener('DOMContentLoaded', () => {
     imagensProcessadas.forEach((imgObj) => {
       const itemDiv = document.createElement('div'); itemDiv.classList.add('item-relatorio');
       const wrapper = document.createElement('div'); wrapper.classList.add('imagem-wrapper');
-      const imgEl = document.createElement('img'); imgEl.src = imgObj.url; imgEl.classList.add('foto-principal'); wrapper.appendChild(imgEl);
+      
+      const imgEl = document.createElement('img'); 
+      imgEl.src = imgObj.url; 
+      imgEl.classList.add('foto-principal'); 
+      
+      // Aplicando a borda se selecionada nas opções
+      if (opt.bordaFotos === 'preta-2pt') {
+        imgEl.classList.add('borda-preta-2pt');
+      }
+
+      wrapper.appendChild(imgEl);
+      
       if (opt.usarMarca && !imgObj.noLogo) {
         const logo = document.createElement('img'); logo.src = 'sabesp-logo.png'; logo.classList.add('marca-dagua-overlay', `pos-${opt.posMarca}`, opt.tamMarca); logo.style.opacity = opt.opacMarca; wrapper.appendChild(logo);
       }
@@ -951,7 +983,6 @@ document.addEventListener('DOMContentLoaded', () => {
     let assinaturaHtml = '';
     if (checkboxAssinatura.checked) {
       
-      // DEPARTAMENTO 1
       let deptoFinal1 = selectDepartamento.value === 'Outros' ? inputDepartamentoOutros.value.trim() : selectDepartamento.value;
       if (!deptoFinal1) deptoFinal1 = 'Divisão de Manutenção e Serviços de São José dos Campos';
 
@@ -972,7 +1003,6 @@ document.addEventListener('DOMContentLoaded', () => {
       let bloco2 = '';
       if (checkboxIncluirFiscal2.checked) {
         
-        // DEPARTAMENTO 2
         let deptoFinal2 = selectDepartamento2.value === 'Outros' ? inputDepartamentoOutros2.value.trim() : selectDepartamento2.value;
         if (!deptoFinal2) deptoFinal2 = 'Divisão de Manutenção e Serviços de São José dos Campos';
         

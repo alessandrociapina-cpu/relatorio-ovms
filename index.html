@@ -12,21 +12,21 @@
   <link href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.css" rel="stylesheet">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.js"></script>
   
-  <link rel="stylesheet" href="style.css?v=30"/>
+  <link rel="stylesheet" href="style.css?v=31"/>
 </head>
 <body>
   <div class="container">
     <h1>Relatório Fotográfico - OVMS</h1>
     
     <div class="versao-info" style="text-align: center; font-size: 0.8em; color: #6c757d; margin-top: -15px; margin-bottom: 20px;">
-      Versão 30 | Última atualização: 12/03/2026
+      Versão 31 | Última atualização: 16/03/2026
       <span class="info-tooltip-container" tabindex="0">
         <span class="info-icon">ℹ️</span>
         <span class="info-tooltip-text" style="width: 320px; max-height: 350px; overflow-y: auto; text-align: left;">
           <b>Últimas Atualizações:</b><br><br>
-          <b>v30:</b> Departamentos independentes. Agora é possível escolher um departamento diferente para cada fiscal.<br><br>
-          <b>v29:</b> Atualização do departamento padrão para São José dos Campos.<br><br>
-          <b>v28:</b> Forçada quebra de cache e motor definitivo "Network First".
+          <b>v31:</b> Nova opção para adicionar bordas pretas (2pt) nas fotos geradas no PDF para um acabamento visual mais limpo.<br><br>
+          <b>v30:</b> Departamentos independentes para cada fiscal.<br><br>
+          <b>v29:</b> Atualização do departamento padrão para São José dos Campos.
         </span>
       </span>
     </div>
@@ -152,6 +152,13 @@
             <label><input type="radio" name="layoutColunas" value="2" checked> 2 colunas (padrão)</label>
             <label><input type="radio" name="layoutColunas" value="1"> 1 coluna (fotos maiores)</label>
           </div>
+          
+          <div class="grupo-opcao">
+            <span class="grupo-label" style="font-weight: normal;">Bordas nas fotos:</span>
+            <label><input type="radio" name="bordaFotos" value="nenhuma" checked> Sem borda (Padrão)</label>
+            <label><input type="radio" name="bordaFotos" value="preta-2pt"> Borda Preta (2pt)</label>
+          </div>
+          
           <div class="grupo-opcao">
             <span class="grupo-label" style="font-weight: normal;">Qualidade das imagens:</span>
             <label><input type="radio" name="qualidadeImagens" value="media" checked> Média — 1024 px</label>
@@ -348,7 +355,7 @@
     </div>
   </div>
 
-  <script src="script.js?v=30"></script>
+  <script src="script.js?v=31"></script>
   
   <script>
     if ('serviceWorker' in navigator) {

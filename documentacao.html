@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Documentação - Relatório OVMS</title>
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style.css?v=31">
   <style>
     .doc-container {
       max-width: 850px;
@@ -42,7 +42,7 @@
     <ul>
       <li><strong>index.html:</strong> Contém a estrutura semântica da interface, painéis de formulário, contêineres de impressão dinâmicos, modais flutuantes e o gatilho de atualização automática (Network First).</li>
       <li><strong>style.css:</strong> Define a identidade visual, responsividade avançada para dispositivos móveis e as regras estritas de formatação de quebra de páginas em impressão de PDFs (<code>@media print</code>).</li>
-      <li><strong>script.js:</strong> O núcleo lógico da aplicação. Controla a manipulação do DOM, o processamento de imagens via Canvas (marca d'água, desenho, redimensionamento), sistema de dupla assinatura digital e a gestão assíncrona do Auto-Save.</li>
+      <li><strong>script.js:</strong> O núcleo lógico da aplicação. Controla a manipulação do DOM, o processamento de imagens via Canvas (marca d'água, bordas, desenho, redimensionamento), sistema de dupla assinatura digital e a gestão assíncrona do Auto-Save.</li>
       <li><strong>sw.js:</strong> Arquivo do <i>Service Worker</i> que gerencia o motor de cache inteligente e garante o funcionamento Offline da ferramenta após o primeiro carregamento.</li>
       <li><strong>documentacao.html:</strong> Página dedicada à documentação técnica e histórico de versões.</li>
       <li><strong>manifest.json:</strong> Arquivo de propriedades do PWA que fornece o nome, cores de tema e diretrizes para os sistemas operativos instalarem o sistema na Área de Trabalho ou ecrã inicial.</li>
@@ -54,7 +54,7 @@
 
     <h4>4. Funcionalidades Principais</h4>
     <ul>
-      <li><strong>Processamento de Imagens:</strong> Redimensionamento automático no lado do cliente para poupar memória do dispositivo.</li>
+      <li><strong>Processamento de Imagens:</strong> Redimensionamento automático no lado do cliente para poupar memória do dispositivo. Pode adicionar bordas estilizadas no relatório final.</li>
       <li><strong>Recuperação de GPS:</strong> Leitura universal de coordenadas EXIF e <i>fallback</i> (📍 Atualizar GPS pelo Celular) para captura nativa da antena em caso de foto recebida via WhatsApp, onde o sistema operativo apaga a geolocalização nativa para proteger a privacidade do remetente.</li>
       <li><strong>Laboratório de Edição:</strong> Modais para rotacionar, recortar (com proporções 4:3 e 3:4 forçadas) e desenhar vetores diretamente sobre evidências.</li>
       <li><strong>Extração de Vídeo:</strong> Leitor para capturar frames fotográficos diretamente de gravações em campo.</li>
@@ -70,7 +70,8 @@
       <li><strong>v21 a v23:</strong> Otimização de layout em linha (Data/Hora e Cargo) e avisos de melhoria de formato fotográfico (4:3).</li>
       <li><strong>v24 a v26:</strong> Correção de Bug nos botões Crop, aprimoramento na transparência da assinatura (Remove.bg) e tradução de UI ("aparelho celular").</li>
       <li><strong>v27 a v28:</strong> Inserção do módulo multi-fiscal (2ª assinatura paralela) e blindagem do Service Worker ("Quebrador de Cache") para 100% de garantia em atualizações remotas.</li>
-      <li><strong>v29 a v30 (Atual):</strong> Desacoplamento de departamento global. Inclusão de campos de departamentos individuais e parametrizáveis para cada fiscal. Ajuste no nome do departamento padrão para "Divisão de Manutenção e Serviços de São José dos Campos", padronizando a unidade no documento final.</li>
+      <li><strong>v29 a v30:</strong> Desacoplamento de departamento global. Inclusão de campos de departamentos individuais e parametrizáveis para cada fiscal. Ajuste no nome do departamento padrão para São José dos Campos.</li>
+      <li><strong>v31 (Atual):</strong> Adição do suporte para bordas em fotografias (borda de 2pt preta) no relatório PDF para uma melhor leitura e acabamento visual.</li>
     </ul>
 
     <h4>Apêndice B: Verificação de Segurança Corporativa (Compliance InfoSec)</h4>

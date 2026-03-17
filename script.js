@@ -591,7 +591,7 @@ document.addEventListener('DOMContentLoaded', () => {
   function renderizarGaleria() {
     galeriaPreview.innerHTML = '';
     if (fotosSelecionadasParaRelatorio.length === 0) {
-      galeriaPreview.innerHTML = '<p>Nenhuma foto selected.</p>';
+      galeriaPreview.innerHTML = '<p>Nenhuma foto selecionada.</p>';
       return;
     }
 

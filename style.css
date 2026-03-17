@@ -108,7 +108,7 @@ hr { margin: 30px 0; border: 0; border-top: 1px solid #ddd; }
 .modal-acoes { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; }
 
 /* Área do Relatório */
-#area-relatorio { display: none; margin-top: 30px; padding: 20px; border: 1px solid #ccc; background-color: #fff; border-radius: 5px; }
+#area-relatorio { display: none; margin-top: 30px; padding: 20px; border: 1px solid #ccc; background-color: #fff; border-radius: 5px; position: relative; }
 .cabecalho-principal { display: grid; grid-template-columns: 125px 1fr 125px; align-items: center; border-bottom: 2px solid #eee; padding-bottom: 15px; margin-bottom: 15px; }
 .titulo-companhia { font-family: Tahoma, sans-serif; font-size: 12pt; font-weight: bold; color: #12D0FF; margin-bottom: 5px; text-align: center; }
 .titulo-vistoria { font-weight: bold; font-size: 18pt; color: #12D0FF; text-align: center; margin: 0; }
@@ -134,8 +134,9 @@ hr { margin: 30px 0; border: 0; border-top: 1px solid #ddd; }
 .linha-assinatura { width: 260px; border-top: 1px solid #000; margin-top: 0px; margin-bottom: 5px; }
 .assinatura-imagem-limpa { max-width: 260px; height: auto; max-height: 60px; object-fit: contain; display: block; margin-bottom: 10px; }
 
-/* Rodapé (Relatório PDF) */
-.rodape-container { margin-top: auto; border-top: 1.5px solid #12D0FF; padding-top: 8px; width: 100%; flex-shrink: 0; }
+/* Rodapé Dinâmico (Fixo no fundo da página em Impressão) */
+.rodape-fixo { width: 100%; margin-top: 20px; }
+.rodape-container { border-top: 1.5px solid #12D0FF; padding-top: 8px; width: 100%; }
 .rodape-texto, .rodape-texto div, .rodape-texto span { font-family: Tahoma, sans-serif; font-weight: bold; font-size: 8pt; color: #12D0FF; text-align: left; line-height: 1.2; }
 
 /* ========================================= */
@@ -190,7 +191,7 @@ hr { margin: 30px 0; border: 0; border-top: 1px solid #ddd; }
 
   /* Impressão do Rodapé */
   body.preview-print .rodape-texto, body.preview-print .rodape-texto div, body.preview-print .rodape-texto span { color: #12D0FF !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-  body.preview-print .rodape-container { border-top: 1.5px solid #12D0FF !important; margin-top: auto; padding-top: 4px; }
+  body.preview-print .rodape-container { border-top: 1.5px solid #12D0FF !important; padding-top: 4px; }
 }
 
 @media print {
@@ -198,4 +199,14 @@ hr { margin: 30px 0; border: 0; border-top: 1px solid #ddd; }
   .container { width: 100% !important; margin: 0 !important; padding: 0 !important; box-shadow: none !important; border: none !important; }
   .secao-entrada, .secao-fotos, .secao-observacoes, .secao-acao, .secao-projeto, body > .container > h1, hr, .versao-info { display: none !important; }
   #area-relatorio { border: none !important; padding: 0 !important; margin: 0 !important; display: block !important; }
+  
+  /* Truque para cravar o rodapé no fundo de todas as páginas físicas */
+  .rodape-fixo {
+      position: fixed !important;
+      bottom: 0 !important;
+      left: 0 !important;
+      width: 100% !important;
+      background: #fff; /* Evita linhas de tabela a vazar por baixo */
+      z-index: 1000;
+  }
 }

@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Documentação - Relatório OVMS</title>
-  <link rel="stylesheet" href="style.css?v=33">
+  <link rel="stylesheet" href="style.css?v=34">
   <style>
     .doc-container {
       max-width: 850px;
@@ -59,7 +59,7 @@
       <li><strong>Laboratório de Edição:</strong> Modais para rotacionar, recortar (com proporções 4:3 e 3:4 forçadas) e desenhar vetores diretamente sobre evidências.</li>
       <li><strong>Extração de Vídeo:</strong> Leitor para capturar frames fotográficos diretamente de gravações em campo.</li>
       <li><strong>Gestão de Rascunho (Auto-Save):</strong> Implementação de temporizador (<i>Debounce</i> de 5s) para salvamento silencioso sem causar engasgos em aparelhos celulares. Exportação física do projeto em <code>.json</code>.</li>
-      <li><strong>Motor Dinâmico de PDF:</strong> Suporte a múltiplas assinaturas dinâmicas. A estrutura do documento utiliza Tabelas (`thead` e `tfoot`) para garantir que o cabeçalho e o rodapé oficial da Sabesp se repitam automaticamente no topo e no fundo de todas as páginas do PDF gerado.</li>
+      <li><strong>Motor Dinâmico de PDF:</strong> Suporte a múltiplas assinaturas dinâmicas (1 ou 2 fiscais lado a lado com departamentos independentes). A estrutura do documento utiliza Tabelas (`thead`) aliadas a posições fixas de CSS (`position: fixed`) para garantir que o cabeçalho e o rodapé oficial da Sabesp se repitam automaticamente e fiquem ancorados nos limites da página em todas as folhas do PDF gerado.</li>
     </ul>
 
     <h4>Apêndice A: Histórico de Atualizações</h4>
@@ -70,10 +70,9 @@
       <li><strong>v21 a v23:</strong> Otimização de layout em linha (Data/Hora e Cargo) e avisos de melhoria de formato fotográfico (4:3).</li>
       <li><strong>v24 a v26:</strong> Correção de Bug nos botões Crop, aprimoramento na transparência da assinatura (Remove.bg) e tradução de UI ("aparelho celular").</li>
       <li><strong>v27 a v28:</strong> Inserção do módulo multi-fiscal (2ª assinatura paralela) e blindagem do Service Worker ("Quebrador de Cache") para 100% de garantia em atualizações remotas.</li>
-      <li><strong>v29 a v30:</strong> Desacoplamento de departamento global. Inclusão de campos de departamentos individuais e parametrizáveis para cada fiscal.</li>
-      <li><strong>v31:</strong> Adição do suporte para bordas pretas nas fotografias geradas.</li>
-      <li><strong>v32:</strong> Implementação do Cabeçalho de repetição global via `thead` HTML para impressões multipáginas.</li>
-      <li><strong>v33 (Atual):</strong> Adição do Rodapé Oficial corporativo, integrando endereço e site via tag estrutural `tfoot` e estilos customizados para repetição padronizada em todas as páginas da exportação PDF.</li>
+      <li><strong>v29 a v30:</strong> Desacoplamento de departamento global. Inclusão de campos de departamentos individuais e parametrizáveis para cada fiscal. Ajuste no nome do departamento padrão para São José dos Campos.</li>
+      <li><strong>v31 a v32:</strong> Adição do suporte para bordas pretas nas fotografias geradas e implementação do Cabeçalho de repetição global via `thead` HTML para impressões multipáginas.</li>
+      <li><strong>v33 a v34 (Atual):</strong> Adição do Rodapé Oficial corporativo e resolução do Bug de Sobreposição. O rodapé agora utiliza `position: fixed` associado a um `tfoot` fantasma de 25mm, o que obriga o navegador a ancorar o texto institucional sempre no fundo absoluto do papel em todas as páginas, não importando a quantidade de conteúdo da última folha.</li>
     </ul>
 
     <h4>Apêndice B: Verificação de Segurança Corporativa (Compliance InfoSec)</h4>

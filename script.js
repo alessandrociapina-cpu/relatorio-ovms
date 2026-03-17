@@ -255,7 +255,6 @@ document.addEventListener('DOMContentLoaded', () => {
   let fotosSelecionadasParaRelatorio = [];
 
   function exportarEstado() {
-    // Recolher as opções de layout na altura da gravação (Borda)
     const borda = Array.from(document.querySelectorAll('input[name="bordaFotos"]')).find(r => r.checked)?.value || 'nenhuma';
     
     return {
@@ -301,7 +300,6 @@ document.addEventListener('DOMContentLoaded', () => {
       }
 
       if (estado.form.departamento1) selectDepartamento.value = estado.form.departamento1;
-      // Retrocompatibilidade
       if (estado.form.departamento && !estado.form.departamento1) selectDepartamento.value = estado.form.departamento;
       if (selectDepartamento.value === 'Outros') {
         inputDepartamentoOutros.style.display = 'inline-block';
@@ -439,7 +437,6 @@ document.addEventListener('DOMContentLoaded', () => {
   rangeOpacidadeMarca.addEventListener('input', (e) => spanValorOpacidade.textContent = `${e.target.value}%`);
   checkboxMetadados.addEventListener('change', () => renderizarGaleria());
 
-  // Adicionado Listener para salvar Rascunho quando as Bordas mudarem
   const radiosBordaFotos = document.querySelectorAll('input[name="bordaFotos"]');
   radiosBordaFotos.forEach(r => r.addEventListener('change', salvarRascunhoLocal));
 
@@ -899,10 +896,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const layout = Array.from(radiosLayout).find(r => r.checked)?.value || '2';
     const qualidade = Array.from(radiosQualidade).find(r => r.checked)?.value || 'media';
     const margens = Array.from(radiosMargens).find(r => r.checked)?.value || 'maiores';
-    
-    // Ler a nova opção de borda
     const borda = Array.from(document.querySelectorAll('input[name="bordaFotos"]')).find(r => r.checked)?.value || 'nenhuma';
-    
     const mapaQualidade = { media: { largura: 1024, qualidade: 0.7 }, maxima: { largura: 1600, qualidade: 0.8 } };
     const mapaMargens = { menores: 5, maiores: 15 };
     return {
@@ -910,7 +904,7 @@ document.addEventListener('DOMContentLoaded', () => {
       margensMm: mapaMargens[margens], usarMarca: checkboxMarca.checked, posMarca: selectPosicaoMarca.value, 
       tamMarca: selectTamanhoMarca.value, opacMarca: parseInt(rangeOpacidadeMarca.value, 10) / 100, 
       fonte: selectFonte.value, tamanhoFonte: selectTamanhoFonte.value, usarMetadados: checkboxMetadados.checked,
-      bordaFotos: borda // Injetando a configuração de borda
+      bordaFotos: borda
     };
   }
 
@@ -962,7 +956,6 @@ document.addEventListener('DOMContentLoaded', () => {
       imgEl.src = imgObj.url; 
       imgEl.classList.add('foto-principal'); 
       
-      // Aplicando a borda se selecionada nas opções
       if (opt.bordaFotos === 'preta-2pt') {
         imgEl.classList.add('borda-preta-2pt');
       }
@@ -1038,7 +1031,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     observacoesFinaisRelatorioDiv.innerHTML = obsFinalHtml;
 
-    areaRelatorio.style.display = 'block';
+    areaRelatorio.style.display = 'table';
     if (ativarPreview) document.body.classList.add('preview-print');
     areaRelatorio.scrollIntoView({ behavior: 'smooth' });
   }

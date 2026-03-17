@@ -1,11 +1,11 @@
-const CACHE_NAME = 'ovms-app-v32'; 
+const CACHE_NAME = 'ovms-app-v33'; 
 
 const urlsToCache = [
   './',
   './index.html',
   './documentacao.html',
-  './style.css?v=32',
-  './script.js?v=32',
+  './style.css?v=33',
+  './script.js?v=33',
   './manifest.json',
   './sabesp-logo.png',
   'https://cdn.jsdelivr.net/npm/exif-js',
@@ -31,7 +31,6 @@ self.addEventListener('activate', event => {
   self.clients.claim();
 });
 
-// O Motor Definitivo: 100% NETWORK FIRST
 self.addEventListener('fetch', event => {
   if (event.request.method !== 'GET') return;
 

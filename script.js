@@ -4,14 +4,12 @@ document.addEventListener('DOMContentLoaded', () => {
   const inputDataVistoria = document.getElementById('dataVistoria');
   const inputHoraVistoria = document.getElementById('horaVistoria');
   
-  // Fiscal 1
   const inputNomeFiscal = document.getElementById('nomeFiscal');
   const selectCargo = document.getElementById('cargoFiscal');
   const inputCargoOutros = document.getElementById('cargoFiscalOutros');
   const selectDepartamento = document.getElementById('departamentoFiscal');
   const inputDepartamentoOutros = document.getElementById('departamentoFiscalOutros');
 
-  // Fiscal 2
   const checkboxIncluirFiscal2 = document.getElementById('incluirFiscal2');
   const blocoFiscal2 = document.getElementById('blocoFiscal2');
   const inputNomeFiscal2 = document.getElementById('nomeFiscal2');
@@ -38,7 +36,6 @@ document.addEventListener('DOMContentLoaded', () => {
   const inputCarregarProjeto = document.getElementById('inputCarregarProjeto');
   const autoSaveStatus = document.getElementById('autoSaveStatus');
 
-  // Lógica Cargo e Depto Fiscal 1
   selectCargo.addEventListener('change', (e) => {
     if (e.target.value === 'Outros') {
       inputCargoOutros.style.display = 'inline-block';
@@ -63,7 +60,6 @@ document.addEventListener('DOMContentLoaded', () => {
   });
   inputDepartamentoOutros.addEventListener('input', salvarRascunhoLocal);
 
-  // Lógica Cargo e Depto Fiscal 2
   selectCargo2.addEventListener('change', (e) => {
     if (e.target.value === 'Outros') {
       inputCargoOutros2.style.display = 'inline-block';
@@ -88,7 +84,6 @@ document.addEventListener('DOMContentLoaded', () => {
   });
   inputDepartamentoOutros2.addEventListener('input', salvarRascunhoLocal);
 
-  // Lógica da Assinatura 1 e 2
   const checkboxAssinatura = document.getElementById('incluirAssinatura');
   const dicaAssinatura = document.getElementById('dicaAssinatura');
   
@@ -290,7 +285,6 @@ document.addEventListener('DOMContentLoaded', () => {
       inputNomeFiscal.value = estado.form.fiscal || '';
       inputObservacoes.value = estado.form.obs || '';
       
-      // Fiscal 1
       if (estado.form.cargo) selectCargo.value = estado.form.cargo;
       if (estado.form.cargo === 'Outros') {
         inputCargoOutros.style.display = 'inline-block';
@@ -308,7 +302,6 @@ document.addEventListener('DOMContentLoaded', () => {
         inputDepartamentoOutros.style.display = 'none';
       }
 
-      // Fiscal 2
       checkboxIncluirFiscal2.checked = estado.form.incluirFiscal2 || false;
       blocoFiscal2.style.display = checkboxIncluirFiscal2.checked ? 'flex' : 'none';
       inputNomeFiscal2.value = estado.form.nomeFiscal2 || '';
@@ -329,12 +322,10 @@ document.addEventListener('DOMContentLoaded', () => {
         inputDepartamentoOutros2.style.display = 'none';
       }
 
-      // Assinaturas
       checkboxAssinatura.checked = estado.form.incluirAssinatura || false;
       assinaturaBase64 = estado.form.assinaturaUrl || null;
       assinaturaBase64_2 = estado.form.assinaturaUrl2 || null;
       
-      // Borda
       if (estado.form.bordaFotos) {
         const rb = document.querySelector(`input[name="bordaFotos"][value="${estado.form.bordaFotos}"]`);
         if (rb) rb.checked = true;
@@ -600,7 +591,7 @@ document.addEventListener('DOMContentLoaded', () => {
   function renderizarGaleria() {
     galeriaPreview.innerHTML = '';
     if (fotosSelecionadasParaRelatorio.length === 0) {
-      galeriaPreview.innerHTML = '<p>Nenhuma foto selecionada.</p>';
+      galeriaPreview.innerHTML = '<p>Nenhuma foto selected.</p>';
       return;
     }
 

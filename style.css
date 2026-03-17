@@ -169,7 +169,11 @@ hr { margin: 30px 0; border: 0; border-top: 1px solid #ddd; }
 @media print, (max-width: 10000px) { 
   body.preview-print { background-color: #fff !important; }
   body.preview-print .container { max-width: 210mm; padding: 0 !important; margin: 0 auto; box-shadow: none !important; border: none !important; }
+  
+  /* Configuração rígida de Tabela para o Cabeçalho repetir */
   body.preview-print #area-relatorio { border: none !important; padding: 0 !important; margin: 0 !important; display: block; }
+  body.preview-print #area-relatorio table { width: 100%; border-collapse: collapse; }
+  body.preview-print #area-relatorio td { padding: 0; vertical-align: top; border: none; }
   
   body.preview-print .versao-info { display: none !important; }
 

@@ -345,7 +345,6 @@ document.addEventListener('DOMContentLoaded', () => {
   const dbName = 'ovmsDB';
   const storeName = 'rascunhoStore';
 
-  // Inicializa o banco de dados nativo do navegador
   function initDB() {
     return new Promise((resolve, reject) => {
       const request = indexedDB.open(dbName, 1);
@@ -420,7 +419,17 @@ document.addEventListener('DOMContentLoaded', () => {
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `Vistoria_${inputDataVistoria.value || 'OVMS'}.json`;
+    
+    // --- LÓGICA DE NOME DO ARQUIVO MELHORADA ---
+    const dataArquivo = inputDataVistoria.value || 'sem-data';
+    let localArquivo = inputLocalVistoria.value.trim();
+    
+    // Substitui espaços e caracteres especiais por '_' para evitar problemas no SO
+    localArquivo = localArquivo ? localArquivo.replace(/[^a-zA-Z0-9-]/g, '_') : 'sem-local'; 
+    
+    a.download = `vistoria-${dataArquivo}-${localArquivo}.json`;
+    // ------------------------------------------
+    
     a.click();
     URL.revokeObjectURL(url);
   });
@@ -452,13 +461,30 @@ document.addEventListener('DOMContentLoaded', () => {
       }
 
       if(dataToRestore) {
-        if(confirm('Encontrámos um relatório em andamento guardado. Deseja restaurá-lo?')) {
+        // --- LÓGICA DE CONFIRMAÇÃO MELHORADA ---
+        const localSalvo = (dataToRestore.form && dataToRestore.form.local) ? dataToRestore.form.local : 'Não informado';
+        
+        // Formatar data (se existir) do formato YYYY-MM-DD para DD/MM/YYYY
+        let dataSalva = 'Não informada';
+        if (dataToRestore.form && dataToRestore.form.data) {
+          const partesData = dataToRestore.form.data.split('-');
+          if (partesData.length === 3) {
+            dataSalva = `${partesData[2]}/${partesData[1]}/${partesData[0]}`;
+          } else {
+            dataSalva = dataToRestore.form.data;
+          }
+        }
+        
+        const mensagemConfirma = `Encontramos um relatório em andamento salvo neste dispositivo:\n\n📍 Local: ${localSalvo}\n📅 Data: ${dataSalva}\n\nDeseja restaurar esta vistoria?`;
+
+        if(confirm(mensagemConfirma)) {
           carregarEstado(dataToRestore);
           autoSaveStatus.textContent = 'Rascunho restaurado.';
         } else {
           await limparDB();
           localStorage.removeItem('ovms_rascunho');
         }
+        // ---------------------------------------
       }
     } catch (e) {
       console.error("Erro assíncrono ao recuperar o estado da vistoria:", e);

@@ -339,6 +339,57 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
+  // =======================================================
+  // MOTOR DE AUTO-SAVE COM INDEXEDDB (SUPORTE A FOTOS GRANDES)
+  // =======================================================
+  const dbName = 'ovmsDB';
+  const storeName = 'rascunhoStore';
+
+  // Inicializa o banco de dados nativo do navegador
+  function initDB() {
+    return new Promise((resolve, reject) => {
+      const request = indexedDB.open(dbName, 1);
+      request.onupgradeneeded = (e) => {
+        const db = e.target.result;
+        if (!db.objectStoreNames.contains(storeName)) {
+          db.createObjectStore(storeName);
+        }
+      };
+      request.onsuccess = () => resolve(request.result);
+      request.onerror = () => reject(request.error);
+    });
+  }
+
+  async function salvarDB(estado) {
+    const db = await initDB();
+    return new Promise((resolve, reject) => {
+      const tx = db.transaction(storeName, 'readwrite');
+      tx.objectStore(storeName).put(estado, 'draft');
+      tx.oncomplete = () => resolve();
+      tx.onerror = () => reject(tx.error);
+    });
+  }
+
+  async function carregarDB() {
+    const db = await initDB();
+    return new Promise((resolve, reject) => {
+      const tx = db.transaction(storeName, 'readonly');
+      const request = tx.objectStore(storeName).get('draft');
+      request.onsuccess = () => resolve(request.result);
+      request.onerror = () => reject(request.error);
+    });
+  }
+
+  async function limparDB() {
+    const db = await initDB();
+    return new Promise((resolve, reject) => {
+      const tx = db.transaction(storeName, 'readwrite');
+      tx.objectStore(storeName).delete('draft');
+      tx.oncomplete = () => resolve();
+      tx.onerror = () => reject(tx.error);
+    });
+  }
+
   let timeoutSalvarRascunho; 
 
   function salvarRascunhoLocal() {
@@ -346,16 +397,17 @@ document.addEventListener('DOMContentLoaded', () => {
     autoSaveStatus.textContent = 'Digitando... (aguardando para salvar)';
     autoSaveStatus.style.color = '#6c757d';
 
-    timeoutSalvarRascunho = setTimeout(() => {
+    timeoutSalvarRascunho = setTimeout(async () => {
       try {
         const estado = exportarEstado();
-        localStorage.setItem('ovms_rascunho', JSON.stringify(estado));
+        await salvarDB(estado);
         const agora = new Date();
         autoSaveStatus.textContent = `✔ Salvo às ${agora.getHours()}:${String(agora.getMinutes()).padStart(2, '0')}`;
         autoSaveStatus.style.color = 'green';
       } catch (e) {
-        autoSaveStatus.textContent = `⚠️ Rascunho pesado. Use "Baixar Projeto" para salvar!`;
+        autoSaveStatus.textContent = `⚠️ Falha ao armazenar. Use "Baixar Projeto" para garantir!`;
         autoSaveStatus.style.color = '#d9534f';
+        console.error('Falha interna no IndexedDB:', e);
       }
     }, 5000); 
   }
@@ -388,17 +440,32 @@ document.addEventListener('DOMContentLoaded', () => {
     inputCarregarProjeto.value = ''; 
   });
 
-  function inicializarAutoSave() {
-    const draft = localStorage.getItem('ovms_rascunho');
-    if(draft) {
-      if(confirm('Encontrámos um relatório em andamento guardado. Deseja restaurá-lo?')) {
-        carregarEstado(JSON.parse(draft));
-        autoSaveStatus.textContent = 'Rascunho restaurado.';
-      } else {
-        localStorage.removeItem('ovms_rascunho');
+  async function inicializarAutoSave() {
+    try {
+      const draftDB = await carregarDB();
+      // Verificação de fallback para rascunhos antigos em localStorage
+      const draftLocal = localStorage.getItem('ovms_rascunho');
+
+      let dataToRestore = draftDB;
+      if (!dataToRestore && draftLocal) {
+        dataToRestore = JSON.parse(draftLocal);
       }
+
+      if(dataToRestore) {
+        if(confirm('Encontrámos um relatório em andamento guardado. Deseja restaurá-lo?')) {
+          carregarEstado(dataToRestore);
+          autoSaveStatus.textContent = 'Rascunho restaurado.';
+        } else {
+          await limparDB();
+          localStorage.removeItem('ovms_rascunho');
+        }
+      }
+    } catch (e) {
+      console.error("Erro assíncrono ao recuperar o estado da vistoria:", e);
     }
   }
+  
+  // Gatilho de recuperação invocado
   inicializarAutoSave();
 
   radiosFerramenta.forEach(radio => {

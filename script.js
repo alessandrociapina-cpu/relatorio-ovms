@@ -340,7 +340,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // =======================================================
-  // MOTOR DE AUTO-SAVE COM INDEXEDDB (SUPORTE A FOTOS GRANDES)
+  // MOTOR DE AUTO-SAVE COM INDEXEDDB
   // =======================================================
   const dbName = 'ovmsDB';
   const storeName = 'rascunhoStore';
@@ -420,16 +420,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const a = document.createElement('a');
     a.href = url;
     
-    // --- LÓGICA DE NOME DO ARQUIVO MELHORADA ---
     const dataArquivo = inputDataVistoria.value || 'sem-data';
     let localArquivo = inputLocalVistoria.value.trim();
-    
-    // Substitui espaços e caracteres especiais por '_' para evitar problemas no SO
     localArquivo = localArquivo ? localArquivo.replace(/[^a-zA-Z0-9-]/g, '_') : 'sem-local'; 
     
     a.download = `vistoria-${dataArquivo}-${localArquivo}.json`;
-    // ------------------------------------------
-    
     a.click();
     URL.revokeObjectURL(url);
   });
@@ -452,7 +447,6 @@ document.addEventListener('DOMContentLoaded', () => {
   async function inicializarAutoSave() {
     try {
       const draftDB = await carregarDB();
-      // Verificação de fallback para rascunhos antigos em localStorage
       const draftLocal = localStorage.getItem('ovms_rascunho');
 
       let dataToRestore = draftDB;
@@ -461,10 +455,8 @@ document.addEventListener('DOMContentLoaded', () => {
       }
 
       if(dataToRestore) {
-        // --- LÓGICA DE CONFIRMAÇÃO MELHORADA ---
         const localSalvo = (dataToRestore.form && dataToRestore.form.local) ? dataToRestore.form.local : 'Não informado';
         
-        // Formatar data (se existir) do formato YYYY-MM-DD para DD/MM/YYYY
         let dataSalva = 'Não informada';
         if (dataToRestore.form && dataToRestore.form.data) {
           const partesData = dataToRestore.form.data.split('-');
@@ -484,14 +476,12 @@ document.addEventListener('DOMContentLoaded', () => {
           await limparDB();
           localStorage.removeItem('ovms_rascunho');
         }
-        // ---------------------------------------
       }
     } catch (e) {
       console.error("Erro assíncrono ao recuperar o estado da vistoria:", e);
     }
   }
   
-  // Gatilho de recuperação invocado
   inicializarAutoSave();
 
   radiosFerramenta.forEach(radio => {
@@ -1115,28 +1105,39 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     observacoesFinaisRelatorioDiv.innerHTML = obsFinalHtml;
 
-    // --- NOVA LÓGICA DO RODAPÉ DINÂMICO ---
-    const deptoPadrao = 'Divisão de Manutenção e Serviços de São José dos Campos';
-    let deptoFiscal1 = selectDepartamento.value === 'Outros' ? inputDepartamentoOutros.value.trim() : selectDepartamento.value;
-    let deptoFiscal2 = checkboxIncluirFiscal2.checked ? (selectDepartamento2.value === 'Outros' ? inputDepartamentoOutros2.value.trim() : selectDepartamento2.value) : deptoPadrao;
-
+    // --- NOVA LÓGICA DO RODAPÉ DINÂMICO (v36) ---
     const rodapeDiv = document.querySelector('.rodape-texto');
     if (rodapeDiv) {
-      if (deptoFiscal1 !== deptoPadrao && deptoFiscal1 !== '') {
-        rodapeDiv.innerHTML = `Companhia de Saneamento Básico do Estado de São Paulo – Sabesp<br>
-        <span contenteditable="true" style="display:inline-block; outline:none;">${deptoFiscal1}</span><br>
-        <span>www.sabesp.com.br</span>`;
-      } else if (deptoFiscal2 !== deptoPadrao && deptoFiscal2 !== '') {
-        rodapeDiv.innerHTML = `Companhia de Saneamento Básico do Estado de São Paulo – Sabesp<br>
-        <span>www.sabesp.com.br</span>`;
+      let isOutros1 = selectDepartamento.value === 'Outros';
+      let isOutros2 = checkboxIncluirFiscal2.checked && selectDepartamento2.value === 'Outros';
+
+      if (isOutros1 || isOutros2) {
+        // Pega o nome do departamento customizado digitado (prioridade para o fiscal 1)
+        let deptoNome = '';
+        if (isOutros1 && inputDepartamentoOutros.value.trim() !== '') {
+          deptoNome = inputDepartamentoOutros.value.trim();
+        } else if (isOutros2 && inputDepartamentoOutros2.value.trim() !== '') {
+          deptoNome = inputDepartamentoOutros2.value.trim();
+        }
+
+        if (deptoNome !== '') {
+          rodapeDiv.innerHTML = `Companhia de Saneamento Básico do Estado de São Paulo – Sabesp<br>
+          <span contenteditable="true" style="display:inline-block; outline:none;">${deptoNome}</span><br>
+          <span>www.sabesp.com.br</span>`;
+        } else {
+          // Se escolheu 'Outros' mas deixou a caixa em branco
+          rodapeDiv.innerHTML = `Companhia de Saneamento Básico do Estado de São Paulo – Sabesp<br>
+          <span>www.sabesp.com.br</span>`;
+        }
       } else {
+        // Padrão
         rodapeDiv.innerHTML = `Companhia de Saneamento Básico do Estado de São Paulo – Sabesp<br>
         <span contenteditable="true" style="display:inline-block; outline:none;">Divisão de Manutenção e Serviços Operacionais de São José dos Campos - OVMS</span><br>
         <span contenteditable="true" style="display: inline-block; outline: none; min-width: 100%;">Rua Euclides Miragaia, 126, Centro - CEP 12.245-820 - São José dos Campos - SP</span><br>
         <span>www.sabesp.com.br</span>`;
       }
     }
-    // ---------------------------------------
+    // -------------------------------------------
 
     areaRelatorio.style.display = 'table';
     if (ativarPreview) document.body.classList.add('preview-print');

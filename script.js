@@ -538,7 +538,7 @@ document.addEventListener('DOMContentLoaded', () => {
     
     const tituloOriginal = document.title;
     let nomeObra = inputLocalVistoria.value.trim();
-    document.title = nomeObra ? `Relatório Fotográfico - ${nomeObra}` : 'Relatório Fotográfico - OVMS';
+    document.title = nomeObra ? `Relatório Fotográfico - ${nomeObra}` : 'Relatório Fotográfico';
     
     setTimeout(() => { 
       window.print(); 
@@ -1114,6 +1114,29 @@ document.addEventListener('DOMContentLoaded', () => {
       obsFinalHtml += assinaturaHtml;
     }
     observacoesFinaisRelatorioDiv.innerHTML = obsFinalHtml;
+
+    // --- NOVA LÓGICA DO RODAPÉ DINÂMICO ---
+    const deptoPadrao = 'Divisão de Manutenção e Serviços de São José dos Campos';
+    let deptoFiscal1 = selectDepartamento.value === 'Outros' ? inputDepartamentoOutros.value.trim() : selectDepartamento.value;
+    let deptoFiscal2 = checkboxIncluirFiscal2.checked ? (selectDepartamento2.value === 'Outros' ? inputDepartamentoOutros2.value.trim() : selectDepartamento2.value) : deptoPadrao;
+
+    const rodapeDiv = document.querySelector('.rodape-texto');
+    if (rodapeDiv) {
+      if (deptoFiscal1 !== deptoPadrao && deptoFiscal1 !== '') {
+        rodapeDiv.innerHTML = `Companhia de Saneamento Básico do Estado de São Paulo – Sabesp<br>
+        <span contenteditable="true" style="display:inline-block; outline:none;">${deptoFiscal1}</span><br>
+        <span>www.sabesp.com.br</span>`;
+      } else if (deptoFiscal2 !== deptoPadrao && deptoFiscal2 !== '') {
+        rodapeDiv.innerHTML = `Companhia de Saneamento Básico do Estado de São Paulo – Sabesp<br>
+        <span>www.sabesp.com.br</span>`;
+      } else {
+        rodapeDiv.innerHTML = `Companhia de Saneamento Básico do Estado de São Paulo – Sabesp<br>
+        <span contenteditable="true" style="display:inline-block; outline:none;">Divisão de Manutenção e Serviços Operacionais de São José dos Campos - OVMS</span><br>
+        <span contenteditable="true" style="display: inline-block; outline: none; min-width: 100%;">Rua Euclides Miragaia, 126, Centro - CEP 12.245-820 - São José dos Campos - SP</span><br>
+        <span>www.sabesp.com.br</span>`;
+      }
+    }
+    // ---------------------------------------
 
     areaRelatorio.style.display = 'table';
     if (ativarPreview) document.body.classList.add('preview-print');

@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Documentação - Relatório OVMS</title>
-  <link rel="stylesheet" href="style.css?v=35">
+  <link rel="stylesheet" href="style.css?v=36">
   <style>
     .doc-container {
       max-width: 850px;
@@ -73,8 +73,9 @@
       <li><strong>v27 a v28:</strong> Inserção do módulo multi-fiscal (2ª assinatura paralela) e blindagem do Service Worker ("Quebrador de Cache") para 100% de garantia em atualizações remotas.</li>
       <li><strong>v29 a v30:</strong> Desacoplamento de departamento global. Inclusão de campos de departamentos individuais e parametrizáveis para cada fiscal. Ajuste no nome do departamento padrão para São José dos Campos.</li>
       <li><strong>v31 a v32:</strong> Adição do suporte para bordas pretas nas fotografias geradas e implementação do Cabeçalho de repetição global via `thead` HTML para impressões multipáginas.</li>
-      <li><strong>v33 a v34:</strong> Adição do Rodapé Oficial corporativo e resolução do Bug de Sobreposição. O rodapé agora utiliza `position: fixed` associado a um `tfoot` fantasma de 25mm, o que obriga o navegador a ancorar o texto institucional sempre no fundo absoluto do papel em todas as páginas, não importando a quantidade de conteúdo da última folha.</li>
-      <li><strong>v35 (Atual):</strong> Migração do motor de Auto-Save de <code>localStorage</code> para <code>IndexedDB</code>, resolvendo o limite de cota de 5MB do navegador e permitindo a recuperação completa e o armazenamento offline seguro de relatórios contendo múltiplas fotografias em alta resolução.</li>
+      <li><strong>v33 a v34:</strong> Adição do Rodapé Oficial corporativo e resolução do Bug de Sobreposição utilizando posição fixa e <code>tfoot</code>.</li>
+      <li><strong>v35:</strong> Migração do motor de Auto-Save de <code>localStorage</code> para <code>IndexedDB</code>.</li>
+      <li><strong>v36 (Atual):</strong> Aprimoramento da lógica do rodapé dinâmico: o endereço fixo é removido automaticamente caso o usuário selecione "Outros" no campo de departamento de qualquer um dos fiscais, assumindo apenas o nome do departamento customizado.</li>
     </ul>
 
     <h4>Apêndice B: Verificação de Segurança Corporativa (Compliance InfoSec)</h4>

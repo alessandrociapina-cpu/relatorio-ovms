@@ -12,7 +12,7 @@ const urlsToCache = [
   './script.js?v=43',
   './manifest.json',
   './sabesp-logo.png',
-  'https://cdn.jsdelivr.net/npm/exif-js',
+  'https://cdn.jsdelivr.net/npm/exif-js@2.3.0',
   'https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.css',
   'https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.js',
 ];

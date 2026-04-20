@@ -759,6 +759,46 @@ hr {
   }
 }
 
+/* -------- Toast de atualização de versão -------- */
+#toast-atualizacao {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #333;
+  color: #fff;
+  padding: 12px 18px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  z-index: 10000;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35);
+  font-size: 0.9em;
+  white-space: nowrap;
+}
+#toast-atualizacao[hidden] {
+  display: none;
+}
+#toast-atualizacao button {
+  background: #007bff;
+  color: #fff;
+  border: none;
+  padding: 6px 14px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 0.9em;
+  white-space: nowrap;
+}
+#toast-atualizacao button:hover {
+  background: #0056b3;
+}
+@media print {
+  #toast-atualizacao {
+    display: none !important;
+  }
+}
+
 /* -------- Impressão e Preview -------- */
 @page {
   size: A4 portrait;

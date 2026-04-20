@@ -8,7 +8,11 @@
     <link rel="manifest" href="manifest.json" />
     <meta name="theme-color" content="#007bff" />
 
-    <script src="https://cdn.jsdelivr.net/npm/exif-js@2.3.0" crossorigin="anonymous"></script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/exif-js@2.3.0"
+      integrity="sha384-rRoXxn2yHlrZYB587Ki9RO1tONhLdM6XfORg7Rw4uwH4/Fh/5nP7IUX91bkaKUgs"
+      crossorigin="anonymous"
+    ></script>
     <link
       href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.css"
       rel="stylesheet"
@@ -588,6 +592,7 @@
         <textarea
           id="observacoesGerais"
           placeholder="Descreva aqui as observações gerais, serviços realizados..."
+          maxlength="3000"
         ></textarea>
       </div>
 
@@ -703,6 +708,7 @@
               type="text"
               id="textoEdicao"
               placeholder="1. Digite o texto e 2. Clique na foto"
+              maxlength="120"
               style="
                 display: none;
                 padding: 6px;
@@ -916,6 +922,12 @@
       </div>
     </div>
 
+    <!-- Toast de nova versão disponível -->
+    <div id="toast-atualizacao" role="alert" aria-live="polite" hidden>
+      <span>🔄 Nova versão disponível!</span>
+      <button type="button" id="btn-recarregar">Atualizar agora</button>
+    </div>
+
     <!-- Modal de alertas e confirmações -->
     <div
       id="modal-app"
@@ -947,13 +959,15 @@
           });
         });
 
-        let refreshing = false;
         navigator.serviceWorker.addEventListener('controllerchange', () => {
-          if (!refreshing) {
-            refreshing = true;
-            window.location.reload();
-          }
+          const toast = document.getElementById('toast-atualizacao');
+          if (toast) toast.hidden = false;
         });
+
+        const btnRecarregar = document.getElementById('btn-recarregar');
+        if (btnRecarregar) {
+          btnRecarregar.addEventListener('click', () => window.location.reload());
+        }
       }
     </script>
   </body>

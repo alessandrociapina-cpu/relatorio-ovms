@@ -158,6 +158,9 @@ describe('dmsParaDecimal()', () => {
     const coord = [{ valueOf: () => 23 }, { valueOf: () => 32 }, { valueOf: () => 0 }];
     expect(dmsParaDecimal(coord)).toBeCloseTo(23 + 32 / 60);
   });
+  test('usa parseFloat quando coords[0] é zero (falsy)', () => {
+    expect(dmsParaDecimal([0, 30, 0])).toBeCloseTo(0.5);
+  });
 });
 
 describe('aplicarRefGps()', () => {

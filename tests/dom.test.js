@@ -147,6 +147,17 @@ describe('mostrarAlerta()', () => {
     await promise;
     expect(modal.style.display).toBe('none');
   });
+
+  test('ignora teclas que não sejam Enter ou Escape', async () => {
+    const modal = document.getElementById('modal-app');
+    const promise = mostrarAlerta('Aguardando');
+    document.dispatchEvent(new KeyboardEvent('keydown', { key: 'a' }));
+    document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Tab' }));
+    expect(modal.style.display).toBe('flex');
+    document.getElementById('modal-btn-ok').click();
+    await promise;
+    expect(modal.style.display).toBe('none');
+  });
 });
 
 describe('confirmar()', () => {

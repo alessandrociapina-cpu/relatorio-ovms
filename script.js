@@ -36,6 +36,16 @@ document.addEventListener('DOMContentLoaded', () => {
   const inputCarregarProjeto = document.getElementById('inputCarregarProjeto');
   const autoSaveStatus = document.getElementById('autoSaveStatus');
 
+  function esc(str) {
+    if (str == null) return '';
+    return String(str)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+  }
+
   selectCargo.addEventListener('change', (e) => {
     if (e.target.value === 'Outros') {
       inputCargoOutros.style.display = 'inline-block';
@@ -999,7 +1009,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const local = inputLocalVistoria.value; const data = new Date(inputDataVistoria.value + 'T00:00:00');
     const dataFormatada = data.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' });
-    const horaHtml = inputHoraVistoria.value ? `<p><strong>Hora:</strong> ${inputHoraVistoria.value}</p>` : '';
+    const horaHtml = inputHoraVistoria.value ? `<p><strong>Hora:</strong> ${esc(inputHoraVistoria.value)}</p>` : '';
     
     areaRelatorio.style.fontFamily = opt.fonte; areaRelatorio.style.fontSize = `${opt.tamanhoFonte}pt`;
     cabecalhoRelatorioDiv.innerHTML = `
@@ -1011,7 +1021,7 @@ document.addEventListener('DOMContentLoaded', () => {
         </div>
         <img src="sabesp-logo.png" alt="Logo" class="logo-relatorio-direito">
       </div>
-      <div class="info-vistoria"><p><strong>Local da Vistoria:</strong> ${local}</p><p><strong>Data da Vistoria:</strong> ${dataFormatada}</p>${horaHtml}</div>
+      <div class="info-vistoria"><p><strong>Local da Vistoria:</strong> ${esc(local)}</p><p><strong>Data da Vistoria:</strong> ${esc(dataFormatada)}</p>${horaHtml}</div>
     `;
 
     areaRelatorio.classList.remove('layout-1-col'); if (opt.layoutColunas === '1') areaRelatorio.classList.add('layout-1-col');
@@ -1055,15 +1065,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
       const nome1 = inputNomeFiscal.value.trim() || '1º Fiscal/Inspetor';
       const cargo1 = selectCargo.value === 'Outros' ? inputCargoOutros.value.trim() : selectCargo.value;
-      const img1 = assinaturaBase64 ? `<img src="${assinaturaBase64}" class="assinatura-imagem-limpa">` : `<div style="height: 50px;"></div>`;
-      
+      const img1 = assinaturaBase64 ? `<img src="${esc(assinaturaBase64)}" class="assinatura-imagem-limpa">` : `<div style="height: 50px;"></div>`;
+
       let bloco1 = `
         <div class="bloco-assinatura">
           ${img1}
           <div class="linha-assinatura"></div>
-          <strong>${nome1}</strong>
-          <span style="font-size: 0.85em; color: #555;">${cargo1}</span>
-          <span style="font-size: 0.85em; color: #555;">${deptoFinal1}</span>
+          <strong>${esc(nome1)}</strong>
+          <span style="font-size: 0.85em; color: #555;">${esc(cargo1)}</span>
+          <span style="font-size: 0.85em; color: #555;">${esc(deptoFinal1)}</span>
         </div>
       `;
 
@@ -1075,15 +1085,15 @@ document.addEventListener('DOMContentLoaded', () => {
         
         const nome2 = inputNomeFiscal2.value.trim() || '2º Fiscal/Inspetor';
         const cargo2 = selectCargo2.value === 'Outros' ? inputCargoOutros2.value.trim() : selectCargo2.value;
-        const img2 = assinaturaBase64_2 ? `<img src="${assinaturaBase64_2}" class="assinatura-imagem-limpa">` : `<div style="height: 50px;"></div>`;
-        
+        const img2 = assinaturaBase64_2 ? `<img src="${esc(assinaturaBase64_2)}" class="assinatura-imagem-limpa">` : `<div style="height: 50px;"></div>`;
+
         bloco2 = `
           <div class="bloco-assinatura">
             ${img2}
             <div class="linha-assinatura"></div>
-            <strong>${nome2}</strong>
-            <span style="font-size: 0.85em; color: #555;">${cargo2}</span>
-            <span style="font-size: 0.85em; color: #555;">${deptoFinal2}</span>
+            <strong>${esc(nome2)}</strong>
+            <span style="font-size: 0.85em; color: #555;">${esc(cargo2)}</span>
+            <span style="font-size: 0.85em; color: #555;">${esc(deptoFinal2)}</span>
           </div>
         `;
       }
@@ -1098,7 +1108,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     let obsFinalHtml = '';
     if (inputObservacoes.value.trim()) {
-      obsFinalHtml += `<h3>Observações Gerais</h3><p>${inputObservacoes.value.trim()}</p>`;
+      obsFinalHtml += `<h3>Observações Gerais</h3><p>${esc(inputObservacoes.value.trim())}</p>`;
     }
     if (assinaturaHtml) {
       obsFinalHtml += assinaturaHtml;
@@ -1122,7 +1132,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (deptoNome !== '') {
           rodapeDiv.innerHTML = `Companhia de Saneamento Básico do Estado de São Paulo – Sabesp<br>
-          <span contenteditable="true" style="display:inline-block; outline:none;">${deptoNome}</span><br>
+          <span contenteditable="true" style="display:inline-block; outline:none;">${esc(deptoNome)}</span><br>
           <span>www.sabesp.com.br</span>`;
         } else {
           // Se escolheu 'Outros' mas deixou a caixa em branco

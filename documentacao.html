@@ -217,10 +217,21 @@
           qualquer um dos fiscais, assumindo apenas o nome do departamento customizado.
         </li>
         <li>
-          <strong>v38 (Atual):</strong> Pipeline de qualidade contínua: (1) GitHub Actions CI com
-          execução automática de lint e testes a cada commit; (2) Pre-commit hook via Husky +
-          lint-staged impedindo commits com erros de lint; (3) Ampliação da cobertura de testes de
-          31 para 59 casos — novos módulos <code>dmsParaDecimal</code>, <code>aplicarRefGps</code>,
+          <strong>v42 (Atual):</strong> Ciclo de arquitetura e qualidade: (1) Divisão de
+          <code>script.js</code> em módulos reutilizáveis —
+          <code>modules/storage.js</code> (IndexedDB) e <code>modules/gps.js</code> (leitura
+          EXIF/GPS); (2) Extração de funções de UI para
+          <code>domUtils.js</code> (<code>mostrarErro</code>, <code>limparErro</code>,
+          <code>mostrarAlerta</code>, <code>confirmar</code>); (3) Modal HTML nativo substituindo
+          todos os <code>alert()</code>/<code>confirm()</code> do browser; (4) Remoção do fallback
+          <code>localStorage</code> e validação de esquema no auto-restore do IndexedDB; (5) Testes
+          JSDOM para funções de UI — 82 testes totais.
+        </li>
+        <li>
+          <strong>v38:</strong> Pipeline de qualidade contínua: (1) GitHub Actions CI com execução
+          automática de lint e testes a cada commit; (2) Pre-commit hook via Husky + lint-staged
+          impedindo commits com erros de lint; (3) Ampliação da cobertura de testes de 31 para 59
+          casos — novos módulos <code>dmsParaDecimal</code>, <code>aplicarRefGps</code>,
           <code>sanitizarNomeArquivo</code> e <code>validarEsquemaProjeto</code>; (4) SRI
           (Subresource Integrity) nas bibliotecas Cropper.js v1.6.1 e versão fixada
           <code>exif-js@2.3.0</code>; (5) Validação de MIME type nos uploads de assinatura; (6)

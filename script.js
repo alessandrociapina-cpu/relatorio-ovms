@@ -1,4 +1,4 @@
-/* global esc, formatarDataISO, resolverDepartamento, criarBlocoAssinatura, dmsParaDecimal, aplicarRefGps, sanitizarNomeArquivo, validarEsquemaProjeto */
+/* global esc, formatarDataISO, resolverDepartamento, criarBlocoAssinatura, sanitizarNomeArquivo, validarEsquemaProjeto, mostrarErro, limparErro, mostrarAlerta, confirmar, salvarDB, carregarDB, limparDB, lerMetadadosExif */
 document.addEventListener('DOMContentLoaded', () => {
   const formVistoria = document.getElementById('form-vistoria');
   const inputLocalVistoria = document.getElementById('localVistoria');
@@ -36,25 +36,6 @@ document.addEventListener('DOMContentLoaded', () => {
   const btnSalvarProjeto = document.getElementById('btnSalvarProjeto');
   const inputCarregarProjeto = document.getElementById('inputCarregarProjeto');
   const autoSaveStatus = document.getElementById('autoSaveStatus');
-
-  function mostrarErro(input, msg) {
-    input.classList.add('input-invalido');
-    const id = `erro-${input.id}`;
-    let span = document.getElementById(id);
-    if (!span) {
-      span = document.createElement('span');
-      span.id = id;
-      span.className = 'msg-erro-campo';
-      input.parentNode.insertBefore(span, input.nextSibling);
-    }
-    span.textContent = msg;
-  }
-
-  function limparErro(input) {
-    input.classList.remove('input-invalido');
-    const span = document.getElementById(`erro-${input.id}`);
-    if (span) span.remove();
-  }
 
   function validarFiscal(
     inputNome,
@@ -255,11 +236,11 @@ document.addEventListener('DOMContentLoaded', () => {
     salvarRascunhoLocal();
   });
 
-  inputImagemAssinatura.addEventListener('change', (e) => {
+  inputImagemAssinatura.addEventListener('change', async (e) => {
     const file = e.target.files[0];
     if (!file) return;
     if (!file.type.startsWith('image/')) {
-      alert('Selecione apenas arquivos de imagem.');
+      await mostrarAlerta('Selecione apenas arquivos de imagem.', 'error');
       e.target.value = '';
       return;
     }
@@ -272,11 +253,11 @@ document.addEventListener('DOMContentLoaded', () => {
     reader.readAsDataURL(file);
   });
 
-  inputImagemAssinatura2.addEventListener('change', (e) => {
+  inputImagemAssinatura2.addEventListener('change', async (e) => {
     const file = e.target.files[0];
     if (!file) return;
     if (!file.type.startsWith('image/')) {
-      alert('Selecione apenas arquivos de imagem.');
+      await mostrarAlerta('Selecione apenas arquivos de imagem.', 'error');
       e.target.value = '';
       return;
     }
@@ -489,56 +470,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  // =======================================================
-  // MOTOR DE AUTO-SAVE COM INDEXEDDB
-  // =======================================================
-  const dbName = 'ovmsDB';
-  const storeName = 'rascunhoStore';
-
-  function initDB() {
-    return new Promise((resolve, reject) => {
-      const request = indexedDB.open(dbName, 1);
-      request.onupgradeneeded = (e) => {
-        const db = e.target.result;
-        if (!db.objectStoreNames.contains(storeName)) {
-          db.createObjectStore(storeName);
-        }
-      };
-      request.onsuccess = () => resolve(request.result);
-      request.onerror = () => reject(request.error);
-    });
-  }
-
-  async function salvarDB(estado) {
-    const db = await initDB();
-    return new Promise((resolve, reject) => {
-      const tx = db.transaction(storeName, 'readwrite');
-      tx.objectStore(storeName).put(estado, 'draft');
-      tx.oncomplete = () => resolve();
-      tx.onerror = () => reject(tx.error);
-    });
-  }
-
-  async function carregarDB() {
-    const db = await initDB();
-    return new Promise((resolve, reject) => {
-      const tx = db.transaction(storeName, 'readonly');
-      const request = tx.objectStore(storeName).get('draft');
-      request.onsuccess = () => resolve(request.result);
-      request.onerror = () => reject(request.error);
-    });
-  }
-
-  async function limparDB() {
-    const db = await initDB();
-    return new Promise((resolve, reject) => {
-      const tx = db.transaction(storeName, 'readwrite');
-      tx.objectStore(storeName).delete('draft');
-      tx.oncomplete = () => resolve();
-      tx.onerror = () => reject(tx.error);
-    });
-  }
-
   let timeoutSalvarRascunho;
 
   function salvarRascunhoLocal() {
@@ -588,27 +519,27 @@ document.addEventListener('DOMContentLoaded', () => {
     URL.revokeObjectURL(url);
   });
 
-  inputCarregarProjeto.addEventListener('change', (e) => {
+  inputCarregarProjeto.addEventListener('change', async (e) => {
     const file = e.target.files[0];
     if (!file) return;
     if (!file.name.endsWith('.json')) {
-      alert('Selecione um arquivo de projeto (.json).');
+      await mostrarAlerta('Selecione um arquivo de projeto (.json).', 'error');
       inputCarregarProjeto.value = '';
       return;
     }
     const reader = new FileReader();
-    reader.onload = (ev) => {
+    reader.onload = async (ev) => {
       try {
         const dados = JSON.parse(ev.target.result);
         if (!validarEsquemaProjeto(dados)) {
-          alert('Arquivo inválido: formato não reconhecido.');
+          await mostrarAlerta('Arquivo inválido: formato não reconhecido.', 'error');
           return;
         }
         carregarEstado(dados);
-        alert('Projeto carregado com sucesso!');
+        await mostrarAlerta('Projeto carregado com sucesso!', 'success');
         salvarRascunhoLocal();
       } catch (_err) {
-        alert('Erro ao ler o arquivo. Verifique se é um projeto válido.');
+        await mostrarAlerta('Erro ao ler o arquivo. Verifique se é um projeto válido.', 'error');
       }
     };
     reader.readAsText(file);
@@ -617,15 +548,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
   async function inicializarAutoSave() {
     try {
-      const draftDB = await carregarDB();
-      const draftLocal = localStorage.getItem('ovms_rascunho');
+      const dataToRestore = await carregarDB();
 
-      let dataToRestore = draftDB;
-      if (!dataToRestore && draftLocal) {
-        dataToRestore = JSON.parse(draftLocal);
-      }
-
-      if (dataToRestore) {
+      if (dataToRestore && validarEsquemaProjeto(dataToRestore)) {
         const localSalvo =
           dataToRestore.form && dataToRestore.form.local
             ? dataToRestore.form.local
@@ -638,12 +563,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const mensagemConfirma = `Encontramos um relatório em andamento salvo neste dispositivo:\n\n📍 Local: ${localSalvo}\n📅 Data: ${dataSalva}\n\nDeseja restaurar esta vistoria?`;
 
-        if (confirm(mensagemConfirma)) {
+        if (await confirmar(mensagemConfirma)) {
           carregarEstado(dataToRestore);
           autoSaveStatus.textContent = 'Rascunho restaurado.';
         } else {
           await limparDB();
-          localStorage.removeItem('ovms_rascunho');
         }
       }
     } catch (e) {
@@ -731,48 +655,6 @@ document.addEventListener('DOMContentLoaded', () => {
     document.body.classList.toggle('preview-print');
     areaRelatorio.scrollIntoView({ behavior: 'smooth', block: 'start' });
   });
-
-  function lerMetadadosExif(file) {
-    return new Promise((resolve) => {
-      if (typeof EXIF === 'undefined' || !file.type.startsWith('image/')) {
-        resolve('');
-        return;
-      }
-
-      EXIF.getData(file, function () {
-        let textoMeta = '';
-        const dataExif = EXIF.getTag(this, 'DateTimeOriginal');
-        if (dataExif) {
-          const partes = dataExif.split(' ');
-          if (partes.length === 2)
-            textoMeta += `🗓️ ${partes[0].split(':').reverse().join('/')} às ${partes[1].substring(0, 5)}  `;
-        }
-
-        const lat = EXIF.getTag(this, 'GPSLatitude');
-        const lng = EXIF.getTag(this, 'GPSLongitude');
-        const latRef = EXIF.getTag(this, 'GPSLatitudeRef');
-        const lngRef = EXIF.getTag(this, 'GPSLongitudeRef');
-
-        if (lat !== undefined && lng !== undefined) {
-          try {
-            const calcLat = aplicarRefGps(dmsParaDecimal(lat), latRef);
-            const calcLng = aplicarRefGps(dmsParaDecimal(lng), lngRef);
-
-            if (calcLat !== 0 && calcLng !== 0 && !isNaN(calcLat) && !isNaN(calcLng)) {
-              textoMeta += `📍 GPS: ${calcLat.toFixed(6)}, ${calcLng.toFixed(6)}`;
-            } else {
-              textoMeta += `📍 GPS: Removido pelo sistema do aparelho celular`;
-            }
-          } catch (e) {
-            textoMeta += `📍 GPS: Falha na leitura`;
-          }
-        } else {
-          textoMeta += `📍 GPS: Bloqueado pelo aparelho celular (Use o botão abaixo)`;
-        }
-        resolve(textoMeta.trim());
-      });
-    });
-  }
 
   function redimensionarImagem(dataUrl, maxWidth, quality) {
     return new Promise((resolve, reject) => {
@@ -942,7 +824,7 @@ document.addEventListener('DOMContentLoaded', () => {
       btnRestaurar.classList.add('btn-acao-foto', 'btn-restaurar');
       btnRestaurar.title = 'Remove cortes e desenhos';
       btnRestaurar.onclick = async () => {
-        if (confirm('Deseja remover todos os recortes e desenhos desta foto?')) {
+        if (await confirmar('Deseja remover todos os recortes e desenhos desta foto?')) {
           fotoInfo.previewDataUrl = await redimensionarImagem(fotoInfo.originalDataUrl, 1024, 0.7);
           fotoInfo.editedPreviewDataUrl = null;
           renderizarGaleria();
@@ -987,7 +869,7 @@ document.addEventListener('DOMContentLoaded', () => {
       btnGPSAtual.classList.add('btn-acao-foto', 'btn-gps');
       btnGPSAtual.title = 'Usa a antena GPS do aparelho celular para preencher a localização';
 
-      btnGPSAtual.onclick = () => {
+      btnGPSAtual.onclick = async () => {
         if (navigator.geolocation) {
           btnGPSAtual.innerHTML = '⏳ Procurando...';
           navigator.geolocation.getCurrentPosition(
@@ -1004,15 +886,16 @@ document.addEventListener('DOMContentLoaded', () => {
               salvarRascunhoLocal();
             },
             (_err) => {
-              alert(
-                'Por favor, ative a Localização (GPS) no seu celular e dê permissão ao navegador.'
+              mostrarAlerta(
+                'Por favor, ative a Localização (GPS) no seu celular e dê permissão ao navegador.',
+                'error'
               );
               btnGPSAtual.innerHTML = '📍 Atualizar GPS pelo Celular';
             },
             { enableHighAccuracy: true }
           );
         } else {
-          alert('GPS não suportado neste navegador.');
+          mostrarAlerta('GPS não suportado neste navegador.', 'error');
         }
       };
 
@@ -1181,7 +1064,7 @@ document.addEventListener('DOMContentLoaded', () => {
         ctxEditor.fillText(txt, pos.x, pos.y);
         historicoEdicao.push(canvasEditor.toDataURL());
       } else {
-        alert('Digite o texto na barra superior antes de clicar na foto.');
+        mostrarAlerta('Digite o texto na barra superior antes de clicar na foto.');
         inputTextoEdicao.focus();
       }
       return;
@@ -1345,7 +1228,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!validarFormulario()) return;
     const fotosValidas = fotosSelecionadasParaRelatorio.filter((f) => f && f.originalDataUrl);
     if (fotosValidas.length === 0) {
-      alert('Selecione pelo menos uma foto.');
+      await mostrarAlerta('Selecione pelo menos uma foto.', 'error');
       return;
     }
 

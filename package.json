@@ -1,24 +1,28 @@
 {
   "name": "relatorio-ovms",
-  "version": "38.0.0",
+  "version": "42.0.0",
   "description": "Sistema de Relatório Fotográfico OVMS – Sabesp",
   "private": true,
   "scripts": {
-    "lint": "eslint script.js utils.js",
-    "lint:fix": "eslint script.js utils.js --fix",
+    "lint": "eslint script.js utils.js domUtils.js modules/*.js tests/**/*.test.js",
+    "lint:fix": "eslint script.js utils.js domUtils.js modules/*.js tests/**/*.test.js --fix",
     "format": "prettier --write \"*.{js,html,css}\"",
     "test": "jest",
     "test:watch": "jest --watch",
     "prepare": "husky"
   },
   "lint-staged": {
-    "*.js": ["eslint --fix", "prettier --write"],
+    "*.js": [
+      "eslint --fix",
+      "prettier --write"
+    ],
     "*.{html,css}": "prettier --write"
   },
   "devDependencies": {
     "eslint": "^8.57.0",
     "husky": "^9.1.7",
     "jest": "^29.7.0",
+    "jest-environment-jsdom": "^30.3.0",
     "lint-staged": "^16.4.0",
     "prettier": "^3.2.5"
   }

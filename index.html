@@ -21,7 +21,7 @@
       crossorigin="anonymous"
     ></script>
 
-    <link rel="stylesheet" href="style.css?v=38" />
+    <link rel="stylesheet" href="style.css?v=42" />
   </head>
   <body>
     <div class="container">
@@ -37,7 +37,7 @@
           margin-bottom: 20px;
         "
       >
-        Versão 38 | Última atualização: 20/04/2026
+        Versão 42 | Última atualização: 20/04/2026
         <span class="info-tooltip-container" tabindex="0">
           <span class="info-icon">ℹ️</span>
           <span
@@ -45,6 +45,10 @@
             style="width: 320px; max-height: 350px; overflow-y: auto; text-align: left"
           >
             <b>Últimas Atualizações:</b><br /><br />
+            <b>v42:</b> Divisão de script.js em módulos reutilizáveis (storage.js, gps.js). Modal
+            nativo de alertas e confirmações substituindo alert()/confirm(). Remoção do fallback
+            localStorage. Validação de esquema no auto-restore do IndexedDB. Testes JSDOM para
+            funções de UI (mostrarErro, limparErro, mostrarAlerta, confirmar) — 88 testes totais.<br /><br />
             <b>v38:</b> CI/CD com GitHub Actions (lint + testes automáticos em todo commit).
             Pre-commit hook via Husky. Cobertura de testes ampliada de 31 para 59 casos (GPS
             DMS→decimal, sanitização de nomes de arquivo, validação de esquema JSON). SRI
@@ -919,8 +923,28 @@
       </div>
     </div>
 
-    <script src="utils.js?v=38"></script>
-    <script src="script.js?v=38"></script>
+    <!-- Modal de alertas e confirmações -->
+    <div
+      id="modal-app"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="modal-mensagem"
+      style="display: none"
+    >
+      <div class="modal-caixa">
+        <p id="modal-mensagem"></p>
+        <div class="modal-acoes">
+          <button id="modal-btn-ok" class="botao-primario">OK</button>
+          <button id="modal-btn-cancelar" class="botao-secundario">Cancelar</button>
+        </div>
+      </div>
+    </div>
+
+    <script src="utils.js?v=42"></script>
+    <script src="domUtils.js?v=42"></script>
+    <script src="modules/storage.js?v=42"></script>
+    <script src="modules/gps.js?v=42"></script>
+    <script src="script.js?v=42"></script>
 
     <script>
       if ('serviceWorker' in navigator) {

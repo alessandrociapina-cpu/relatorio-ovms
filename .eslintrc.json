@@ -17,5 +17,12 @@
     "eqeqeq": ["error", "always"],
     "no-var": "error",
     "prefer-const": "warn"
-  }
+  },
+  "overrides": [
+    {
+      "files": ["tests/**/*.js"],
+      "env": { "jest": true, "node": true },
+      "rules": { "no-console": "off" }
+    }
+  ]
 }

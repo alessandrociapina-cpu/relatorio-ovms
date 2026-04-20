@@ -1,400 +1,943 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="pt-BR">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Relatório Fotográfico</title>
-  
-  <link rel="manifest" href="manifest.json">
-  <meta name="theme-color" content="#007bff">
-  
-  <script src="https://cdn.jsdelivr.net/npm/exif-js"></script>
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.css" rel="stylesheet">
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.js"></script>
-  
-  <link rel="stylesheet" href="style.css?v=37"/>
-</head>
-<body>
-  <div class="container">
-    <h1>Relatório Fotográfico</h1>
-    
-    <div class="versao-info" style="text-align: center; font-size: 0.8em; color: #6c757d; margin-top: -15px; margin-bottom: 20px;">
-      Versão 37 | Última atualização: 20/04/2026
-      <span class="info-tooltip-container" tabindex="0">
-        <span class="info-icon">ℹ️</span>
-        <span class="info-tooltip-text" style="width: 320px; max-height: 350px; overflow-y: auto; text-align: left;">
-          <b>Últimas Atualizações:</b><br><br>
-          <b>v37:</b> Correção de segurança XSS em todos os campos do relatório. Validação de formulário com mensagens de erro inline. Testes unitários automatizados (31 casos). Eliminação de código duplicado (fiscal1/2) e padronização com ESLint e Prettier.<br><br>
-          <b>v36:</b> Ajuste na lógica do rodapé para exibir corretamente o departamento customizado ("Outros") sem o endereço de SJC.<br><br>
-          <b>v35:</b> Transição para banco de dados IndexedDB para armazenamento local de fotos sem limite de cota.
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Relatório Fotográfico</title>
+
+    <link rel="manifest" href="manifest.json" />
+    <meta name="theme-color" content="#007bff" />
+
+    <script src="https://cdn.jsdelivr.net/npm/exif-js@2.3.0" crossorigin="anonymous"></script>
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.css"
+      rel="stylesheet"
+      integrity="sha384-AMJcAgMUmNt1Zo4ranquGLeT5m7yOrVbtNsNk0oZohvxqKk6RRzXHqlEaS9gFXR7"
+      crossorigin="anonymous"
+    />
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.js"
+      integrity="sha384-jzwsV9ieM/KUDMeo+d8dc+jm0GEl7ywPNwg10alB5BodVuC/Kx9RpEnyrl2Om9zH"
+      crossorigin="anonymous"
+    ></script>
+
+    <link rel="stylesheet" href="style.css?v=38" />
+  </head>
+  <body>
+    <div class="container">
+      <h1>Relatório Fotográfico</h1>
+
+      <div
+        class="versao-info"
+        style="
+          text-align: center;
+          font-size: 0.8em;
+          color: #6c757d;
+          margin-top: -15px;
+          margin-bottom: 20px;
+        "
+      >
+        Versão 38 | Última atualização: 20/04/2026
+        <span class="info-tooltip-container" tabindex="0">
+          <span class="info-icon">ℹ️</span>
+          <span
+            class="info-tooltip-text"
+            style="width: 320px; max-height: 350px; overflow-y: auto; text-align: left"
+          >
+            <b>Últimas Atualizações:</b><br /><br />
+            <b>v38:</b> CI/CD com GitHub Actions (lint + testes automáticos em todo commit).
+            Pre-commit hook via Husky. Cobertura de testes ampliada de 31 para 59 casos (GPS
+            DMS→decimal, sanitização de nomes de arquivo, validação de esquema JSON). SRI
+            (Subresource Integrity) nas bibliotecas Cropper.js e versão fixada do exif-js. Validação
+            de MIME type nos uploads de assinatura. Validação de esquema no carregamento de projetos
+            .json.<br /><br />
+            <b>v37:</b> Correção de segurança XSS em todos os campos do relatório. Validação de
+            formulário com mensagens de erro inline. Testes unitários automatizados (31 casos).
+            Eliminação de código duplicado (fiscal1/2) e padronização com ESLint e Prettier.<br /><br />
+            <b>v36:</b> Ajuste na lógica do rodapé para exibir corretamente o departamento
+            customizado ("Outros") sem o endereço de SJC.<br /><br />
+            <b>v35:</b> Transição para banco de dados IndexedDB para armazenamento local de fotos
+            sem limite de cota.
+          </span>
         </span>
-      </span>
-    </div>
+      </div>
 
-    <div class="secao-projeto" style="margin-bottom: 25px; padding: 15px; background: #eef2f5; border-radius: 6px; border: 1px solid #ced4da; display: flex; flex-wrap: wrap; gap: 10px; align-items: center;">
-      <span style="font-weight: bold; color: #495057; margin-right: 10px;">Gerenciar Rascunho:</span>
-      <button type="button" id="btnSalvarProjeto" class="botao-principal" style="background-color: #17a2b8;">💾 Baixar Projeto</button>
-      <label for="inputCarregarProjeto" class="botao-secundario" style="margin: 0; background-color: #6c757d; color: white; cursor: pointer;">📂 Carregar Projeto</label>
-      <input type="file" id="inputCarregarProjeto" accept=".json" style="display:none;">
-      
-      <a href="documentacao.html" target="_blank" class="botao-secundario" style="background-color: #343a40; color: white; margin-left: auto; text-decoration: none; padding: 10px 20px; display: inline-block;">📄 Documentação</a>
-      
-      <span id="autoSaveStatus" style="font-size: 0.85em; color: #6c757d; font-style: italic; margin-left: 10px; width: 100%; text-align: right;">Nenhum rascunho salvo</span>
-    </div>
+      <div
+        class="secao-projeto"
+        style="
+          margin-bottom: 25px;
+          padding: 15px;
+          background: #eef2f5;
+          border-radius: 6px;
+          border: 1px solid #ced4da;
+          display: flex;
+          flex-wrap: wrap;
+          gap: 10px;
+          align-items: center;
+        "
+      >
+        <span style="font-weight: bold; color: #495057; margin-right: 10px"
+          >Gerenciar Rascunho:</span
+        >
+        <button
+          type="button"
+          id="btnSalvarProjeto"
+          class="botao-principal"
+          style="background-color: #17a2b8"
+        >
+          💾 Baixar Projeto
+        </button>
+        <label
+          for="inputCarregarProjeto"
+          class="botao-secundario"
+          style="margin: 0; background-color: #6c757d; color: white; cursor: pointer"
+          >📂 Carregar Projeto</label
+        >
+        <input type="file" id="inputCarregarProjeto" accept=".json" style="display: none" />
 
-    <div class="secao-entrada">
-      <h2>1. Informações da Vistoria</h2>
-      <form id="form-vistoria">
-        <div class="campo-simples">
-          <label for="localVistoria">Local da Vistoria:</label>
-          <input type="text" id="localVistoria" name="localVistoria" required maxlength="200">
-        </div>
-        
-        <div class="linha-dupla">
-          <div class="campo-metade">
-            <label for="dataVistoria">Data da Vistoria:</label>
-            <input type="date" id="dataVistoria" name="dataVistoria" required>
+        <a
+          href="documentacao.html"
+          target="_blank"
+          class="botao-secundario"
+          style="
+            background-color: #343a40;
+            color: white;
+            margin-left: auto;
+            text-decoration: none;
+            padding: 10px 20px;
+            display: inline-block;
+          "
+          >📄 Documentação</a
+        >
+
+        <span
+          id="autoSaveStatus"
+          style="
+            font-size: 0.85em;
+            color: #6c757d;
+            font-style: italic;
+            margin-left: 10px;
+            width: 100%;
+            text-align: right;
+          "
+          >Nenhum rascunho salvo</span
+        >
+      </div>
+
+      <div class="secao-entrada">
+        <h2>1. Informações da Vistoria</h2>
+        <form id="form-vistoria">
+          <div class="campo-simples">
+            <label for="localVistoria">Local da Vistoria:</label>
+            <input type="text" id="localVistoria" name="localVistoria" required maxlength="200" />
           </div>
-          <div class="campo-metade">
-            <label for="horaVistoria">Hora da Vistoria:</label>
-            <input type="time" id="horaVistoria" name="horaVistoria">
-          </div>
-        </div>
-        
-        <div class="linha-dupla" style="margin-bottom: 10px;">
-          <div class="campo-metade">
-            <label for="nomeFiscal">Nome do 1º Fiscal/Inspetor:</label>
-            <input type="text" id="nomeFiscal" name="nomeFiscal" required maxlength="100">
-          </div>
-          <div class="campo-metade">
-            <label for="cargoFiscal">Cargo do 1º Fiscal:</label>
-            <div style="display: flex; gap: 5px;">
-              <select id="cargoFiscal" name="cargoFiscal" class="input-select-largo" style="flex-grow: 1;">
-                <option value="Engenheiro Civil" selected>Engenheiro Civil</option>
-                <option value="Engenheiro">Engenheiro</option>
-                <option value="Técnico em Sistemas de Saneamento">Técnico em Sist. Saneamento</option>
-                <option value="Outros">Outros...</option>
-              </select>
-              <input type="text" id="cargoFiscalOutros" name="cargoFiscalOutros" placeholder="Qual?" maxlength="80" style="display: none; flex-grow: 1; max-width: 150px;">
+
+          <div class="linha-dupla">
+            <div class="campo-metade">
+              <label for="dataVistoria">Data da Vistoria:</label>
+              <input type="date" id="dataVistoria" name="dataVistoria" required />
+            </div>
+            <div class="campo-metade">
+              <label for="horaVistoria">Hora da Vistoria:</label>
+              <input type="time" id="horaVistoria" name="horaVistoria" />
             </div>
           </div>
-        </div>
-        <div class="campo-simples" style="margin-top: 0; margin-bottom: 25px;">
-          <label for="departamentoFiscal">Departamento (1º Fiscal):</label>
-          <div style="display: flex; gap: 5px;">
-            <select id="departamentoFiscal" name="departamentoFiscal" class="input-select-largo" style="flex-grow: 1;">
-              <option value="Divisão de Manutenção e Serviços de São José dos Campos" selected>Divisão de Manutenção e Serviços de São José dos Campos</option>
-              <option value="Outros">Outros (Digite ao lado)...</option>
-            </select>
-            <input type="text" id="departamentoFiscalOutros" name="departamentoFiscalOutros" placeholder="Qual o departamento?" maxlength="150" style="display: none; flex-grow: 1; max-width: 250px;">
-          </div>
-        </div>
 
-        <div class="campo-simples" style="margin-top: -5px; margin-bottom: 20px;">
-          <label style="cursor: pointer; color: #007bff; display: inline-block; font-weight: normal;"><input type="checkbox" id="incluirFiscal2"> ➕ Adicionar 2º Fiscal/Inspetor</label>
-        </div>
-
-        <div id="blocoFiscal2" style="display: none; flex-direction: column; background: #fdfdfd; border-left: 3px solid #007bff; padding: 15px; border-radius: 4px; margin-bottom: 15px;">
-          <div class="linha-dupla" style="margin-bottom: 10px;">
+          <div class="linha-dupla" style="margin-bottom: 10px">
             <div class="campo-metade">
-              <label for="nomeFiscal2">Nome do 2º Fiscal/Inspetor:</label>
-              <input type="text" id="nomeFiscal2" name="nomeFiscal2" maxlength="100">
+              <label for="nomeFiscal">Nome do 1º Fiscal/Inspetor:</label>
+              <input type="text" id="nomeFiscal" name="nomeFiscal" required maxlength="100" />
             </div>
             <div class="campo-metade">
-              <label for="cargoFiscal2">Cargo do 2º Fiscal:</label>
-              <div style="display: flex; gap: 5px;">
-                <select id="cargoFiscal2" name="cargoFiscal2" class="input-select-largo" style="flex-grow: 1;">
+              <label for="cargoFiscal">Cargo do 1º Fiscal:</label>
+              <div style="display: flex; gap: 5px">
+                <select
+                  id="cargoFiscal"
+                  name="cargoFiscal"
+                  class="input-select-largo"
+                  style="flex-grow: 1"
+                >
                   <option value="Engenheiro Civil" selected>Engenheiro Civil</option>
                   <option value="Engenheiro">Engenheiro</option>
-                  <option value="Técnico em Sistemas de Saneamento">Técnico em Sist. Saneamento</option>
+                  <option value="Técnico em Sistemas de Saneamento">
+                    Técnico em Sist. Saneamento
+                  </option>
                   <option value="Outros">Outros...</option>
                 </select>
-                <input type="text" id="cargoFiscalOutros2" name="cargoFiscalOutros2" placeholder="Qual?" maxlength="80" style="display: none; flex-grow: 1; max-width: 150px;">
+                <input
+                  type="text"
+                  id="cargoFiscalOutros"
+                  name="cargoFiscalOutros"
+                  placeholder="Qual?"
+                  maxlength="80"
+                  style="display: none; flex-grow: 1; max-width: 150px"
+                />
               </div>
             </div>
           </div>
-          <div class="campo-simples" style="margin-bottom: 0;">
-            <label for="departamentoFiscal2">Departamento (2º Fiscal):</label>
-            <div style="display: flex; gap: 5px;">
-              <select id="departamentoFiscal2" name="departamentoFiscal2" class="input-select-largo" style="flex-grow: 1;">
-                <option value="Divisão de Manutenção e Serviços de São José dos Campos" selected>Divisão de Manutenção e Serviços de São José dos Campos</option>
+          <div class="campo-simples" style="margin-top: 0; margin-bottom: 25px">
+            <label for="departamentoFiscal">Departamento (1º Fiscal):</label>
+            <div style="display: flex; gap: 5px">
+              <select
+                id="departamentoFiscal"
+                name="departamentoFiscal"
+                class="input-select-largo"
+                style="flex-grow: 1"
+              >
+                <option value="Divisão de Manutenção e Serviços de São José dos Campos" selected>
+                  Divisão de Manutenção e Serviços de São José dos Campos
+                </option>
                 <option value="Outros">Outros (Digite ao lado)...</option>
               </select>
-              <input type="text" id="departamentoFiscalOutros2" name="departamentoFiscalOutros2" placeholder="Qual o departamento?" maxlength="150" style="display: none; flex-grow: 1; max-width: 250px;">
+              <input
+                type="text"
+                id="departamentoFiscalOutros"
+                name="departamentoFiscalOutros"
+                placeholder="Qual o departamento?"
+                maxlength="150"
+                style="display: none; flex-grow: 1; max-width: 250px"
+              />
             </div>
           </div>
-        </div>
 
-        <div class="caixa-assinatura">
-          <div class="caixa-assinatura-linha">
-            <label><input type="checkbox" id="incluirAssinatura"> 📝 Assinar no rodapé</label>
-            
-            <input type="file" id="imagemAssinatura" accept="image/*" style="display:none;">
-            <label for="imagemAssinatura" class="botao-secundario" id="btnAssinaturaLabel" style="margin:0; display:none; font-size:0.75em; padding:4px 8px; background-color:#6c757d;">📎 Anexar Assinatura 1</label>
-            <span id="assinaturaStatus" style="font-size:0.8em; color:green; display:none; font-weight:bold;">✔ 1</span>
-            <button type="button" id="btnRemoverAssinatura" style="display:none; background:transparent; border:none; color:#d9534f; cursor:pointer; font-size:1em; padding:0; font-weight:bold;" title="Remover imagem da assinatura 1">✖</button>
+          <div class="campo-simples" style="margin-top: -5px; margin-bottom: 20px">
+            <label
+              style="cursor: pointer; color: #007bff; display: inline-block; font-weight: normal"
+              ><input type="checkbox" id="incluirFiscal2" /> ➕ Adicionar 2º Fiscal/Inspetor</label
+            >
+          </div>
 
-            <input type="file" id="imagemAssinatura2" accept="image/*" style="display:none;">
-            <label for="imagemAssinatura2" class="botao-secundario" id="btnAssinaturaLabel2" style="margin:0; display:none; font-size:0.75em; padding:4px 8px; background-color:#6c757d;">📎 Anexar Assinatura 2</label>
-            <span id="assinaturaStatus2" style="font-size:0.8em; color:green; display:none; font-weight:bold;">✔ 2</span>
-            <button type="button" id="btnRemoverAssinatura2" style="display:none; background:transparent; border:none; color:#d9534f; cursor:pointer; font-size:1em; padding:0; font-weight:bold;" title="Remover imagem da assinatura 2">✖</button>
+          <div
+            id="blocoFiscal2"
+            style="
+              display: none;
+              flex-direction: column;
+              background: #fdfdfd;
+              border-left: 3px solid #007bff;
+              padding: 15px;
+              border-radius: 4px;
+              margin-bottom: 15px;
+            "
+          >
+            <div class="linha-dupla" style="margin-bottom: 10px">
+              <div class="campo-metade">
+                <label for="nomeFiscal2">Nome do 2º Fiscal/Inspetor:</label>
+                <input type="text" id="nomeFiscal2" name="nomeFiscal2" maxlength="100" />
+              </div>
+              <div class="campo-metade">
+                <label for="cargoFiscal2">Cargo do 2º Fiscal:</label>
+                <div style="display: flex; gap: 5px">
+                  <select
+                    id="cargoFiscal2"
+                    name="cargoFiscal2"
+                    class="input-select-largo"
+                    style="flex-grow: 1"
+                  >
+                    <option value="Engenheiro Civil" selected>Engenheiro Civil</option>
+                    <option value="Engenheiro">Engenheiro</option>
+                    <option value="Técnico em Sistemas de Saneamento">
+                      Técnico em Sist. Saneamento
+                    </option>
+                    <option value="Outros">Outros...</option>
+                  </select>
+                  <input
+                    type="text"
+                    id="cargoFiscalOutros2"
+                    name="cargoFiscalOutros2"
+                    placeholder="Qual?"
+                    maxlength="80"
+                    style="display: none; flex-grow: 1; max-width: 150px"
+                  />
+                </div>
+              </div>
+            </div>
+            <div class="campo-simples" style="margin-bottom: 0">
+              <label for="departamentoFiscal2">Departamento (2º Fiscal):</label>
+              <div style="display: flex; gap: 5px">
+                <select
+                  id="departamentoFiscal2"
+                  name="departamentoFiscal2"
+                  class="input-select-largo"
+                  style="flex-grow: 1"
+                >
+                  <option value="Divisão de Manutenção e Serviços de São José dos Campos" selected>
+                    Divisão de Manutenção e Serviços de São José dos Campos
+                  </option>
+                  <option value="Outros">Outros (Digite ao lado)...</option>
+                </select>
+                <input
+                  type="text"
+                  id="departamentoFiscalOutros2"
+                  name="departamentoFiscalOutros2"
+                  placeholder="Qual o departamento?"
+                  maxlength="150"
+                  style="display: none; flex-grow: 1; max-width: 250px"
+                />
+              </div>
+            </div>
           </div>
-          
-          <div id="dicaAssinatura" style="display:none; font-size: 0.85em; color: #555; background: #fff3cd; padding: 10px; border-left: 4px solid #ffeeba; border-radius: 4px; margin-top: 10px; width: 100%; box-sizing: border-box; line-height: 1.5;">
-            <strong>💡 Dica Profissional:</strong> Para a assinatura não esconder a linha do documento, utilize uma foto com <strong>fundo transparente</strong>. Você pode remover o fundo branco da sua assinatura facilmente através do site <a href="https://www.remove.bg/pt-br" target="_blank" rel="noopener noreferrer" style="color: #007bff; font-weight: bold;">remove.bg</a> antes de anexá-la.
-          </div>
-        </div>
 
-        <fieldset class="opcoes-relatorio">
-          <legend>Opções de Layout e Impressão</legend>
-          <div class="grupo-opcao">
-            <span class="grupo-label" style="font-weight: normal;">Layout de colunas:</span>
-            <label><input type="radio" name="layoutColunas" value="2" checked> 2 colunas (padrão)</label>
-            <label><input type="radio" name="layoutColunas" value="1"> 1 coluna (fotos maiores)</label>
-          </div>
-          <div class="grupo-opcao">
-            <span class="grupo-label" style="font-weight: normal;">Bordas nas fotos:</span>
-            <label><input type="radio" name="bordaFotos" value="nenhuma" checked> Sem borda (Padrão)</label>
-            <label><input type="radio" name="bordaFotos" value="preta-2pt"> Borda Preta (2pt)</label>
-          </div>
-          <div class="grupo-opcao">
-            <span class="grupo-label" style="font-weight: normal;">Qualidade das imagens:</span>
-            <label><input type="radio" name="qualidadeImagens" value="media" checked> Média — 1024 px</label>
-            <label><input type="radio" name="qualidadeImagens" value="maxima"> Máxima — 1600 px</label>
-          </div>
-          <div class="grupo-opcao">
-            <span class="grupo-label" style="font-weight: normal;">Margens de impressão:</span>
-            <label><input type="radio" name="margensImpressao" value="menores"> Menores (5 mm)</label>
-            <label><input type="radio" name="margensImpressao" value="maiores" checked> Maiores (15 mm) (padrão)</label>
-          </div>
-          <div class="grupo-opcao">
-            <span class="grupo-label" style="font-weight: normal;">Fonte:</span>
-            <select id="fonteRelatorio" class="input-select">
-              <option value="Tahoma, sans-serif" selected>Tahoma</option>
-              <option value="Arial, sans-serif">Arial</option>
-              <option value="'Times New Roman', Times, serif">Times New Roman</option>
-              <option value="Calibri, sans-serif">Calibri</option>
-              <option value="Verdana, sans-serif">Verdana</option>
-            </select>
-            <span class="grupo-label" style="font-weight: normal; margin-left: 15px;">Tamanho:</span>
-            <select id="tamanhoFonteRelatorio" class="input-select">
-              <option value="9">9 pt</option>
-              <option value="10">10 pt</option>
-              <option value="11">11 pt</option>
-              <option value="12" selected>12 pt</option>
-              <option value="14">14 pt</option>
-            </select>
-          </div>
-        </fieldset>
+          <div class="caixa-assinatura">
+            <div class="caixa-assinatura-linha">
+              <label><input type="checkbox" id="incluirAssinatura" /> 📝 Assinar no rodapé</label>
 
-        <fieldset class="opcoes-relatorio">
-          <legend>Marca d'água (Logo)</legend>
-          <div class="grupo-opcao">
-            <label><input type="checkbox" id="usarMarcaDagua" checked> Inserir logo nas imagens</label>
+              <input type="file" id="imagemAssinatura" accept="image/*" style="display: none" />
+              <label
+                for="imagemAssinatura"
+                class="botao-secundario"
+                id="btnAssinaturaLabel"
+                style="
+                  margin: 0;
+                  display: none;
+                  font-size: 0.75em;
+                  padding: 4px 8px;
+                  background-color: #6c757d;
+                "
+                >📎 Anexar Assinatura 1</label
+              >
+              <span
+                id="assinaturaStatus"
+                style="font-size: 0.8em; color: green; display: none; font-weight: bold"
+                >✔ 1</span
+              >
+              <button
+                type="button"
+                id="btnRemoverAssinatura"
+                style="
+                  display: none;
+                  background: transparent;
+                  border: none;
+                  color: #d9534f;
+                  cursor: pointer;
+                  font-size: 1em;
+                  padding: 0;
+                  font-weight: bold;
+                "
+                title="Remover imagem da assinatura 1"
+              >
+                ✖
+              </button>
+
+              <input type="file" id="imagemAssinatura2" accept="image/*" style="display: none" />
+              <label
+                for="imagemAssinatura2"
+                class="botao-secundario"
+                id="btnAssinaturaLabel2"
+                style="
+                  margin: 0;
+                  display: none;
+                  font-size: 0.75em;
+                  padding: 4px 8px;
+                  background-color: #6c757d;
+                "
+                >📎 Anexar Assinatura 2</label
+              >
+              <span
+                id="assinaturaStatus2"
+                style="font-size: 0.8em; color: green; display: none; font-weight: bold"
+                >✔ 2</span
+              >
+              <button
+                type="button"
+                id="btnRemoverAssinatura2"
+                style="
+                  display: none;
+                  background: transparent;
+                  border: none;
+                  color: #d9534f;
+                  cursor: pointer;
+                  font-size: 1em;
+                  padding: 0;
+                  font-weight: bold;
+                "
+                title="Remover imagem da assinatura 2"
+              >
+                ✖
+              </button>
+            </div>
+
+            <div
+              id="dicaAssinatura"
+              style="
+                display: none;
+                font-size: 0.85em;
+                color: #555;
+                background: #fff3cd;
+                padding: 10px;
+                border-left: 4px solid #ffeeba;
+                border-radius: 4px;
+                margin-top: 10px;
+                width: 100%;
+                box-sizing: border-box;
+                line-height: 1.5;
+              "
+            >
+              <strong>💡 Dica Profissional:</strong> Para a assinatura não esconder a linha do
+              documento, utilize uma foto com <strong>fundo transparente</strong>. Você pode remover
+              o fundo branco da sua assinatura facilmente através do site
+              <a
+                href="https://www.remove.bg/pt-br"
+                target="_blank"
+                rel="noopener noreferrer"
+                style="color: #007bff; font-weight: bold"
+                >remove.bg</a
+              >
+              antes de anexá-la.
+            </div>
           </div>
-          
-          <div id="opcoesMarcaDagua" style="display: flex; gap: 15px; margin-top: 10px; align-items: center; flex-wrap: wrap;">
-            <div style="display: flex; align-items: center; gap: 5px;">
-              <span class="grupo-label" style="font-weight: normal;">Canto:</span>
-              <select id="posicaoMarcaDagua" class="input-select">
-                <option value="bottom-right">Inferior Direito</option>
-                <option value="bottom-left">Inferior Esquerdo</option>
-                <option value="top-right">Superior Direito</option>
-                <option value="top-left">Superior Esquerdo</option>
+
+          <fieldset class="opcoes-relatorio">
+            <legend>Opções de Layout e Impressão</legend>
+            <div class="grupo-opcao">
+              <span class="grupo-label" style="font-weight: normal">Layout de colunas:</span>
+              <label
+                ><input type="radio" name="layoutColunas" value="2" checked /> 2 colunas
+                (padrão)</label
+              >
+              <label
+                ><input type="radio" name="layoutColunas" value="1" /> 1 coluna (fotos
+                maiores)</label
+              >
+            </div>
+            <div class="grupo-opcao">
+              <span class="grupo-label" style="font-weight: normal">Bordas nas fotos:</span>
+              <label
+                ><input type="radio" name="bordaFotos" value="nenhuma" checked /> Sem borda
+                (Padrão)</label
+              >
+              <label
+                ><input type="radio" name="bordaFotos" value="preta-2pt" /> Borda Preta (2pt)</label
+              >
+            </div>
+            <div class="grupo-opcao">
+              <span class="grupo-label" style="font-weight: normal">Qualidade das imagens:</span>
+              <label
+                ><input type="radio" name="qualidadeImagens" value="media" checked /> Média — 1024
+                px</label
+              >
+              <label
+                ><input type="radio" name="qualidadeImagens" value="maxima" /> Máxima — 1600
+                px</label
+              >
+            </div>
+            <div class="grupo-opcao">
+              <span class="grupo-label" style="font-weight: normal">Margens de impressão:</span>
+              <label
+                ><input type="radio" name="margensImpressao" value="menores" /> Menores (5
+                mm)</label
+              >
+              <label
+                ><input type="radio" name="margensImpressao" value="maiores" checked /> Maiores (15
+                mm) (padrão)</label
+              >
+            </div>
+            <div class="grupo-opcao">
+              <span class="grupo-label" style="font-weight: normal">Fonte:</span>
+              <select id="fonteRelatorio" class="input-select">
+                <option value="Tahoma, sans-serif" selected>Tahoma</option>
+                <option value="Arial, sans-serif">Arial</option>
+                <option value="'Times New Roman', Times, serif">Times New Roman</option>
+                <option value="Calibri, sans-serif">Calibri</option>
+                <option value="Verdana, sans-serif">Verdana</option>
+              </select>
+              <span class="grupo-label" style="font-weight: normal; margin-left: 15px"
+                >Tamanho:</span
+              >
+              <select id="tamanhoFonteRelatorio" class="input-select">
+                <option value="9">9 pt</option>
+                <option value="10">10 pt</option>
+                <option value="11">11 pt</option>
+                <option value="12" selected>12 pt</option>
+                <option value="14">14 pt</option>
               </select>
             </div>
-            <div style="display: flex; align-items: center; gap: 5px;">
-              <span class="grupo-label" style="font-weight: normal;">Tamanho:</span>
-              <select id="tamanhoMarcaDagua" class="input-select">
-                <option value="logo-pequeno">Pequeno (1/4)</option>
-                <option value="logo-medio">Médio (1/2)</option>
-                <option value="logo-grande">Grande (1/1)</option>
-              </select>
+          </fieldset>
+
+          <fieldset class="opcoes-relatorio">
+            <legend>Marca d'água (Logo)</legend>
+            <div class="grupo-opcao">
+              <label
+                ><input type="checkbox" id="usarMarcaDagua" checked /> Inserir logo nas
+                imagens</label
+              >
             </div>
-            <div style="display: flex; align-items: center; gap: 5px;">
-              <span class="grupo-label" style="font-weight: normal;">Transparência:</span>
-              <input type="range" id="opacidadeMarcaDagua" min="10" max="100" value="70">
-              <span id="valorOpacidade" style="display:inline-block; width: 40px; font-weight:bold;">70%</span>
+
+            <div
+              id="opcoesMarcaDagua"
+              style="
+                display: flex;
+                gap: 15px;
+                margin-top: 10px;
+                align-items: center;
+                flex-wrap: wrap;
+              "
+            >
+              <div style="display: flex; align-items: center; gap: 5px">
+                <span class="grupo-label" style="font-weight: normal">Canto:</span>
+                <select id="posicaoMarcaDagua" class="input-select">
+                  <option value="bottom-right">Inferior Direito</option>
+                  <option value="bottom-left">Inferior Esquerdo</option>
+                  <option value="top-right">Superior Direito</option>
+                  <option value="top-left">Superior Esquerdo</option>
+                </select>
+              </div>
+              <div style="display: flex; align-items: center; gap: 5px">
+                <span class="grupo-label" style="font-weight: normal">Tamanho:</span>
+                <select id="tamanhoMarcaDagua" class="input-select">
+                  <option value="logo-pequeno">Pequeno (1/4)</option>
+                  <option value="logo-medio">Médio (1/2)</option>
+                  <option value="logo-grande">Grande (1/1)</option>
+                </select>
+              </div>
+              <div style="display: flex; align-items: center; gap: 5px">
+                <span class="grupo-label" style="font-weight: normal">Transparência:</span>
+                <input type="range" id="opacidadeMarcaDagua" min="10" max="100" value="70" />
+                <span
+                  id="valorOpacidade"
+                  style="display: inline-block; width: 40px; font-weight: bold"
+                  >70%</span
+                >
+              </div>
+            </div>
+          </fieldset>
+
+          <fieldset class="opcoes-relatorio">
+            <legend>Metadados e Segurança</legend>
+            <div class="grupo-opcao">
+              <label
+                ><input type="checkbox" id="usarMetadados" /> Exibir Data, Hora e Coordenadas GPS
+                nas fotos</label
+              >
+            </div>
+            <div
+              style="
+                font-size: 0.85em;
+                color: #856404;
+                margin: 12px 0 0 0;
+                line-height: 1.5;
+                background-color: #fff3cd;
+                padding: 12px;
+                border-left: 4px solid #ffeeba;
+                border-radius: 4px;
+              "
+            >
+              <strong>⚠️ AVISO DE METADADOS E PERDA DE GPS:</strong>
+              <ul style="margin: 8px 0 0 20px; padding: 0">
+                <li style="margin-bottom: 5px">
+                  Aplicativos como <strong>WhatsApp</strong> apagam automaticamente os dados de
+                  localização (GPS) das fotos por segurança.
+                </li>
+                <li style="margin-bottom: 5px">
+                  <strong>Uso em Computador (Desktop):</strong> Prefira transferir as fotografias do
+                  aparelho celular para o PC via <strong>Cabo USB</strong> ou em anexo original por
+                  <strong>E-mail</strong>.
+                </li>
+                <li>
+                  <strong>Uso no Campo (Celular):</strong> Caso a foto fique sem GPS, basta clicar
+                  no botão <strong>"📍 Atualizar GPS pelo Celular"</strong>, logo abaixo da foto
+                  inserida.
+                </li>
+              </ul>
+            </div>
+          </fieldset>
+        </form>
+      </div>
+
+      <div class="secao-fotos">
+        <h2>2. Seleção de Fotos e Legendas</h2>
+        <div style="display: flex; gap: 10px; margin-bottom: 15px; flex-wrap: wrap">
+          <input type="file" id="selecionarFotos" accept="image/*" multiple style="display: none" />
+          <label for="selecionarFotos" class="botao-upload">Selecionar Fotos</label>
+
+          <input type="file" id="selecionarVideo" accept="video/*" style="display: none" />
+          <label
+            for="selecionarVideo"
+            class="botao-secundario"
+            style="background-color: #6c757d; color: white"
+            >Extrair de Vídeo</label
+          >
+        </div>
+
+        <div
+          style="
+            background-color: #eef2f5;
+            color: #495057;
+            padding: 12px;
+            border-radius: 5px;
+            font-size: 0.9em;
+            margin-bottom: 20px;
+            border-left: 4px solid #007bff;
+            line-height: 1.5;
+          "
+        >
+          <strong>💡 Dica de Captura:</strong> Para otimizar o espaço na folha A4 e evitar "buracos"
+          no relatório, configure a câmera do seu aparelho celular para a
+          <strong>proporção 4:3</strong> e dê preferência a tirar fotos com o
+          <strong>celular deitado (modo paisagem)</strong>.
+        </div>
+
+        <div id="galeria-fotos-legenda" class="galeria-preview"></div>
+      </div>
+
+      <div class="secao-observacoes">
+        <h2>3. Observações Gerais</h2>
+        <textarea
+          id="observacoesGerais"
+          placeholder="Descreva aqui as observações gerais, serviços realizados..."
+        ></textarea>
+      </div>
+
+      <div class="secao-acao">
+        <button type="button" id="btnGerarRelatorio" class="botao-principal">
+          Gerar Relatório
+        </button>
+        <button
+          type="button"
+          id="btnGerarPDF"
+          class="botao-secundario"
+          title="Gera um PDF via caixa de impressão do navegador."
+        >
+          Gerar PDF
+        </button>
+        <button
+          type="button"
+          id="btnAlternarPreview"
+          class="botao-texto"
+          title="Alterna a visualização de impressão na tela"
+        >
+          Alternar pré-visualização
+        </button>
+        <small class="nota-pdf"
+          >Atenção: Se marcar "Cabeçalhos e rodapés" para exibir o número da página, o navegador
+          imprimirá também o seu link da web por padrão.</small
+        >
+      </div>
+
+      <hr />
+
+      <div id="area-relatorio">
+        <table style="width: 100%; border-collapse: collapse; border: none">
+          <thead style="display: table-header-group">
+            <tr>
+              <td
+                id="cabecalho-relatorio"
+                style="padding: 0; border: none; padding-bottom: 10px"
+              ></td>
+            </tr>
+          </thead>
+
+          <tbody style="display: table-row-group">
+            <tr>
+              <td style="padding: 0; border: none">
+                <div id="corpo-relatorio" class="corpo-relatorio-grid"></div>
+                <div id="observacoes-finais-relatorio"></div>
+              </td>
+            </tr>
+          </tbody>
+
+          <tfoot style="display: table-footer-group">
+            <tr>
+              <td style="height: 25mm; border: none"></td>
+            </tr>
+          </tfoot>
+        </table>
+
+        <div class="rodape-fixo-print">
+          <div class="rodape-container">
+            <div class="rodape-texto">
+              Companhia de Saneamento Básico do Estado de São Paulo – Sabesp<br />
+              <span contenteditable="true" style="display: inline-block; outline: none"
+                >Divisão de Manutenção e Serviços Operacionais de São José dos Campos - OVMS</span
+              ><br />
+              <span
+                contenteditable="true"
+                style="display: inline-block; outline: none; min-width: 100%"
+                >Rua Euclides Miragaia, 126, Centro - CEP 12.245-820 - São José dos Campos -
+                SP</span
+              ><br />
+              <span>www.sabesp.com.br</span>
             </div>
           </div>
-        </fieldset>
-
-        <fieldset class="opcoes-relatorio">
-          <legend>Metadados e Segurança</legend>
-          <div class="grupo-opcao">
-            <label><input type="checkbox" id="usarMetadados"> Exibir Data, Hora e Coordenadas GPS nas fotos</label>
-          </div>
-          <div style="font-size: 0.85em; color: #856404; margin: 12px 0 0 0; line-height: 1.5; background-color: #fff3cd; padding: 12px; border-left: 4px solid #ffeeba; border-radius: 4px;">
-            <strong>⚠️ AVISO DE METADADOS E PERDA DE GPS:</strong>
-            <ul style="margin: 8px 0 0 20px; padding: 0;">
-              <li style="margin-bottom: 5px;">Aplicativos como <strong>WhatsApp</strong> apagam automaticamente os dados de localização (GPS) das fotos por segurança.</li>
-              <li style="margin-bottom: 5px;"><strong>Uso em Computador (Desktop):</strong> Prefira transferir as fotografias do aparelho celular para o PC via <strong>Cabo USB</strong> ou em anexo original por <strong>E-mail</strong>.</li>
-              <li><strong>Uso no Campo (Celular):</strong> Caso a foto fique sem GPS, basta clicar no botão <strong>"📍 Atualizar GPS pelo Celular"</strong>, logo abaixo da foto inserida.</li>
-            </ul>
-          </div>
-        </fieldset>
-      </form>
-    </div>
-
-    <div class="secao-fotos">
-      <h2>2. Seleção de Fotos e Legendas</h2>
-      <div style="display: flex; gap: 10px; margin-bottom: 15px; flex-wrap: wrap;">
-        <input type="file" id="selecionarFotos" accept="image/*" multiple style="display: none;">
-        <label for="selecionarFotos" class="botao-upload">Selecionar Fotos</label>
-        
-        <input type="file" id="selecionarVideo" accept="video/*" style="display: none;">
-        <label for="selecionarVideo" class="botao-secundario" style="background-color: #6c757d; color: white;">Extrair de Vídeo</label>
-      </div>
-
-      <div style="background-color: #eef2f5; color: #495057; padding: 12px; border-radius: 5px; font-size: 0.9em; margin-bottom: 20px; border-left: 4px solid #007bff; line-height: 1.5;">
-        <strong>💡 Dica de Captura:</strong> Para otimizar o espaço na folha A4 e evitar "buracos" no relatório, configure a câmera do seu aparelho celular para a <strong>proporção 4:3</strong> e dê preferência a tirar fotos com o <strong>celular deitado (modo paisagem)</strong>.
-      </div>
-
-      <div id="galeria-fotos-legenda" class="galeria-preview"></div>
-    </div>
-
-    <div class="secao-observacoes">
-      <h2>3. Observações Gerais</h2>
-      <textarea id="observacoesGerais" placeholder="Descreva aqui as observações gerais, serviços realizados..."></textarea>
-    </div>
-
-    <div class="secao-acao">
-      <button type="button" id="btnGerarRelatorio" class="botao-principal">Gerar Relatório</button>
-      <button type="button" id="btnGerarPDF" class="botao-secundario" title="Gera um PDF via caixa de impressão do navegador.">Gerar PDF</button>
-      <button type="button" id="btnAlternarPreview" class="botao-texto" title="Alterna a visualização de impressão na tela">Alternar pré-visualização</button>
-      <small class="nota-pdf">Atenção: Se marcar "Cabeçalhos e rodapés" para exibir o número da página, o navegador imprimirá também o seu link da web por padrão.</small>
-    </div>
-
-    <hr>
-    
-    <div id="area-relatorio">
-      <table style="width: 100%; border-collapse: collapse; border: none;">
-        <thead style="display: table-header-group;">
-          <tr>
-            <td id="cabecalho-relatorio" style="padding: 0; border: none; padding-bottom: 10px;"></td>
-          </tr>
-        </thead>
-        
-        <tbody style="display: table-row-group;">
-          <tr>
-            <td style="padding: 0; border: none;">
-              <div id="corpo-relatorio" class="corpo-relatorio-grid"></div>
-              <div id="observacoes-finais-relatorio"></div>
-            </td>
-          </tr>
-        </tbody>
-        
-        <tfoot style="display: table-footer-group;">
-          <tr>
-            <td style="height: 25mm; border: none;"></td>
-          </tr>
-        </tfoot>
-      </table>
-
-      <div class="rodape-fixo-print">
-        <div class="rodape-container">
-          <div class="rodape-texto">
-            Companhia de Saneamento Básico do Estado de São Paulo – Sabesp<br>
-            <span contenteditable="true" style="display:inline-block; outline:none;">Divisão de Manutenção e Serviços Operacionais de São José dos Campos - OVMS</span><br>
-            <span contenteditable="true" style="display: inline-block; outline: none; min-width: 100%;">Rua Euclides Miragaia, 126, Centro - CEP 12.245-820 - São José dos Campos - SP</span><br>
-            <span>www.sabesp.com.br</span>
-          </div>
         </div>
       </div>
     </div>
-  </div>
 
-  <div id="modalEditor" class="modal-oculto">
-    <div class="modal-conteudo" style="max-width: 900px; width: 95%;">
-      <h3>Desenhar e Apontar</h3>
-      <p style="font-size: 0.9em; color: #555; margin-top: -10px;">Marque os pontos de atenção na foto.</p>
-      <div class="editor-toolbar" style="margin-bottom: 10px; display: flex; gap: 10px; align-items: center; flex-wrap: wrap; background: #f8f9fa; padding: 10px; border-radius: 5px; width: 100%; box-sizing: border-box; border: 1px solid #ddd;">
-        <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap; flex-grow: 1;">
-          <span style="font-weight: bold; color: #444;">Ferramenta:</span>
-          <label style="cursor: pointer;"><input type="radio" name="ferramentaEdicao" value="seta" checked> ↗️ Seta</label>
-          <label style="cursor: pointer;"><input type="radio" name="ferramentaEdicao" value="circulo"> ⭕ Elipse</label>
-          <label style="cursor: pointer;"><input type="radio" name="ferramentaEdicao" value="texto"> 🔠 Texto</label>
-          <input type="text" id="textoEdicao" placeholder="1. Digite o texto e 2. Clique na foto" style="display:none; padding: 6px; border: 1px solid #ccc; border-radius: 4px; flex-grow: 1; min-width: 200px;">
+    <div id="modalEditor" class="modal-oculto">
+      <div class="modal-conteudo" style="max-width: 900px; width: 95%">
+        <h3>Desenhar e Apontar</h3>
+        <p style="font-size: 0.9em; color: #555; margin-top: -10px">
+          Marque os pontos de atenção na foto.
+        </p>
+        <div
+          class="editor-toolbar"
+          style="
+            margin-bottom: 10px;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            flex-wrap: wrap;
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 5px;
+            width: 100%;
+            box-sizing: border-box;
+            border: 1px solid #ddd;
+          "
+        >
+          <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap; flex-grow: 1">
+            <span style="font-weight: bold; color: #444">Ferramenta:</span>
+            <label style="cursor: pointer"
+              ><input type="radio" name="ferramentaEdicao" value="seta" checked /> ↗️ Seta</label
+            >
+            <label style="cursor: pointer"
+              ><input type="radio" name="ferramentaEdicao" value="circulo" /> ⭕ Elipse</label
+            >
+            <label style="cursor: pointer"
+              ><input type="radio" name="ferramentaEdicao" value="texto" /> 🔠 Texto</label
+            >
+            <input
+              type="text"
+              id="textoEdicao"
+              placeholder="1. Digite o texto e 2. Clique na foto"
+              style="
+                display: none;
+                padding: 6px;
+                border: 1px solid #ccc;
+                border-radius: 4px;
+                flex-grow: 1;
+                min-width: 200px;
+              "
+            />
+          </div>
+          <div
+            style="
+              border-left: 2px solid #ddd;
+              padding-left: 15px;
+              display: flex;
+              gap: 5px;
+              align-items: center;
+            "
+          >
+            <span style="font-weight: bold; color: #444; margin-right: 5px">Zoom:</span>
+            <button
+              type="button"
+              id="btnZoomOut"
+              class="botao-secundario"
+              style="padding: 2px 10px; font-weight: bold; margin: 0"
+            >
+              -
+            </button>
+            <span id="zoomLabel" style="min-width: 45px; text-align: center; font-weight: bold"
+              >100%</span
+            >
+            <button
+              type="button"
+              id="btnZoomIn"
+              class="botao-secundario"
+              style="padding: 2px 10px; font-weight: bold; margin: 0"
+            >
+              +
+            </button>
+          </div>
         </div>
-        <div style="border-left: 2px solid #ddd; padding-left: 15px; display: flex; gap: 5px; align-items: center;">
-          <span style="font-weight: bold; color: #444; margin-right: 5px;">Zoom:</span>
-          <button type="button" id="btnZoomOut" class="botao-secundario" style="padding: 2px 10px; font-weight: bold; margin: 0;">-</button>
-          <span id="zoomLabel" style="min-width: 45px; text-align: center; font-weight: bold;">100%</span>
-          <button type="button" id="btnZoomIn" class="botao-secundario" style="padding: 2px 10px; font-weight: bold; margin: 0;">+</button>
+        <div
+          class="canvas-container"
+          style="
+            height: 60vh;
+            width: 100%;
+            background: #e9ecef;
+            border: 1px solid #ccc;
+            overflow: auto;
+            text-align: center;
+            margin-bottom: 15px;
+            border-radius: 5px;
+          "
+        >
+          <canvas
+            id="canvasEditor"
+            style="max-width: 100%; max-height: 60vh; margin: auto; display: block"
+          ></canvas>
+        </div>
+        <div class="modal-acoes">
+          <button type="button" id="btnSalvarEdicao" class="botao-principal">Salvar Imagem</button>
+          <button type="button" id="btnDesfazerSeta" class="botao-secundario">
+            Desfazer Última
+          </button>
+          <button type="button" id="btnFecharModal" class="botao-texto">Cancelar</button>
         </div>
       </div>
-      <div class="canvas-container" style="height: 60vh; width: 100%; background: #e9ecef; border: 1px solid #ccc; overflow: auto; text-align: center; margin-bottom: 15px; border-radius: 5px;">
-        <canvas id="canvasEditor" style="max-width: 100%; max-height: 60vh; margin: auto; display: block;"></canvas>
-      </div>
-      <div class="modal-acoes">
-        <button type="button" id="btnSalvarEdicao" class="botao-principal">Salvar Imagem</button>
-        <button type="button" id="btnDesfazerSeta" class="botao-secundario">Desfazer Última</button>
-        <button type="button" id="btnFecharModal" class="botao-texto">Cancelar</button>
+    </div>
+
+    <div id="modalCrop" class="modal-oculto">
+      <div class="modal-conteudo" style="max-width: 900px; width: 95%">
+        <h3>Recortar Imagem</h3>
+        <p style="font-size: 0.9em; color: #555; margin-top: -10px">
+          Ajuste a área para focar no detalhe principal da patologia.
+        </p>
+
+        <div
+          style="
+            display: flex;
+            gap: 8px;
+            margin-bottom: 12px;
+            justify-content: center;
+            flex-wrap: wrap;
+          "
+        >
+          <span
+            style="
+              font-weight: bold;
+              color: #444;
+              align-self: center;
+              font-size: 0.9em;
+              margin-right: 5px;
+            "
+            >Formato:</span
+          >
+          <button
+            type="button"
+            id="btnCropLivre"
+            class="botao-secundario"
+            style="margin: 0; padding: 5px 12px; font-size: 0.85em; background-color: #28a745"
+          >
+            Livre
+          </button>
+          <button
+            type="button"
+            id="btnCrop43"
+            class="botao-secundario"
+            style="margin: 0; padding: 5px 12px; font-size: 0.85em; background-color: #6c757d"
+          >
+            Horizontal (4:3)
+          </button>
+          <button
+            type="button"
+            id="btnCrop34"
+            class="botao-secundario"
+            style="margin: 0; padding: 5px 12px; font-size: 0.85em; background-color: #6c757d"
+          >
+            Vertical (3:4)
+          </button>
+        </div>
+
+        <div
+          style="
+            height: 60vh;
+            width: 100%;
+            background: #e9ecef;
+            border: 1px solid #ccc;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            margin-bottom: 15px;
+            border-radius: 5px;
+          "
+        >
+          <img id="imgCrop" style="max-width: 100%; max-height: 100%; display: block" src="" />
+        </div>
+        <div class="modal-acoes">
+          <button type="button" id="btnAplicarCrop" class="botao-principal">Aplicar Recorte</button>
+          <button type="button" id="btnFecharCrop" class="botao-texto">Cancelar</button>
+        </div>
       </div>
     </div>
-  </div>
 
-  <div id="modalCrop" class="modal-oculto">
-    <div class="modal-conteudo" style="max-width: 900px; width: 95%;">
-      <h3>Recortar Imagem</h3>
-      <p style="font-size: 0.9em; color: #555; margin-top: -10px;">Ajuste a área para focar no detalhe principal da patologia.</p>
-      
-      <div style="display: flex; gap: 8px; margin-bottom: 12px; justify-content: center; flex-wrap: wrap;">
-        <span style="font-weight: bold; color: #444; align-self: center; font-size: 0.9em; margin-right: 5px;">Formato:</span>
-        <button type="button" id="btnCropLivre" class="botao-secundario" style="margin: 0; padding: 5px 12px; font-size: 0.85em; background-color: #28a745;">Livre</button>
-        <button type="button" id="btnCrop43" class="botao-secundario" style="margin: 0; padding: 5px 12px; font-size: 0.85em; background-color: #6c757d;">Horizontal (4:3)</button>
-        <button type="button" id="btnCrop34" class="botao-secundario" style="margin: 0; padding: 5px 12px; font-size: 0.85em; background-color: #6c757d;">Vertical (3:4)</button>
-      </div>
-
-      <div style="height: 60vh; width: 100%; background: #e9ecef; border: 1px solid #ccc; display: flex; justify-content: center; align-items: center; overflow: hidden; margin-bottom: 15px; border-radius: 5px;">
-        <img id="imgCrop" style="max-width: 100%; max-height: 100%; display: block;" src="">
-      </div>
-      <div class="modal-acoes">
-        <button type="button" id="btnAplicarCrop" class="botao-principal">Aplicar Recorte</button>
-        <button type="button" id="btnFecharCrop" class="botao-texto">Cancelar</button>
+    <div id="modalVideo" class="modal-oculto">
+      <div class="modal-conteudo">
+        <h3>Extrair Frame do Vídeo</h3>
+        <p style="font-size: 0.9em; color: #555; margin-top: -10px">
+          Use os controles para encontrar o momento exato e clique em Capturar.
+        </p>
+        <div
+          class="video-container"
+          style="
+            text-align: center;
+            background: #000;
+            margin-bottom: 15px;
+            border-radius: 4px;
+            width: 100%;
+          "
+        >
+          <video id="videoPlayer" style="max-width: 100%; max-height: 50vh" controls></video>
+        </div>
+        <div
+          class="video-controles"
+          style="display: flex; gap: 10px; align-items: center; margin-bottom: 15px; width: 100%"
+        >
+          <button
+            type="button"
+            id="btnVideoRewind"
+            class="botao-secundario"
+            style="padding: 5px 10px"
+          >
+            ⏪ -0.1s
+          </button>
+          <input
+            type="range"
+            id="videoSlider"
+            min="0"
+            max="100"
+            value="0"
+            step="0.01"
+            style="flex-grow: 1; cursor: pointer"
+          />
+          <button
+            type="button"
+            id="btnVideoForward"
+            class="botao-secundario"
+            style="padding: 5px 10px"
+          >
+            +0.1s ⏩
+          </button>
+        </div>
+        <div class="modal-acoes">
+          <button
+            type="button"
+            id="btnCapturarFrame"
+            class="botao-principal"
+            style="background-color: #28a745"
+          >
+            📸 Capturar Frame
+          </button>
+          <button type="button" id="btnFecharModalVideo" class="botao-secundario">
+            Concluir e Fechar
+          </button>
+        </div>
+        <p
+          id="msgFrameCapturado"
+          style="
+            color: green;
+            font-weight: bold;
+            display: none;
+            margin-top: 10px;
+            text-align: center;
+          "
+        >
+          ✔ Frame capturado e adicionado à galeria!
+        </p>
       </div>
     </div>
-  </div>
 
-  <div id="modalVideo" class="modal-oculto">
-    <div class="modal-conteudo">
-      <h3>Extrair Frame do Vídeo</h3>
-      <p style="font-size: 0.9em; color: #555; margin-top: -10px;">Use os controles para encontrar o momento exato e clique em Capturar.</p>
-      <div class="video-container" style="text-align: center; background: #000; margin-bottom: 15px; border-radius: 4px; width: 100%;">
-        <video id="videoPlayer" style="max-width: 100%; max-height: 50vh;" controls></video>
-      </div>
-      <div class="video-controles" style="display: flex; gap: 10px; align-items: center; margin-bottom: 15px; width: 100%;">
-        <button type="button" id="btnVideoRewind" class="botao-secundario" style="padding: 5px 10px;">⏪ -0.1s</button>
-        <input type="range" id="videoSlider" min="0" max="100" value="0" step="0.01" style="flex-grow: 1; cursor: pointer;">
-        <button type="button" id="btnVideoForward" class="botao-secundario" style="padding: 5px 10px;">+0.1s ⏩</button>
-      </div>
-      <div class="modal-acoes">
-        <button type="button" id="btnCapturarFrame" class="botao-principal" style="background-color: #28a745;">📸 Capturar Frame</button>
-        <button type="button" id="btnFecharModalVideo" class="botao-secundario">Concluir e Fechar</button>
-      </div>
-      <p id="msgFrameCapturado" style="color: green; font-weight: bold; display: none; margin-top: 10px; text-align: center;">✔ Frame capturado e adicionado à galeria!</p>
-    </div>
-  </div>
+    <script src="utils.js?v=38"></script>
+    <script src="script.js?v=38"></script>
 
-  <script src="utils.js?v=37"></script>
-  <script src="script.js?v=37"></script>
-  
-  <script>
-    if ('serviceWorker' in navigator) {
-      window.addEventListener('load', () => {
-        navigator.serviceWorker.register('sw.js').then(reg => {
-          reg.update(); 
+    <script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('sw.js').then((reg) => {
+            reg.update();
+          });
         });
-      });
 
-      let refreshing = false;
-      navigator.serviceWorker.addEventListener('controllerchange', () => {
-        if (!refreshing) {
-          refreshing = true;
-          window.location.reload(); 
-        }
-      });
-    }
-  </script>
-</body>
+        let refreshing = false;
+        navigator.serviceWorker.addEventListener('controllerchange', () => {
+          if (!refreshing) {
+            refreshing = true;
+            window.location.reload();
+          }
+        });
+      }
+    </script>
+  </body>
 </html>

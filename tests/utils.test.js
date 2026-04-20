@@ -1,6 +1,15 @@
 'use strict';
 
-const { esc, formatarDataISO, resolverDepartamento, criarBlocoAssinatura } = require('../utils');
+const {
+  esc,
+  formatarDataISO,
+  resolverDepartamento,
+  criarBlocoAssinatura,
+  dmsParaDecimal,
+  aplicarRefGps,
+  sanitizarNomeArquivo,
+  validarEsquemaProjeto,
+} = require('../utils');
 
 const DEPTO_PADRAO = 'Divisão de Manutenção e Serviços de São José dos Campos';
 
@@ -123,5 +132,102 @@ describe('criarBlocoAssinatura()', () => {
   test('inclui linha de assinatura', () => {
     const html = criarBlocoAssinatura('Nome', 'Cargo', 'Depto', null);
     expect(html).toContain('class="linha-assinatura"');
+  });
+});
+
+describe('dmsParaDecimal()', () => {
+  test('retorna número diretamente quando já é número', () => {
+    expect(dmsParaDecimal(45.5)).toBe(45.5);
+  });
+  test('converte string para float', () => {
+    expect(dmsParaDecimal('23.123')).toBeCloseTo(23.123);
+  });
+  test('converte array DMS [graus, minutos, segundos]', () => {
+    expect(dmsParaDecimal([23, 30, 0])).toBeCloseTo(23.5);
+  });
+  test('converte DMS com segundos fracionados', () => {
+    expect(dmsParaDecimal([23, 0, 36])).toBeCloseTo(23.01);
+  });
+  test('retorna 0 para array vazio', () => {
+    expect(dmsParaDecimal([])).toBe(0);
+  });
+  test('retorna 0 para null', () => {
+    expect(dmsParaDecimal(null)).toBe(0);
+  });
+  test('suporta objetos valueOf (formato EXIF raw)', () => {
+    const coord = [{ valueOf: () => 23 }, { valueOf: () => 32 }, { valueOf: () => 0 }];
+    expect(dmsParaDecimal(coord)).toBeCloseTo(23 + 32 / 60);
+  });
+});
+
+describe('aplicarRefGps()', () => {
+  test('nega valor para referência S', () => {
+    expect(aplicarRefGps(23.5, 'S')).toBeCloseTo(-23.5);
+  });
+  test('nega valor para referência W', () => {
+    expect(aplicarRefGps(46.6, 'W')).toBeCloseTo(-46.6);
+  });
+  test('mantém positivo para referência N', () => {
+    expect(aplicarRefGps(23.5, 'N')).toBeCloseTo(23.5);
+  });
+  test('mantém positivo para referência E', () => {
+    expect(aplicarRefGps(46.6, 'E')).toBeCloseTo(46.6);
+  });
+  test('força positivo antes de negar para S (valor já negativo)', () => {
+    expect(aplicarRefGps(-23.5, 'S')).toBeCloseTo(-23.5);
+  });
+  test('retorna valor sem alteração para ref desconhecida', () => {
+    expect(aplicarRefGps(10, 'X')).toBe(10);
+  });
+});
+
+describe('sanitizarNomeArquivo()', () => {
+  test('retorna sem-local para string vazia', () => {
+    expect(sanitizarNomeArquivo('')).toBe('sem-local');
+  });
+  test('retorna sem-local para null', () => {
+    expect(sanitizarNomeArquivo(null)).toBe('sem-local');
+  });
+  test('retorna sem-local para apenas espaços', () => {
+    expect(sanitizarNomeArquivo('   ')).toBe('sem-local');
+  });
+  test('substitui espaços por underscore', () => {
+    expect(sanitizarNomeArquivo('Rua das Flores')).toBe('Rua_das_Flores');
+  });
+  test('substitui caracteres especiais por underscore', () => {
+    expect(sanitizarNomeArquivo('São José/SJC')).toBe('S_o_Jos__SJC');
+  });
+  test('mantém letras, números e hífens', () => {
+    expect(sanitizarNomeArquivo('abc-123-XYZ')).toBe('abc-123-XYZ');
+  });
+  test('remove espaços das extremidades antes de processar', () => {
+    expect(sanitizarNomeArquivo('  local  ')).toBe('local');
+  });
+});
+
+describe('validarEsquemaProjeto()', () => {
+  test('retorna false para null', () => {
+    expect(validarEsquemaProjeto(null)).toBe(false);
+  });
+  test('retorna false para array', () => {
+    expect(validarEsquemaProjeto([])).toBe(false);
+  });
+  test('retorna false para string', () => {
+    expect(validarEsquemaProjeto('texto')).toBe(false);
+  });
+  test('retorna true para objeto vazio (sem campos obrigatórios)', () => {
+    expect(validarEsquemaProjeto({})).toBe(true);
+  });
+  test('retorna true para projeto válido com form e fotos', () => {
+    expect(validarEsquemaProjeto({ form: { local: 'X' }, fotos: [] })).toBe(true);
+  });
+  test('retorna false se form não for objeto', () => {
+    expect(validarEsquemaProjeto({ form: 'invalido' })).toBe(false);
+  });
+  test('retorna false se fotos não for array', () => {
+    expect(validarEsquemaProjeto({ fotos: 'invalido' })).toBe(false);
+  });
+  test('retorna false se form for array', () => {
+    expect(validarEsquemaProjeto({ form: [] })).toBe(false);
   });
 });

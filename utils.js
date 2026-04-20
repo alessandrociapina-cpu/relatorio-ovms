@@ -39,7 +39,47 @@ function criarBlocoAssinatura(nome, cargo, depto, assinaturaUrl) {
   `;
 }
 
+function dmsParaDecimal(coords) {
+  if (typeof coords === 'number') return coords;
+  if (typeof coords === 'string') return parseFloat(coords);
+  if (coords && coords.length >= 3) {
+    const d = coords[0] && coords[0].valueOf ? coords[0].valueOf() : parseFloat(coords[0]) || 0;
+    const m = coords[1] && coords[1].valueOf ? coords[1].valueOf() : parseFloat(coords[1]) || 0;
+    const s = coords[2] && coords[2].valueOf ? coords[2].valueOf() : parseFloat(coords[2]) || 0;
+    return d + m / 60 + s / 3600;
+  }
+  return 0;
+}
+
+function aplicarRefGps(valor, ref) {
+  if (ref === 'S' || ref === 'W') return Math.abs(valor) * -1;
+  if (ref === 'N' || ref === 'E') return Math.abs(valor);
+  return valor;
+}
+
+function sanitizarNomeArquivo(valor) {
+  if (!valor || !valor.trim()) return 'sem-local';
+  return valor.trim().replace(/[^a-zA-Z0-9-]/g, '_');
+}
+
+function validarEsquemaProjeto(dados) {
+  if (!dados || typeof dados !== 'object' || Array.isArray(dados)) return false;
+  if ('form' in dados && (typeof dados.form !== 'object' || Array.isArray(dados.form)))
+    return false;
+  if ('fotos' in dados && !Array.isArray(dados.fotos)) return false;
+  return true;
+}
+
 /* global module */
 if (typeof module !== 'undefined') {
-  module.exports = { esc, formatarDataISO, resolverDepartamento, criarBlocoAssinatura };
+  module.exports = {
+    esc,
+    formatarDataISO,
+    resolverDepartamento,
+    criarBlocoAssinatura,
+    dmsParaDecimal,
+    aplicarRefGps,
+    sanitizarNomeArquivo,
+    validarEsquemaProjeto,
+  };
 }

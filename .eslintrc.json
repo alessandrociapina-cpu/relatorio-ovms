@@ -12,7 +12,7 @@
     "Cropper": "readonly"
   },
   "rules": {
-    "no-unused-vars": "warn",
+    "no-unused-vars": ["warn", { "argsIgnorePattern": "^_" }],
     "no-console": ["warn", { "allow": ["error"] }],
     "eqeqeq": ["error", "always"],
     "no-var": "error",

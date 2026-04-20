@@ -1,3 +1,4 @@
+/* global esc, formatarDataISO, resolverDepartamento, criarBlocoAssinatura */
 document.addEventListener('DOMContentLoaded', () => {
   const formVistoria = document.getElementById('form-vistoria');
   const inputLocalVistoria = document.getElementById('localVistoria');
@@ -612,7 +613,7 @@ document.addEventListener('DOMContentLoaded', () => {
     await gerarRelatorio(true); 
     
     const tituloOriginal = document.title;
-    let nomeObra = inputLocalVistoria.value.trim();
+    const nomeObra = inputLocalVistoria.value.trim();
     document.title = nomeObra ? `Relatório Fotográfico - ${nomeObra}` : 'Relatório Fotográfico';
     
     setTimeout(() => { 
@@ -646,9 +647,9 @@ document.addEventListener('DOMContentLoaded', () => {
               if (typeof coords === 'number') return coords;
               if (typeof coords === 'string') return parseFloat(coords); 
               if (coords && coords.length >= 3) {
-                let d = coords[0].valueOf ? coords[0].valueOf() : parseFloat(coords[0]) || 0;
-                let m = coords[1].valueOf ? coords[1].valueOf() : parseFloat(coords[1]) || 0;
-                let s = coords[2].valueOf ? coords[2].valueOf() : parseFloat(coords[2]) || 0;
+                const d = coords[0].valueOf ? coords[0].valueOf() : parseFloat(coords[0]) || 0;
+                const m = coords[1].valueOf ? coords[1].valueOf() : parseFloat(coords[1]) || 0;
+                const s = coords[2].valueOf ? coords[2].valueOf() : parseFloat(coords[2]) || 0;
                 return d + (m / 60) + (s / 3600);
               }
               return 0;
@@ -729,25 +730,27 @@ document.addEventListener('DOMContentLoaded', () => {
     const sortedFiles = Array.from(files).sort((a, b) => a.name.localeCompare(b.name, undefined, { numeric: true }));
     const novasFotos = new Array(sortedFiles.length);
 
-    const promises = sortedFiles.map((file, index) => new Promise(async (resolve) => {
-      if (!file.type.startsWith('image/')) { novasFotos[index] = null; resolve(); return; }
+    async function processarFoto(file, index) {
+      if (!file.type.startsWith('image/')) { novasFotos[index] = null; return; }
       const metadadosExtraidos = await lerMetadadosExif(file);
-      const reader = new FileReader();
-      reader.onload = async (e) => {
-        try {
-          const originalDataUrl = e.target.result;
-          const resizedPreview = await redimensionarImagem(originalDataUrl, 1024, 0.7);
-          novasFotos[index] = {
-            id: `foto-${Date.now()}-${index}`, fileName: file.name,
-            originalDataUrl: originalDataUrl, 
-            previewDataUrl: resizedPreview,   
-            editedPreviewDataUrl: null,       
-            textoLegenda: '', metadadosExif: metadadosExtraidos, ocultarLogo: false, ocultarMetadados: false 
-          };
-        } catch (error) { novasFotos[index] = null; } finally { resolve(); }
-      };
-      reader.readAsDataURL(file);
-    }));
+      const originalDataUrl = await new Promise((resolve) => {
+        const reader = new FileReader();
+        reader.onload = (e) => resolve(e.target.result);
+        reader.readAsDataURL(file);
+      });
+      try {
+        const resizedPreview = await redimensionarImagem(originalDataUrl, 1024, 0.7);
+        novasFotos[index] = {
+          id: `foto-${Date.now()}-${index}`, fileName: file.name,
+          originalDataUrl: originalDataUrl,
+          previewDataUrl: resizedPreview,
+          editedPreviewDataUrl: null,
+          textoLegenda: '', metadadosExif: metadadosExtraidos, ocultarLogo: false, ocultarMetadados: false
+        };
+      } catch (error) { novasFotos[index] = null; }
+    }
+
+    const promises = sortedFiles.map((file, index) => processarFoto(file, index));
 
     await Promise.all(promises);
     fotosSelecionadasParaRelatorio = [...fotosSelecionadasParaRelatorio, ...novasFotos.filter(f => f !== null)];
@@ -848,7 +851,7 @@ document.addEventListener('DOMContentLoaded', () => {
               renderizarGaleria();
               salvarRascunhoLocal();
             },
-            (err) => {
+            (_err) => {
               alert('Por favor, ative a Localização (GPS) no seu celular e dê permissão ao navegador.');
               btnGPSAtual.innerHTML = '📍 Atualizar GPS pelo Celular';
             },
@@ -1166,8 +1169,8 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- NOVA LÓGICA DO RODAPÉ DINÂMICO (v36) ---
     const rodapeDiv = document.querySelector('.rodape-texto');
     if (rodapeDiv) {
-      let isOutros1 = selectDepartamento.value === 'Outros';
-      let isOutros2 = checkboxIncluirFiscal2.checked && selectDepartamento2.value === 'Outros';
+      const isOutros1 = selectDepartamento.value === 'Outros';
+      const isOutros2 = checkboxIncluirFiscal2.checked && selectDepartamento2.value === 'Outros';
 
       if (isOutros1 || isOutros2) {
         // Pega o nome do departamento customizado digitado (prioridade para o fiscal 1)

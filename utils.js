@@ -3,7 +3,7 @@
 const DEPARTAMENTO_PADRAO = 'Divisão de Manutenção e Serviços de São José dos Campos';
 
 function esc(str) {
-  if (str == null) return '';
+  if (str === null || str === undefined) return '';
   return String(str)
     .replace(/&/g, '&amp;')
     .replace(/</g, '&lt;')
@@ -39,6 +39,7 @@ function criarBlocoAssinatura(nome, cargo, depto, assinaturaUrl) {
   `;
 }
 
+/* global module */
 if (typeof module !== 'undefined') {
   module.exports = { esc, formatarDataISO, resolverDepartamento, criarBlocoAssinatura };
 }

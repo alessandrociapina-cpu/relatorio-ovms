@@ -36,16 +36,6 @@ document.addEventListener('DOMContentLoaded', () => {
   const inputCarregarProjeto = document.getElementById('inputCarregarProjeto');
   const autoSaveStatus = document.getElementById('autoSaveStatus');
 
-  function esc(str) {
-    if (str == null) return '';
-    return String(str)
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;')
-      .replace(/"/g, '&quot;')
-      .replace(/'/g, '&#39;');
-  }
-
   function mostrarErro(input, msg) {
     input.classList.add('input-invalido');
     const id = `erro-${input.id}`;
@@ -65,53 +55,32 @@ document.addEventListener('DOMContentLoaded', () => {
     if (span) span.remove();
   }
 
-  function validarFormulario() {
+  function validarFiscal(inputNome, selectCargo, inputCargoOutros, selectDepto, inputDeptoOutros, label) {
     let valido = true;
     let primeiroErro = null;
 
-    const local = inputLocalVistoria.value.trim();
-    if (!local) {
-      mostrarErro(inputLocalVistoria, 'Informe o local da vistoria.');
-      if (!primeiroErro) primeiroErro = inputLocalVistoria;
+    const nome = inputNome.value.trim();
+    if (!nome) {
+      mostrarErro(inputNome, `Informe o nome do ${label}.`);
+      primeiroErro = inputNome;
       valido = false;
-    } else if (local.length < 3) {
-      mostrarErro(inputLocalVistoria, 'O local deve ter pelo menos 3 caracteres.');
-      if (!primeiroErro) primeiroErro = inputLocalVistoria;
-      valido = false;
-    } else {
-      limparErro(inputLocalVistoria);
-    }
-
-    if (!inputDataVistoria.value) {
-      mostrarErro(inputDataVistoria, 'Informe a data da vistoria.');
-      if (!primeiroErro) primeiroErro = inputDataVistoria;
+    } else if (nome.length < 3) {
+      mostrarErro(inputNome, 'O nome deve ter pelo menos 3 caracteres.');
+      primeiroErro = inputNome;
       valido = false;
     } else {
-      limparErro(inputDataVistoria);
-    }
-
-    const fiscal = inputNomeFiscal.value.trim();
-    if (!fiscal) {
-      mostrarErro(inputNomeFiscal, 'Informe o nome do 1º fiscal.');
-      if (!primeiroErro) primeiroErro = inputNomeFiscal;
-      valido = false;
-    } else if (fiscal.length < 3) {
-      mostrarErro(inputNomeFiscal, 'O nome deve ter pelo menos 3 caracteres.');
-      if (!primeiroErro) primeiroErro = inputNomeFiscal;
-      valido = false;
-    } else {
-      limparErro(inputNomeFiscal);
+      limparErro(inputNome);
     }
 
     if (selectCargo.value === 'Outros') {
       const cargo = inputCargoOutros.value.trim();
       if (!cargo) {
-        mostrarErro(inputCargoOutros, 'Informe o cargo.');
-        if (!primeiroErro) primeiroErro = inputCargoOutros;
+        mostrarErro(inputCargoOutros, `Informe o cargo do ${label}.`);
+        primeiroErro = primeiroErro || inputCargoOutros;
         valido = false;
       } else if (cargo.length < 2) {
         mostrarErro(inputCargoOutros, 'Mínimo de 2 caracteres.');
-        if (!primeiroErro) primeiroErro = inputCargoOutros;
+        primeiroErro = primeiroErro || inputCargoOutros;
         valido = false;
       } else {
         limparErro(inputCargoOutros);
@@ -120,70 +89,57 @@ document.addEventListener('DOMContentLoaded', () => {
       limparErro(inputCargoOutros);
     }
 
-    if (selectDepartamento.value === 'Outros') {
-      const depto = inputDepartamentoOutros.value.trim();
+    if (selectDepto.value === 'Outros') {
+      const depto = inputDeptoOutros.value.trim();
       if (!depto) {
-        mostrarErro(inputDepartamentoOutros, 'Informe o departamento.');
-        if (!primeiroErro) primeiroErro = inputDepartamentoOutros;
+        mostrarErro(inputDeptoOutros, `Informe o departamento do ${label}.`);
+        primeiroErro = primeiroErro || inputDeptoOutros;
         valido = false;
       } else if (depto.length < 3) {
-        mostrarErro(inputDepartamentoOutros, 'Mínimo de 3 caracteres.');
-        if (!primeiroErro) primeiroErro = inputDepartamentoOutros;
+        mostrarErro(inputDeptoOutros, 'Mínimo de 3 caracteres.');
+        primeiroErro = primeiroErro || inputDeptoOutros;
         valido = false;
       } else {
-        limparErro(inputDepartamentoOutros);
+        limparErro(inputDeptoOutros);
       }
     } else {
-      limparErro(inputDepartamentoOutros);
+      limparErro(inputDeptoOutros);
     }
 
+    return { valido, primeiroErro };
+  }
+
+  function validarFormulario() {
+    let valido = true;
+    let primeiroErro = null;
+
+    const local = inputLocalVistoria.value.trim();
+    if (!local) {
+      mostrarErro(inputLocalVistoria, 'Informe o local da vistoria.');
+      primeiroErro = inputLocalVistoria;
+      valido = false;
+    } else if (local.length < 3) {
+      mostrarErro(inputLocalVistoria, 'O local deve ter pelo menos 3 caracteres.');
+      primeiroErro = inputLocalVistoria;
+      valido = false;
+    } else {
+      limparErro(inputLocalVistoria);
+    }
+
+    if (!inputDataVistoria.value) {
+      mostrarErro(inputDataVistoria, 'Informe a data da vistoria.');
+      primeiroErro = primeiroErro || inputDataVistoria;
+      valido = false;
+    } else {
+      limparErro(inputDataVistoria);
+    }
+
+    const r1 = validarFiscal(inputNomeFiscal, selectCargo, inputCargoOutros, selectDepartamento, inputDepartamentoOutros, '1º fiscal');
+    if (!r1.valido) { valido = false; primeiroErro = primeiroErro || r1.primeiroErro; }
+
     if (checkboxIncluirFiscal2.checked) {
-      const fiscal2 = inputNomeFiscal2.value.trim();
-      if (!fiscal2) {
-        mostrarErro(inputNomeFiscal2, 'Informe o nome do 2º fiscal.');
-        if (!primeiroErro) primeiroErro = inputNomeFiscal2;
-        valido = false;
-      } else if (fiscal2.length < 3) {
-        mostrarErro(inputNomeFiscal2, 'O nome deve ter pelo menos 3 caracteres.');
-        if (!primeiroErro) primeiroErro = inputNomeFiscal2;
-        valido = false;
-      } else {
-        limparErro(inputNomeFiscal2);
-      }
-
-      if (selectCargo2.value === 'Outros') {
-        const cargo2 = inputCargoOutros2.value.trim();
-        if (!cargo2) {
-          mostrarErro(inputCargoOutros2, 'Informe o cargo do 2º fiscal.');
-          if (!primeiroErro) primeiroErro = inputCargoOutros2;
-          valido = false;
-        } else if (cargo2.length < 2) {
-          mostrarErro(inputCargoOutros2, 'Mínimo de 2 caracteres.');
-          if (!primeiroErro) primeiroErro = inputCargoOutros2;
-          valido = false;
-        } else {
-          limparErro(inputCargoOutros2);
-        }
-      } else {
-        limparErro(inputCargoOutros2);
-      }
-
-      if (selectDepartamento2.value === 'Outros') {
-        const depto2 = inputDepartamentoOutros2.value.trim();
-        if (!depto2) {
-          mostrarErro(inputDepartamentoOutros2, 'Informe o departamento do 2º fiscal.');
-          if (!primeiroErro) primeiroErro = inputDepartamentoOutros2;
-          valido = false;
-        } else if (depto2.length < 3) {
-          mostrarErro(inputDepartamentoOutros2, 'Mínimo de 3 caracteres.');
-          if (!primeiroErro) primeiroErro = inputDepartamentoOutros2;
-          valido = false;
-        } else {
-          limparErro(inputDepartamentoOutros2);
-        }
-      } else {
-        limparErro(inputDepartamentoOutros2);
-      }
+      const r2 = validarFiscal(inputNomeFiscal2, selectCargo2, inputCargoOutros2, selectDepartamento2, inputDepartamentoOutros2, '2º fiscal');
+      if (!r2.valido) { valido = false; primeiroErro = primeiroErro || r2.primeiroErro; }
     } else {
       limparErro(inputNomeFiscal2);
       limparErro(inputCargoOutros2);
@@ -198,53 +154,21 @@ document.addEventListener('DOMContentLoaded', () => {
     return valido;
   }
 
-  selectCargo.addEventListener('change', (e) => {
-    if (e.target.value === 'Outros') {
-      inputCargoOutros.style.display = 'inline-block';
-      inputCargoOutros.focus();
-    } else {
-      inputCargoOutros.style.display = 'none';
-      inputCargoOutros.value = '';
-    }
-    salvarRascunhoLocal();
-  });
-  inputCargoOutros.addEventListener('input', salvarRascunhoLocal);
+  function vincularSelectOutros(selectEl, inputOutros) {
+    selectEl.addEventListener('change', (e) => {
+      const isOutros = e.target.value === 'Outros';
+      inputOutros.style.display = isOutros ? 'inline-block' : 'none';
+      if (isOutros) inputOutros.focus();
+      else inputOutros.value = '';
+      salvarRascunhoLocal();
+    });
+    inputOutros.addEventListener('input', salvarRascunhoLocal);
+  }
 
-  selectDepartamento.addEventListener('change', (e) => {
-    if (e.target.value === 'Outros') {
-      inputDepartamentoOutros.style.display = 'inline-block';
-      inputDepartamentoOutros.focus();
-    } else {
-      inputDepartamentoOutros.style.display = 'none';
-      inputDepartamentoOutros.value = '';
-    }
-    salvarRascunhoLocal();
-  });
-  inputDepartamentoOutros.addEventListener('input', salvarRascunhoLocal);
-
-  selectCargo2.addEventListener('change', (e) => {
-    if (e.target.value === 'Outros') {
-      inputCargoOutros2.style.display = 'inline-block';
-      inputCargoOutros2.focus();
-    } else {
-      inputCargoOutros2.style.display = 'none';
-      inputCargoOutros2.value = '';
-    }
-    salvarRascunhoLocal();
-  });
-  inputCargoOutros2.addEventListener('input', salvarRascunhoLocal);
-
-  selectDepartamento2.addEventListener('change', (e) => {
-    if (e.target.value === 'Outros') {
-      inputDepartamentoOutros2.style.display = 'inline-block';
-      inputDepartamentoOutros2.focus();
-    } else {
-      inputDepartamentoOutros2.style.display = 'none';
-      inputDepartamentoOutros2.value = '';
-    }
-    salvarRascunhoLocal();
-  });
-  inputDepartamentoOutros2.addEventListener('input', salvarRascunhoLocal);
+  vincularSelectOutros(selectCargo, inputCargoOutros);
+  vincularSelectOutros(selectDepartamento, inputDepartamentoOutros);
+  vincularSelectOutros(selectCargo2, inputCargoOutros2);
+  vincularSelectOutros(selectDepartamento2, inputDepartamentoOutros2);
 
   const checkboxAssinatura = document.getElementById('incluirAssinatura');
   const dicaAssinatura = document.getElementById('dicaAssinatura');
@@ -625,14 +549,9 @@ document.addEventListener('DOMContentLoaded', () => {
         
         let dataSalva = 'Não informada';
         if (dataToRestore.form && dataToRestore.form.data) {
-          const partesData = dataToRestore.form.data.split('-');
-          if (partesData.length === 3) {
-            dataSalva = `${partesData[2]}/${partesData[1]}/${partesData[0]}`;
-          } else {
-            dataSalva = dataToRestore.form.data;
-          }
+          dataSalva = formatarDataISO(dataToRestore.form.data) || 'Não informada';
         }
-        
+
         const mensagemConfirma = `Encontramos um relatório em andamento salvo neste dispositivo:\n\n📍 Local: ${localSalvo}\n📅 Data: ${dataSalva}\n\nDeseja restaurar esta vistoria?`;
 
         if(confirm(mensagemConfirma)) {
@@ -1215,48 +1134,21 @@ document.addEventListener('DOMContentLoaded', () => {
 
     let assinaturaHtml = '';
     if (checkboxAssinatura.checked) {
-      
-      let deptoFinal1 = selectDepartamento.value === 'Outros' ? inputDepartamentoOutros.value.trim() : selectDepartamento.value;
-      if (!deptoFinal1) deptoFinal1 = 'Divisão de Manutenção e Serviços de São José dos Campos';
-
       const nome1 = inputNomeFiscal.value.trim() || '1º Fiscal/Inspetor';
       const cargo1 = selectCargo.value === 'Outros' ? inputCargoOutros.value.trim() : selectCargo.value;
-      const img1 = assinaturaBase64 ? `<img src="${esc(assinaturaBase64)}" class="assinatura-imagem-limpa">` : `<div style="height: 50px;"></div>`;
-
-      let bloco1 = `
-        <div class="bloco-assinatura">
-          ${img1}
-          <div class="linha-assinatura"></div>
-          <strong>${esc(nome1)}</strong>
-          <span style="font-size: 0.85em; color: #555;">${esc(cargo1)}</span>
-          <span style="font-size: 0.85em; color: #555;">${esc(deptoFinal1)}</span>
-        </div>
-      `;
+      const deptoFinal1 = resolverDepartamento(selectDepartamento.value, inputDepartamentoOutros.value);
 
       let bloco2 = '';
       if (checkboxIncluirFiscal2.checked) {
-        
-        let deptoFinal2 = selectDepartamento2.value === 'Outros' ? inputDepartamentoOutros2.value.trim() : selectDepartamento2.value;
-        if (!deptoFinal2) deptoFinal2 = 'Divisão de Manutenção e Serviços de São José dos Campos';
-        
         const nome2 = inputNomeFiscal2.value.trim() || '2º Fiscal/Inspetor';
         const cargo2 = selectCargo2.value === 'Outros' ? inputCargoOutros2.value.trim() : selectCargo2.value;
-        const img2 = assinaturaBase64_2 ? `<img src="${esc(assinaturaBase64_2)}" class="assinatura-imagem-limpa">` : `<div style="height: 50px;"></div>`;
-
-        bloco2 = `
-          <div class="bloco-assinatura">
-            ${img2}
-            <div class="linha-assinatura"></div>
-            <strong>${esc(nome2)}</strong>
-            <span style="font-size: 0.85em; color: #555;">${esc(cargo2)}</span>
-            <span style="font-size: 0.85em; color: #555;">${esc(deptoFinal2)}</span>
-          </div>
-        `;
+        const deptoFinal2 = resolverDepartamento(selectDepartamento2.value, inputDepartamentoOutros2.value);
+        bloco2 = criarBlocoAssinatura(nome2, cargo2, deptoFinal2, assinaturaBase64_2);
       }
 
       assinaturaHtml = `
         <div class="assinaturas-container">
-          ${bloco1}
+          ${criarBlocoAssinatura(nome1, cargo1, deptoFinal1, assinaturaBase64)}
           ${bloco2}
         </div>
       `;

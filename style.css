@@ -412,6 +412,13 @@ hr {
   display: block;
   margin: auto;
 }
+.zoom-controls {
+  display: flex;
+  gap: 5px;
+  align-items: center;
+  border-left: 2px solid #ddd;
+  padding-left: 15px;
+}
 .modal-acoes {
   display: flex;
   gap: 10px;
@@ -682,8 +689,18 @@ hr {
   }
   .editor-toolbar > div {
     justify-content: center;
-    border-left: none !important;
-    padding-left: 0 !important;
+  }
+  .zoom-controls {
+    border-left: none;
+    padding-left: 0;
+    border-top: 1px solid #ddd;
+    padding-top: 8px;
+    justify-content: center;
+  }
+  .modal-conteudo {
+    width: 100%;
+    max-width: calc(100vw - 10px);
+    padding: 12px;
   }
   .modal-caixa {
     padding: 20px 16px;
@@ -709,15 +726,18 @@ hr {
   background: #fff;
   border-radius: 10px;
   padding: 28px 32px;
-  max-width: 420px;
+  max-width: min(420px, calc(100vw - 24px));
   width: 90%;
   box-shadow: 0 8px 30px rgba(0, 0, 0, 0.25);
   text-align: center;
   box-sizing: border-box;
+  overflow: hidden;
 }
 #modal-mensagem {
   font-size: 1rem;
   color: #333;
+  word-break: break-word;
+  overflow-wrap: break-word;
   white-space: pre-line;
   margin: 0 0 20px;
 }

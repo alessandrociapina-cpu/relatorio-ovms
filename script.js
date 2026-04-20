@@ -1394,3 +1394,21 @@ document.addEventListener('DOMContentLoaded', () => {
     areaRelatorio.scrollIntoView({ behavior: 'smooth' });
   }
 });
+
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('sw.js').then((reg) => {
+      reg.update();
+    });
+  });
+
+  navigator.serviceWorker.addEventListener('controllerchange', () => {
+    const toast = document.getElementById('toast-atualizacao');
+    if (toast) toast.hidden = false;
+  });
+
+  const btnRecarregar = document.getElementById('btn-recarregar');
+  if (btnRecarregar) {
+    btnRecarregar.addEventListener('click', () => window.location.reload());
+  }
+}

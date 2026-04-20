@@ -27,13 +27,23 @@ hr {
   border-top: 1px solid #ddd;
 }
 
+/* Foco visível para navegação por teclado */
+:focus-visible {
+  outline: 2px solid #007bff;
+  outline-offset: 2px;
+}
+
 /* Janela Flutuante de Atualização (Tooltip) */
 .info-tooltip-container {
   position: relative;
   display: inline-block;
   cursor: pointer;
   margin-left: 5px;
-  outline: none;
+}
+.info-tooltip-container:focus-visible {
+  outline: 2px solid #007bff;
+  outline-offset: 2px;
+  border-radius: 3px;
 }
 .info-icon {
   font-size: 1.1em;

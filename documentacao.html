@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Documentação - Relatório OVMS</title>
-    <link rel="stylesheet" href="style.css?v=43" />
+    <link rel="stylesheet" href="style.css?v=44" />
     <style>
       .doc-container {
         max-width: 850px;
@@ -235,7 +235,17 @@
           Validação de esquema JSON no carregamento de projetos.
         </li>
         <li>
-          <strong>v42 (Atual):</strong> Ciclo de arquitetura e qualidade: (1) Divisão de
+          <strong>v44 (Atual):</strong> Ciclo de acessibilidade e segurança: (1) Política de
+          Segurança de Conteúdo (CSP) implementada via meta tag — restringe origens de scripts,
+          estilos e imagens; (2) Registro do Service Worker migrado para <code>script.js</code>,
+          eliminando o bloco <code>&lt;script&gt;</code> inline e possibilitando CSP sem
+          <code>'unsafe-inline'</code> para scripts; (3) HTML semântico —
+          <code>&lt;main&gt;</code> e <code>&lt;section aria-labelledby&gt;</code> nas três seções
+          de conteúdo; (4) Foco visível restaurado via <code>:focus-visible</code> global,
+          substituindo o <code>outline: none</code> que prejudicava a navegação por teclado.
+        </li>
+        <li>
+          <strong>v42:</strong> Ciclo de arquitetura e qualidade: (1) Divisão de
           <code>script.js</code> em módulos reutilizáveis —
           <code>modules/storage.js</code> (IndexedDB) e <code>modules/gps.js</code> (leitura
           EXIF/GPS); (2) Extração de funções de UI para

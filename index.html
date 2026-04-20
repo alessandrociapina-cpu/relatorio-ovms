@@ -3,6 +3,10 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; media-src blob:; worker-src 'self'; object-src 'none'"
+    />
     <title>Relatório Fotográfico</title>
 
     <link rel="manifest" href="manifest.json" />
@@ -25,10 +29,10 @@
       crossorigin="anonymous"
     ></script>
 
-    <link rel="stylesheet" href="style.css?v=43" />
+    <link rel="stylesheet" href="style.css?v=44" />
   </head>
   <body>
-    <div class="container">
+    <main class="container">
       <h1>Relatório Fotográfico</h1>
 
       <div
@@ -41,7 +45,7 @@
           margin-bottom: 20px;
         "
       >
-        Versão 42 | Última atualização: 20/04/2026
+        Versão 44 | Última atualização: 20/04/2026
         <span class="info-tooltip-container" tabindex="0">
           <span class="info-icon">ℹ️</span>
           <span
@@ -132,8 +136,8 @@
         >
       </div>
 
-      <div class="secao-entrada">
-        <h2>1. Informações da Vistoria</h2>
+      <section class="secao-entrada" aria-labelledby="titulo-secao-1">
+        <h2 id="titulo-secao-1">1. Informações da Vistoria</h2>
         <form id="form-vistoria">
           <div class="campo-simples">
             <label for="localVistoria">Local da Vistoria:</label>
@@ -549,10 +553,10 @@
             </div>
           </fieldset>
         </form>
-      </div>
+      </section>
 
-      <div class="secao-fotos">
-        <h2>2. Seleção de Fotos e Legendas</h2>
+      <section class="secao-fotos" aria-labelledby="titulo-secao-2">
+        <h2 id="titulo-secao-2">2. Seleção de Fotos e Legendas</h2>
         <div style="display: flex; gap: 10px; margin-bottom: 15px; flex-wrap: wrap">
           <input type="file" id="selecionarFotos" accept="image/*" multiple style="display: none" />
           <label for="selecionarFotos" class="botao-upload">Selecionar Fotos</label>
@@ -585,16 +589,16 @@
         </div>
 
         <div id="galeria-fotos-legenda" class="galeria-preview"></div>
-      </div>
+      </section>
 
-      <div class="secao-observacoes">
-        <h2>3. Observações Gerais</h2>
+      <section class="secao-observacoes" aria-labelledby="titulo-secao-3">
+        <h2 id="titulo-secao-3">3. Observações Gerais</h2>
         <textarea
           id="observacoesGerais"
           placeholder="Descreva aqui as observações gerais, serviços realizados..."
           maxlength="3000"
         ></textarea>
-      </div>
+      </section>
 
       <div class="secao-acao">
         <button type="button" id="btnGerarRelatorio" class="botao-principal">
@@ -669,7 +673,7 @@
           </div>
         </div>
       </div>
-    </div>
+    </main>
 
     <div id="modalEditor" class="modal-oculto">
       <div class="modal-conteudo">
@@ -945,30 +949,10 @@
       </div>
     </div>
 
-    <script src="utils.js?v=43"></script>
-    <script src="domUtils.js?v=43"></script>
-    <script src="modules/storage.js?v=43"></script>
-    <script src="modules/gps.js?v=43"></script>
-    <script src="script.js?v=43"></script>
-
-    <script>
-      if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-          navigator.serviceWorker.register('sw.js').then((reg) => {
-            reg.update();
-          });
-        });
-
-        navigator.serviceWorker.addEventListener('controllerchange', () => {
-          const toast = document.getElementById('toast-atualizacao');
-          if (toast) toast.hidden = false;
-        });
-
-        const btnRecarregar = document.getElementById('btn-recarregar');
-        if (btnRecarregar) {
-          btnRecarregar.addEventListener('click', () => window.location.reload());
-        }
-      }
-    </script>
+    <script src="utils.js?v=44"></script>
+    <script src="domUtils.js?v=44"></script>
+    <script src="modules/storage.js?v=44"></script>
+    <script src="modules/gps.js?v=44"></script>
+    <script src="script.js?v=44"></script>
   </body>
 </html>

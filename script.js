@@ -46,6 +46,158 @@ document.addEventListener('DOMContentLoaded', () => {
       .replace(/'/g, '&#39;');
   }
 
+  function mostrarErro(input, msg) {
+    input.classList.add('input-invalido');
+    const id = `erro-${input.id}`;
+    let span = document.getElementById(id);
+    if (!span) {
+      span = document.createElement('span');
+      span.id = id;
+      span.className = 'msg-erro-campo';
+      input.parentNode.insertBefore(span, input.nextSibling);
+    }
+    span.textContent = msg;
+  }
+
+  function limparErro(input) {
+    input.classList.remove('input-invalido');
+    const span = document.getElementById(`erro-${input.id}`);
+    if (span) span.remove();
+  }
+
+  function validarFormulario() {
+    let valido = true;
+    let primeiroErro = null;
+
+    const local = inputLocalVistoria.value.trim();
+    if (!local) {
+      mostrarErro(inputLocalVistoria, 'Informe o local da vistoria.');
+      if (!primeiroErro) primeiroErro = inputLocalVistoria;
+      valido = false;
+    } else if (local.length < 3) {
+      mostrarErro(inputLocalVistoria, 'O local deve ter pelo menos 3 caracteres.');
+      if (!primeiroErro) primeiroErro = inputLocalVistoria;
+      valido = false;
+    } else {
+      limparErro(inputLocalVistoria);
+    }
+
+    if (!inputDataVistoria.value) {
+      mostrarErro(inputDataVistoria, 'Informe a data da vistoria.');
+      if (!primeiroErro) primeiroErro = inputDataVistoria;
+      valido = false;
+    } else {
+      limparErro(inputDataVistoria);
+    }
+
+    const fiscal = inputNomeFiscal.value.trim();
+    if (!fiscal) {
+      mostrarErro(inputNomeFiscal, 'Informe o nome do 1º fiscal.');
+      if (!primeiroErro) primeiroErro = inputNomeFiscal;
+      valido = false;
+    } else if (fiscal.length < 3) {
+      mostrarErro(inputNomeFiscal, 'O nome deve ter pelo menos 3 caracteres.');
+      if (!primeiroErro) primeiroErro = inputNomeFiscal;
+      valido = false;
+    } else {
+      limparErro(inputNomeFiscal);
+    }
+
+    if (selectCargo.value === 'Outros') {
+      const cargo = inputCargoOutros.value.trim();
+      if (!cargo) {
+        mostrarErro(inputCargoOutros, 'Informe o cargo.');
+        if (!primeiroErro) primeiroErro = inputCargoOutros;
+        valido = false;
+      } else if (cargo.length < 2) {
+        mostrarErro(inputCargoOutros, 'Mínimo de 2 caracteres.');
+        if (!primeiroErro) primeiroErro = inputCargoOutros;
+        valido = false;
+      } else {
+        limparErro(inputCargoOutros);
+      }
+    } else {
+      limparErro(inputCargoOutros);
+    }
+
+    if (selectDepartamento.value === 'Outros') {
+      const depto = inputDepartamentoOutros.value.trim();
+      if (!depto) {
+        mostrarErro(inputDepartamentoOutros, 'Informe o departamento.');
+        if (!primeiroErro) primeiroErro = inputDepartamentoOutros;
+        valido = false;
+      } else if (depto.length < 3) {
+        mostrarErro(inputDepartamentoOutros, 'Mínimo de 3 caracteres.');
+        if (!primeiroErro) primeiroErro = inputDepartamentoOutros;
+        valido = false;
+      } else {
+        limparErro(inputDepartamentoOutros);
+      }
+    } else {
+      limparErro(inputDepartamentoOutros);
+    }
+
+    if (checkboxIncluirFiscal2.checked) {
+      const fiscal2 = inputNomeFiscal2.value.trim();
+      if (!fiscal2) {
+        mostrarErro(inputNomeFiscal2, 'Informe o nome do 2º fiscal.');
+        if (!primeiroErro) primeiroErro = inputNomeFiscal2;
+        valido = false;
+      } else if (fiscal2.length < 3) {
+        mostrarErro(inputNomeFiscal2, 'O nome deve ter pelo menos 3 caracteres.');
+        if (!primeiroErro) primeiroErro = inputNomeFiscal2;
+        valido = false;
+      } else {
+        limparErro(inputNomeFiscal2);
+      }
+
+      if (selectCargo2.value === 'Outros') {
+        const cargo2 = inputCargoOutros2.value.trim();
+        if (!cargo2) {
+          mostrarErro(inputCargoOutros2, 'Informe o cargo do 2º fiscal.');
+          if (!primeiroErro) primeiroErro = inputCargoOutros2;
+          valido = false;
+        } else if (cargo2.length < 2) {
+          mostrarErro(inputCargoOutros2, 'Mínimo de 2 caracteres.');
+          if (!primeiroErro) primeiroErro = inputCargoOutros2;
+          valido = false;
+        } else {
+          limparErro(inputCargoOutros2);
+        }
+      } else {
+        limparErro(inputCargoOutros2);
+      }
+
+      if (selectDepartamento2.value === 'Outros') {
+        const depto2 = inputDepartamentoOutros2.value.trim();
+        if (!depto2) {
+          mostrarErro(inputDepartamentoOutros2, 'Informe o departamento do 2º fiscal.');
+          if (!primeiroErro) primeiroErro = inputDepartamentoOutros2;
+          valido = false;
+        } else if (depto2.length < 3) {
+          mostrarErro(inputDepartamentoOutros2, 'Mínimo de 3 caracteres.');
+          if (!primeiroErro) primeiroErro = inputDepartamentoOutros2;
+          valido = false;
+        } else {
+          limparErro(inputDepartamentoOutros2);
+        }
+      } else {
+        limparErro(inputDepartamentoOutros2);
+      }
+    } else {
+      limparErro(inputNomeFiscal2);
+      limparErro(inputCargoOutros2);
+      limparErro(inputDepartamentoOutros2);
+    }
+
+    if (primeiroErro) {
+      primeiroErro.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      primeiroErro.focus();
+    }
+
+    return valido;
+  }
+
   selectCargo.addEventListener('change', (e) => {
     if (e.target.value === 'Outros') {
       inputCargoOutros.style.display = 'inline-block';
@@ -422,6 +574,10 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   formVistoria.addEventListener('input', salvarRascunhoLocal);
+
+  [inputLocalVistoria, inputDataVistoria, inputNomeFiscal, inputCargoOutros,
+   inputDepartamentoOutros, inputNomeFiscal2, inputCargoOutros2, inputDepartamentoOutros2
+  ].forEach(input => input.addEventListener('input', () => limparErro(input)));
 
   btnSalvarProjeto.addEventListener('click', (e) => {
     e.preventDefault();
@@ -1000,7 +1156,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   async function gerarRelatorio(ativarPreview = true) {
-    if (!formVistoria.checkValidity()) { alert('Preencha as informações obrigatórias.'); formVistoria.reportValidity(); return; }
+    if (!validarFormulario()) return;
     const fotosValidas = fotosSelecionadasParaRelatorio.filter(f => f && f.originalDataUrl);
     if (fotosValidas.length === 0) { alert('Selecione pelo menos uma foto.'); return; }
 

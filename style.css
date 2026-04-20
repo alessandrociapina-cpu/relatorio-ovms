@@ -55,6 +55,10 @@ hr { margin: 30px 0; border: 0; border-top: 1px solid #ddd; }
 }
 .input-select-largo { appearance: auto; background-color: #fff; cursor: pointer; }
 
+/* Validação de Formulário */
+.input-invalido { border-color: #dc3545 !important; box-shadow: 0 0 0 2px rgba(220, 53, 69, 0.2) !important; }
+.msg-erro-campo { display: block; color: #dc3545; font-size: 0.78em; margin-top: 3px; font-weight: normal; }
+
 /* Linha Dupla (Lado a Lado) */
 .linha-dupla { display: flex; gap: 15px; margin-bottom: 15px; flex-wrap: wrap; }
 .campo-metade { flex: 1; min-width: 220px; }

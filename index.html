@@ -47,7 +47,7 @@
       <form id="form-vistoria">
         <div class="campo-simples">
           <label for="localVistoria">Local da Vistoria:</label>
-          <input type="text" id="localVistoria" name="localVistoria" required>
+          <input type="text" id="localVistoria" name="localVistoria" required maxlength="200">
         </div>
         
         <div class="linha-dupla">
@@ -64,7 +64,7 @@
         <div class="linha-dupla" style="margin-bottom: 10px;">
           <div class="campo-metade">
             <label for="nomeFiscal">Nome do 1º Fiscal/Inspetor:</label>
-            <input type="text" id="nomeFiscal" name="nomeFiscal" required>
+            <input type="text" id="nomeFiscal" name="nomeFiscal" required maxlength="100">
           </div>
           <div class="campo-metade">
             <label for="cargoFiscal">Cargo do 1º Fiscal:</label>
@@ -75,7 +75,7 @@
                 <option value="Técnico em Sistemas de Saneamento">Técnico em Sist. Saneamento</option>
                 <option value="Outros">Outros...</option>
               </select>
-              <input type="text" id="cargoFiscalOutros" name="cargoFiscalOutros" placeholder="Qual?" style="display: none; flex-grow: 1; max-width: 150px;">
+              <input type="text" id="cargoFiscalOutros" name="cargoFiscalOutros" placeholder="Qual?" maxlength="80" style="display: none; flex-grow: 1; max-width: 150px;">
             </div>
           </div>
         </div>
@@ -86,7 +86,7 @@
               <option value="Divisão de Manutenção e Serviços de São José dos Campos" selected>Divisão de Manutenção e Serviços de São José dos Campos</option>
               <option value="Outros">Outros (Digite ao lado)...</option>
             </select>
-            <input type="text" id="departamentoFiscalOutros" name="departamentoFiscalOutros" placeholder="Qual o departamento?" style="display: none; flex-grow: 1; max-width: 250px;">
+            <input type="text" id="departamentoFiscalOutros" name="departamentoFiscalOutros" placeholder="Qual o departamento?" maxlength="150" style="display: none; flex-grow: 1; max-width: 250px;">
           </div>
         </div>
 
@@ -98,7 +98,7 @@
           <div class="linha-dupla" style="margin-bottom: 10px;">
             <div class="campo-metade">
               <label for="nomeFiscal2">Nome do 2º Fiscal/Inspetor:</label>
-              <input type="text" id="nomeFiscal2" name="nomeFiscal2">
+              <input type="text" id="nomeFiscal2" name="nomeFiscal2" maxlength="100">
             </div>
             <div class="campo-metade">
               <label for="cargoFiscal2">Cargo do 2º Fiscal:</label>
@@ -109,7 +109,7 @@
                   <option value="Técnico em Sistemas de Saneamento">Técnico em Sist. Saneamento</option>
                   <option value="Outros">Outros...</option>
                 </select>
-                <input type="text" id="cargoFiscalOutros2" name="cargoFiscalOutros2" placeholder="Qual?" style="display: none; flex-grow: 1; max-width: 150px;">
+                <input type="text" id="cargoFiscalOutros2" name="cargoFiscalOutros2" placeholder="Qual?" maxlength="80" style="display: none; flex-grow: 1; max-width: 150px;">
               </div>
             </div>
           </div>
@@ -120,7 +120,7 @@
                 <option value="Divisão de Manutenção e Serviços de São José dos Campos" selected>Divisão de Manutenção e Serviços de São José dos Campos</option>
                 <option value="Outros">Outros (Digite ao lado)...</option>
               </select>
-              <input type="text" id="departamentoFiscalOutros2" name="departamentoFiscalOutros2" placeholder="Qual o departamento?" style="display: none; flex-grow: 1; max-width: 250px;">
+              <input type="text" id="departamentoFiscalOutros2" name="departamentoFiscalOutros2" placeholder="Qual o departamento?" maxlength="150" style="display: none; flex-grow: 1; max-width: 250px;">
             </div>
           </div>
         </div>

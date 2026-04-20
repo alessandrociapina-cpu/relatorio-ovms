@@ -217,15 +217,12 @@
           qualquer um dos fiscais, assumindo apenas o nome do departamento customizado.
         </li>
         <li>
-          <strong>v42 (Atual):</strong> Ciclo de arquitetura e qualidade: (1) Divisão de
-          <code>script.js</code> em módulos reutilizáveis —
-          <code>modules/storage.js</code> (IndexedDB) e <code>modules/gps.js</code> (leitura
-          EXIF/GPS); (2) Extração de funções de UI para
-          <code>domUtils.js</code> (<code>mostrarErro</code>, <code>limparErro</code>,
-          <code>mostrarAlerta</code>, <code>confirmar</code>); (3) Modal HTML nativo substituindo
-          todos os <code>alert()</code>/<code>confirm()</code> do browser; (4) Remoção do fallback
-          <code>localStorage</code> e validação de esquema no auto-restore do IndexedDB; (5) Testes
-          JSDOM para funções de UI — 82 testes totais.
+          <strong>v37:</strong> Ciclo de qualidade e segurança: (1) Correção de vulnerabilidades XSS
+          — sanitização HTML via função <code>esc()</code> aplicada em todos os campos interpolados
+          no relatório; (2) Validação de formulário com mensagens de erro inline e destaque visual
+          nos campos obrigatórios; (3) Extração de <code>utils.js</code> com funções puras e
+          cobertura por 31 testes unitários automatizados (Jest); (4) Eliminação de código duplicado
+          da lógica fiscal1/2 via funções factory; (5) Padronização de estilo com ESLint e Prettier.
         </li>
         <li>
           <strong>v38:</strong> Pipeline de qualidade contínua: (1) GitHub Actions CI com execução
@@ -238,12 +235,15 @@
           Validação de esquema JSON no carregamento de projetos.
         </li>
         <li>
-          <strong>v37:</strong> Ciclo de qualidade e segurança: (1) Correção de vulnerabilidades XSS
-          — sanitização HTML via função <code>esc()</code> aplicada em todos os campos interpolados
-          no relatório; (2) Validação de formulário com mensagens de erro inline e destaque visual
-          nos campos obrigatórios; (3) Extração de <code>utils.js</code> com funções puras e
-          cobertura por 31 testes unitários automatizados (Jest); (4) Eliminação de código duplicado
-          da lógica fiscal1/2 via funções factory; (5) Padronização de estilo com ESLint e Prettier.
+          <strong>v42 (Atual):</strong> Ciclo de arquitetura e qualidade: (1) Divisão de
+          <code>script.js</code> em módulos reutilizáveis —
+          <code>modules/storage.js</code> (IndexedDB) e <code>modules/gps.js</code> (leitura
+          EXIF/GPS); (2) Extração de funções de UI para
+          <code>domUtils.js</code> (<code>mostrarErro</code>, <code>limparErro</code>,
+          <code>mostrarAlerta</code>, <code>confirmar</code>); (3) Modal HTML nativo substituindo
+          todos os <code>alert()</code>/<code>confirm()</code> do browser; (4) Remoção do fallback
+          <code>localStorage</code> e validação de esquema no auto-restore do IndexedDB; (5) Testes
+          JSDOM para funções de UI — 82 testes totais.
         </li>
       </ul>
 

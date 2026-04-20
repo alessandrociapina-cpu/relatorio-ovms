@@ -1,15 +1,18 @@
-const CACHE_NAME = 'ovms-app-v44';
+const CACHE_NAME = 'ovms-app-v45';
 
 const urlsToCache = [
   './',
   './index.html',
   './documentacao.html',
-  './style.css?v=44',
-  './utils.js?v=44',
-  './domUtils.js?v=44',
-  './modules/storage.js?v=44',
-  './modules/gps.js?v=44',
-  './script.js?v=44',
+  './style.css?v=45',
+  './utils.js?v=45',
+  './domUtils.js?v=45',
+  './modules/storage.js?v=45',
+  './modules/gps.js?v=45',
+  './formHandler.js?v=45',
+  './galleryManager.js?v=45',
+  './reportGenerator.js?v=45',
+  './script.js?v=45',
   './manifest.json',
   './sabesp-logo.png',
   'https://cdn.jsdelivr.net/npm/exif-js@2.3.0',

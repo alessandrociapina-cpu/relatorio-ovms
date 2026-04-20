@@ -4,8 +4,8 @@
   "description": "Sistema de Relatório Fotográfico OVMS – Sabesp",
   "private": true,
   "scripts": {
-    "lint": "eslint script.js utils.js domUtils.js modules/*.js tests/**/*.test.js",
-    "lint:fix": "eslint script.js utils.js domUtils.js modules/*.js tests/**/*.test.js --fix",
+    "lint": "eslint script.js formHandler.js galleryManager.js reportGenerator.js utils.js domUtils.js modules/*.js tests/**/*.test.js",
+    "lint:fix": "eslint script.js formHandler.js galleryManager.js reportGenerator.js utils.js domUtils.js modules/*.js tests/**/*.test.js --fix",
     "format": "prettier --write \"*.{js,html,css}\"",
     "test": "jest",
     "test:watch": "jest --watch",

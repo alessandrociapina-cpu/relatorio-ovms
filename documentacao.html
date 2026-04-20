@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Documentação - Relatório OVMS</title>
-    <link rel="stylesheet" href="style.css?v=44" />
+    <link rel="stylesheet" href="style.css?v=45" />
     <style>
       .doc-container {
         max-width: 850px;
@@ -235,14 +235,29 @@
           Validação de esquema JSON no carregamento de projetos.
         </li>
         <li>
-          <strong>v44 (Atual):</strong> Ciclo de acessibilidade e segurança: (1) Política de
-          Segurança de Conteúdo (CSP) implementada via meta tag — restringe origens de scripts,
-          estilos e imagens; (2) Registro do Service Worker migrado para <code>script.js</code>,
-          eliminando o bloco <code>&lt;script&gt;</code> inline e possibilitando CSP sem
+          <strong>v44:</strong> Ciclo de acessibilidade e segurança: (1) Política de Segurança de
+          Conteúdo (CSP) implementada via meta tag — restringe origens de scripts, estilos e
+          imagens; (2) Registro do Service Worker migrado para <code>script.js</code>, eliminando o
+          bloco <code>&lt;script&gt;</code> inline e possibilitando CSP sem
           <code>'unsafe-inline'</code> para scripts; (3) HTML semântico —
           <code>&lt;main&gt;</code> e <code>&lt;section aria-labelledby&gt;</code> nas três seções
           de conteúdo; (4) Foco visível restaurado via <code>:focus-visible</code> global,
           substituindo o <code>outline: none</code> que prejudicava a navegação por teclado.
+        </li>
+        <li>
+          <strong>v45 (Atual):</strong> Ciclo de arquitetura modular e qualidade: (1) Extração de
+          <code>script.js</code> (1400+ linhas) em três módulos IIFE reutilizáveis —
+          <code>formHandler.js</code> (formulário, validação, auto-save, importar/exportar projeto),
+          <code>galleryManager.js</code> (galeria, processamento de imagens, modais de
+          edição/crop/vídeo) e <code>reportGenerator.js</code> (geração do relatório HTML e PDF);
+          (2) Estado compartilhado via objeto <code>appState</code> passado por referência, com
+          callbacks de injeção de dependência para resolver referências cruzadas sem ES modules; (3)
+          Debounce de 50ms nas operações de galeria, prevenindo re-renderizações desnecessárias; (4)
+          Navegação por teclado na galeria — setas reordenam fotos, Delete exclui e Enter abre o
+          editor; (5) Lazy loading nas imagens da galeria via <code>loading="lazy"</code>; (6)
+          <code>aria-label</code> em todos os botões de ação e <code>role="toolbar"</code> nas
+          barras de ação de cada foto; (7) Lighthouse CI no GitHub Actions com auditoria automática
+          de performance, acessibilidade, boas práticas, SEO e PWA a cada commit.
         </li>
         <li>
           <strong>v42:</strong> Ciclo de arquitetura e qualidade: (1) Divisão de

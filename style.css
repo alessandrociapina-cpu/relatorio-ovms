@@ -392,6 +392,8 @@ hr {
   align-items: center;
   max-height: 95vh;
   overflow-y: auto;
+  overflow-x: hidden;
+  box-sizing: border-box;
 }
 .canvas-container {
   overflow: auto;
@@ -415,6 +417,8 @@ hr {
   gap: 10px;
   flex-wrap: wrap;
   justify-content: center;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 /* Área do Relatório */
@@ -678,6 +682,11 @@ hr {
   }
   .editor-toolbar > div {
     justify-content: center;
+    border-left: none !important;
+    padding-left: 0 !important;
+  }
+  .modal-caixa {
+    padding: 20px 16px;
   }
   .caixa-assinatura {
     height: auto;
@@ -704,6 +713,7 @@ hr {
   width: 90%;
   box-shadow: 0 8px 30px rgba(0, 0, 0, 0.25);
   text-align: center;
+  box-sizing: border-box;
 }
 #modal-mensagem {
   font-size: 1rem;
@@ -719,11 +729,6 @@ hr {
 }
 #modal-app[data-tipo='confirm'] .modal-caixa {
   border-top: 4px solid #007bff;
-}
-.modal-acoes {
-  display: flex;
-  gap: 10px;
-  justify-content: center;
 }
 @media print {
   #modal-app {

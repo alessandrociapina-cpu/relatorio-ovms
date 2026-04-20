@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Documentação - Relatório OVMS</title>
-  <link rel="stylesheet" href="style.css?v=36">
+  <link rel="stylesheet" href="style.css?v=37">
   <style>
     .doc-container {
       max-width: 850px;
@@ -43,6 +43,7 @@
     <ul>
       <li><strong>index.html:</strong> Contém a estrutura semântica da interface, painéis de formulário, contêineres de impressão dinâmicos, modais flutuantes e o gatilho de atualização automática (Network First).</li>
       <li><strong>style.css:</strong> Define a identidade visual, responsividade avançada para dispositivos móveis e as regras estritas de formatação de quebra de páginas em impressão de PDFs (<code>@media print</code>).</li>
+      <li><strong>utils.js:</strong> Módulo de funções puras e reutilizáveis: sanitização HTML (<code>esc</code>), formatação de datas, resolução de departamento e geração dos blocos de assinatura. Compatível com navegador e Node.js (Jest).</li>
       <li><strong>script.js:</strong> O núcleo lógico da aplicação. Controla a manipulação do DOM, o processamento de imagens via Canvas (marca d'água, bordas, desenho, redimensionamento), sistema de dupla assinatura digital e a gestão assíncrona do Auto-Save (IndexedDB).</li>
       <li><strong>sw.js:</strong> Arquivo do <i>Service Worker</i> que gerencia o motor de cache inteligente e garante o funcionamento Offline da ferramenta após o primeiro carregamento.</li>
       <li><strong>documentacao.html:</strong> Página dedicada à documentação técnica e histórico de versões.</li>
@@ -75,7 +76,8 @@
       <li><strong>v31 a v32:</strong> Adição do suporte para bordas pretas nas fotografias geradas e implementação do Cabeçalho de repetição global via `thead` HTML para impressões multipáginas.</li>
       <li><strong>v33 a v34:</strong> Adição do Rodapé Oficial corporativo e resolução do Bug de Sobreposição utilizando posição fixa e <code>tfoot</code>.</li>
       <li><strong>v35:</strong> Migração do motor de Auto-Save de <code>localStorage</code> para <code>IndexedDB</code>.</li>
-      <li><strong>v36 (Atual):</strong> Aprimoramento da lógica do rodapé dinâmico: o endereço fixo é removido automaticamente caso o usuário selecione "Outros" no campo de departamento de qualquer um dos fiscais, assumindo apenas o nome do departamento customizado.</li>
+      <li><strong>v36:</strong> Aprimoramento da lógica do rodapé dinâmico: o endereço fixo é removido automaticamente caso o usuário selecione "Outros" no campo de departamento de qualquer um dos fiscais, assumindo apenas o nome do departamento customizado.</li>
+      <li><strong>v37 (Atual):</strong> Ciclo de qualidade e segurança: (1) Correção de vulnerabilidades XSS — sanitização HTML via função <code>esc()</code> aplicada em todos os campos interpolados no relatório; (2) Validação de formulário com mensagens de erro inline e destaque visual nos campos obrigatórios; (3) Extração de <code>utils.js</code> com funções puras e cobertura por 31 testes unitários automatizados (Jest); (4) Eliminação de código duplicado da lógica fiscal1/2 via funções factory; (5) Padronização de estilo com ESLint e Prettier.</li>
     </ul>
 
     <h4>Apêndice B: Verificação de Segurança Corporativa (Compliance InfoSec)</h4>
@@ -83,6 +85,7 @@
     <p><strong>1. Zero Transmissão Externa e Processamento Isolado:</strong> A aplicação é estritamente <i>Client-Side</i>. Todo o processamento (inclusão de textos, leitura de GPS, aplicação de recortes, inserção de assinatura dupla e renderização do PDF final) ocorre exclusivamente na memória do navegador do utilizador. Nenhuma foto ou dado sensível transita por redes externas ou é armazenada em servidores na nuvem, garantindo a conformidade total e irrestrita com as normas da Lei Geral de Proteção de Dados (LGPD) e o sigilo judicial exigido nas perícias.</p>
     <p><strong>2. Imunidade a Firewalls Corporativos Restritivos:</strong> A arquitetura modular descentralizada permite o pleno funcionamento local (Offline-First). Se a infraestrutura da corporação possuir bloqueios em domínios externos, o sistema ignora a restrição operando pelo Service Worker da PWA (Progressive Web App) ou a partir do próprio disco da máquina, no modelo Sandbox padrão aprovado pelo Windows e Android.</p>
     <p><strong>3. Higiene de Bibliotecas de Terceiros:</strong> Todos os scripts auxiliares (<code>exif-js</code> e <code>cropper.js</code>) executam funções de processamento matemático de forma estática via Canvas/DOM no dispositivo do usuário final. O código do sistema foi homologado sem a presença de mecanismos espiões (<i>trackers</i> analíticos, pixels de marketing ou telemetria em segundo plano).</p>
+    <p><strong>4. Proteção contra XSS (Cross-Site Scripting):</strong> A partir da v37, todos os valores inseridos pelo usuário que são renderizados via <code>innerHTML</code> no relatório final passam obrigatoriamente pela função de sanitização <code>esc()</code>, que neutraliza os cinco caracteres perigosos do HTML (<code>&amp;</code>, <code>&lt;</code>, <code>&gt;</code>, <code>"</code>, <code>'</code>). Essa proteção cobre cabeçalho, blocos de assinatura, rodapé dinâmico e observações gerais. A cobertura é verificada por testes unitários automatizados a cada alteração do código.</p>
     <p><strong>Conclusão:</strong> A arquitetura descentralizada (PWA Offline) em vigor neste sistema configura um ambiente de risco zero (Air-Gapped por design web) para adoção em larga escala, provendo notável resiliência contra o vazamento de informações classificadas e oferecendo excelência no isolamento técnico.</p>
     
     <div style="text-align: center; margin-top: 40px;">

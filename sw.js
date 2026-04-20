@@ -1,11 +1,12 @@
-const CACHE_NAME = 'ovms-app-v36'; 
+const CACHE_NAME = 'ovms-app-v37'; 
 
 const urlsToCache = [
   './',
   './index.html',
   './documentacao.html',
-  './style.css?v=36',
-  './script.js?v=36',
+  './style.css?v=37',
+  './utils.js?v=37',
+  './script.js?v=37',
   './manifest.json',
   './sabesp-logo.png',
   'https://cdn.jsdelivr.net/npm/exif-js',

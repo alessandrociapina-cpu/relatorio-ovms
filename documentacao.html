@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Documentação - Relatório OVMS</title>
-    <link rel="stylesheet" href="style.css?v=46" />
+    <link rel="stylesheet" href="style.css?v=47" />
     <style>
       .doc-container {
         max-width: 850px;
@@ -245,14 +245,22 @@
           substituindo o <code>outline: none</code> que prejudicava a navegação por teclado.
         </li>
         <li>
-          <strong>v46 (Atual):</strong> Ciclo de testes e acessibilidade: (1) Cobertura de testes
-          unitários para os três novos módulos — <code>formHandler.test.js</code> (28 testes),
-          <code>galleryManager.test.js</code> (24 testes) e <code>reportGenerator.test.js</code> (16
-          testes) — totalizando 162 testes em 5 suites, todos passando; (2)
-          <code>fieldset/legend</code> nos grupos de 1º e 2º Fiscal/Inspetor, melhorando a semântica
-          e a navegação por leitor de tela; (3) Correção de <code>innerText</code> para
-          <code>textContent</code> em <code>galleryManager.js</code> (compatibilidade com ambientes
-          sem layout).
+          <strong>v47 (Atual):</strong> Ciclo de cobertura completa de testes e semântica: (1) Novas
+          suites — <code>storage.test.js</code> (9 testes, via <code>fake-indexeddb</code>),
+          <code>gps.test.js</code> (20 testes cobrindo EXIF, GPS válido/nulo/bloqueado e conversão
+          DMS→decimal), <code>script.test.js</code> (12 testes de orquestração e wiring dos módulos)
+          — total de <strong>206 testes em 8 suites</strong>; (2)
+          <code>&lt;header&gt;</code> semântico envolvendo o <code>&lt;h1&gt;</code> principal; (3)
+          Script <code>test:coverage</code> com relatório <code>lcov</code> e cobertura inicial de
+          57% de statements/linhas.
+        </li>
+        <li>
+          <strong>v46:</strong> Ciclo de testes e acessibilidade: (1) Cobertura de testes unitários
+          para os três módulos extraídos na v45 — <code>formHandler.test.js</code>,
+          <code>galleryManager.test.js</code> e <code>reportGenerator.test.js</code> — totalizando
+          162 testes em 5 suites; (2) <code>fieldset/legend</code> nos grupos de 1º e 2º
+          Fiscal/Inspetor; (3) Correção de <code>innerText</code> → <code>textContent</code> em
+          <code>galleryManager.js</code>.
         </li>
         <li>
           <strong>v45:</strong> Ciclo de arquitetura modular e qualidade: (1) Extração de

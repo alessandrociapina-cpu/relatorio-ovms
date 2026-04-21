@@ -164,6 +164,20 @@ hr {
   min-width: 220px;
 }
 
+/* Grupos semânticos de fiscal (fieldset/legend) */
+.grupo-fiscal {
+  border: none;
+  padding: 0;
+  margin: 0 0 8px 0;
+}
+.grupo-fiscal > legend {
+  font-weight: 600;
+  color: #495057;
+  padding: 0 4px 6px 0;
+  font-size: 0.9em;
+  width: 100%;
+}
+
 /* Caixa de Assinatura */
 .caixa-assinatura {
   display: flex;

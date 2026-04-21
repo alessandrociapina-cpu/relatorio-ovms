@@ -324,7 +324,7 @@ const GalleryManager = (() => {
         metaInfoPreview.style.fontSize = '0.75em';
         metaInfoPreview.style.color = '#777';
         metaInfoPreview.style.marginBottom = '5px';
-        metaInfoPreview.innerText = fotoInfo.metadadosExif;
+        metaInfoPreview.textContent = fotoInfo.metadadosExif;
         itemPreviewDiv.appendChild(metaInfoPreview);
       }
       itemPreviewDiv.appendChild(legendaTextarea);

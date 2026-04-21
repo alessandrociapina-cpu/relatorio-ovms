@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Documentação - Relatório OVMS</title>
-    <link rel="stylesheet" href="style.css?v=45" />
+    <link rel="stylesheet" href="style.css?v=46" />
     <style>
       .doc-container {
         max-width: 850px;
@@ -245,7 +245,17 @@
           substituindo o <code>outline: none</code> que prejudicava a navegação por teclado.
         </li>
         <li>
-          <strong>v45 (Atual):</strong> Ciclo de arquitetura modular e qualidade: (1) Extração de
+          <strong>v46 (Atual):</strong> Ciclo de testes e acessibilidade: (1) Cobertura de testes
+          unitários para os três novos módulos — <code>formHandler.test.js</code> (28 testes),
+          <code>galleryManager.test.js</code> (24 testes) e <code>reportGenerator.test.js</code> (16
+          testes) — totalizando 162 testes em 5 suites, todos passando; (2)
+          <code>fieldset/legend</code> nos grupos de 1º e 2º Fiscal/Inspetor, melhorando a semântica
+          e a navegação por leitor de tela; (3) Correção de <code>innerText</code> para
+          <code>textContent</code> em <code>galleryManager.js</code> (compatibilidade com ambientes
+          sem layout).
+        </li>
+        <li>
+          <strong>v45:</strong> Ciclo de arquitetura modular e qualidade: (1) Extração de
           <code>script.js</code> (1400+ linhas) em três módulos IIFE reutilizáveis —
           <code>formHandler.js</code> (formulário, validação, auto-save, importar/exportar projeto),
           <code>galleryManager.js</code> (galeria, processamento de imagens, modais de

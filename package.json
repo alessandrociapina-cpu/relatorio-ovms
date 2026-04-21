@@ -1,6 +1,6 @@
 {
   "name": "relatorio-ovms",
-  "version": "42.0.0",
+  "version": "44.0.0",
   "description": "Sistema de Relatório Fotográfico OVMS – Sabesp",
   "private": true,
   "scripts": {

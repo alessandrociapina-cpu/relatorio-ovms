@@ -11,7 +11,7 @@ const {
   validarEsquemaProjeto,
 } = require('../utils');
 
-const DEPTO_PADRAO = 'Divisão de Manutenção e Serviços de São José dos Campos';
+const DEPTO_PADRAO = 'Divisão de Manutenção e Serviços Operacionais de São José dos Campos - OVMS';
 
 describe('esc()', () => {
   test('escapa < e >', () => {

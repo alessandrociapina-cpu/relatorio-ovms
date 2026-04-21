@@ -1,6 +1,7 @@
 'use strict';
 
-const DEPARTAMENTO_PADRAO = 'Divisão de Manutenção e Serviços de São José dos Campos';
+const DEPARTAMENTO_PADRAO =
+  'Divisão de Manutenção e Serviços Operacionais de São José dos Campos - OVMS';
 
 function esc(str) {
   if (str === null || str === undefined) return '';

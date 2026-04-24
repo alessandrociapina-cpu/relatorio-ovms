@@ -31,7 +31,7 @@ describe('lerMetadadosExif() — sem EXIF disponível', () => {
   test('retorna mensagem GPS bloqueado quando EXIF é undefined', async () => {
     delete global.EXIF;
     const resultado = await lerMetadadosExif({ type: 'image/jpeg' });
-    expect(resultado).toContain('Bloqueado pelo aparelho celular');
+    expect(resultado).toContain('Não disponível via navegador');
   });
 
   test('usa lastModified como data de fallback quando EXIF é undefined', async () => {
@@ -40,7 +40,7 @@ describe('lerMetadadosExif() — sem EXIF disponível', () => {
     const resultado = await lerMetadadosExif({ type: 'image/jpeg', lastModified });
     expect(resultado).toContain('15/06/2024');
     expect(resultado).toContain('10:30');
-    expect(resultado).toContain('Bloqueado pelo aparelho celular');
+    expect(resultado).toContain('Não disponível via navegador');
   });
 
   test('resolve com "" para arquivo não-imagem', async () => {
@@ -129,10 +129,10 @@ describe('lerMetadadosExif() — GPS presente e válido', () => {
     expect(resultado).toContain('Removido pelo sistema');
   });
 
-  test('GPS ausente exibe mensagem "Bloqueado pelo aparelho celular"', async () => {
+  test('GPS ausente exibe mensagem "Não disponível via navegador"', async () => {
     global.EXIF = criarExifMock({});
     const resultado = await lerMetadadosExif({ type: 'image/jpeg' });
-    expect(resultado).toContain('Bloqueado pelo aparelho celular');
+    expect(resultado).toContain('Não disponível via navegador');
   });
 
   test('resultado contém GPS quando ambos data e GPS presentes', async () => {

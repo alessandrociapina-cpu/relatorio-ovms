@@ -1,10 +1,28 @@
 'use strict';
 /* global dmsParaDecimal, aplicarRefGps */
 
+function _dataDoArquivo(file) {
+  if (!file.lastModified) return '';
+  const d = new Date(file.lastModified);
+  const dia = String(d.getDate()).padStart(2, '0');
+  const mes = String(d.getMonth() + 1).padStart(2, '0');
+  const ano = d.getFullYear();
+  const hora = String(d.getHours()).padStart(2, '0');
+  const min = String(d.getMinutes()).padStart(2, '0');
+  return `🗓️ ${dia}/${mes}/${ano} às ${hora}:${min}  `;
+}
+
 function lerMetadadosExif(file) {
   return new Promise((resolve) => {
-    if (typeof EXIF === 'undefined' || !file.type.startsWith('image/')) {
+    if (!file.type.startsWith('image/')) {
       resolve('');
+      return;
+    }
+
+    if (typeof EXIF === 'undefined') {
+      const meta =
+        _dataDoArquivo(file) + '📍 GPS: Bloqueado pelo aparelho celular (Use o botão abaixo)';
+      resolve(meta.trim());
       return;
     }
 
@@ -16,6 +34,7 @@ function lerMetadadosExif(file) {
         if (partes.length === 2)
           textoMeta += `🗓️ ${partes[0].split(':').reverse().join('/')} às ${partes[1].substring(0, 5)}  `;
       }
+      if (!textoMeta) textoMeta = _dataDoArquivo(file);
 
       const lat = EXIF.getTag(this, 'GPSLatitude');
       const lng = EXIF.getTag(this, 'GPSLongitude');

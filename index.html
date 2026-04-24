@@ -29,7 +29,7 @@
       crossorigin="anonymous"
     ></script>
 
-    <link rel="stylesheet" href="style.css?v=47" />
+    <link rel="stylesheet" href="style.css?v=48" />
   </head>
   <body>
     <main class="container">
@@ -47,7 +47,7 @@
           margin-bottom: 20px;
         "
       >
-        Versão 47 | Última atualização: 21/04/2026
+        Versão 48 | Última atualização: 24/04/2026
         <span class="info-tooltip-container" tabindex="0">
           <span class="info-icon">ℹ️</span>
           <span
@@ -55,6 +55,8 @@
             style="width: 320px; max-height: 350px; overflow-y: auto; text-align: left"
           >
             <b>Últimas Atualizações:</b><br /><br />
+            <b>v48:</b> Correção: checkbox "Exibir Metadados" reativado por padrão (regressão do v37
+            havia removido o atributo checked).<br /><br />
             <b>v47:</b> 206 testes em 8 suites (storage.js, gps.js, script.js). Header semântico.
             Coverage report (npm run test:coverage). fake-indexeddb para testes de storage.<br /><br />
             <b>v46:</b> 162 testes em 5 suites (formHandler, galleryManager, reportGenerator).
@@ -538,8 +540,8 @@
             <legend>Metadados e Segurança</legend>
             <div class="grupo-opcao">
               <label
-                ><input type="checkbox" id="usarMetadados" /> Exibir Data, Hora e Coordenadas GPS
-                nas fotos</label
+                ><input type="checkbox" id="usarMetadados" checked /> Exibir Data, Hora e
+                Coordenadas GPS nas fotos</label
               >
             </div>
             <div
@@ -970,13 +972,13 @@
       </div>
     </div>
 
-    <script src="utils.js?v=47"></script>
-    <script src="domUtils.js?v=47"></script>
-    <script src="modules/storage.js?v=47"></script>
-    <script src="modules/gps.js?v=47"></script>
-    <script src="formHandler.js?v=47"></script>
-    <script src="galleryManager.js?v=47"></script>
-    <script src="reportGenerator.js?v=47"></script>
-    <script src="script.js?v=47"></script>
+    <script src="utils.js?v=48"></script>
+    <script src="domUtils.js?v=48"></script>
+    <script src="modules/storage.js?v=48"></script>
+    <script src="modules/gps.js?v=48"></script>
+    <script src="formHandler.js?v=48"></script>
+    <script src="galleryManager.js?v=48"></script>
+    <script src="reportGenerator.js?v=48"></script>
+    <script src="script.js?v=48"></script>
   </body>
 </html>

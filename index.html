@@ -29,11 +29,13 @@
       crossorigin="anonymous"
     ></script>
 
-    <link rel="stylesheet" href="style.css?v=44" />
+    <link rel="stylesheet" href="style.css?v=48" />
   </head>
   <body>
     <main class="container">
-      <h1>Relatório Fotográfico</h1>
+      <header>
+        <h1>Relatório Fotográfico</h1>
+      </header>
 
       <div
         class="versao-info"
@@ -45,7 +47,7 @@
           margin-bottom: 20px;
         "
       >
-        Versão 44 | Última atualização: 20/04/2026
+        Versão 48 | Última atualização: 24/04/2026
         <span class="info-tooltip-container" tabindex="0">
           <span class="info-icon">ℹ️</span>
           <span
@@ -53,6 +55,18 @@
             style="width: 320px; max-height: 350px; overflow-y: auto; text-align: left"
           >
             <b>Últimas Atualizações:</b><br /><br />
+            <b>v48:</b> Correção: checkbox "Exibir Metadados" reativado por padrão (regressão do v37
+            havia removido o atributo checked).<br /><br />
+            <b>v47:</b> 206 testes em 8 suites (storage.js, gps.js, script.js). Header semântico.
+            Coverage report (npm run test:coverage). fake-indexeddb para testes de storage.<br /><br />
+            <b>v46:</b> 162 testes em 5 suites (formHandler, galleryManager, reportGenerator).
+            fieldset/legend nos grupos de fiscal.<br /><br />
+            <b>v45:</b> Extração de script.js em formHandler.js, galleryManager.js e
+            reportGenerator.js. Debounce de 50ms na galeria. Navegação por teclado (setas, Delete,
+            Enter) nos itens da galeria. Lazy loading nas imagens. aria-label em todos os botões e
+            grupos de formulário. Lighthouse CI no GitHub Actions.<br /><br />
+            <b>v44:</b> CSP via meta tag. Registro do Service Worker migrado para script.js. HTML
+            semântico com &lt;main&gt; e &lt;section&gt;. Foco visível via :focus-visible.<br /><br />
             <b>v42:</b> Divisão de script.js em módulos reutilizáveis (storage.js, gps.js). Modal
             nativo de alertas e confirmações substituindo alert()/confirm(). Remoção do fallback
             localStorage. Validação de esquema no auto-restore do IndexedDB. Testes JSDOM para
@@ -155,62 +169,65 @@
             </div>
           </div>
 
-          <div class="linha-dupla" style="margin-bottom: 10px">
-            <div class="campo-metade">
-              <label for="nomeFiscal">Nome do 1º Fiscal/Inspetor:</label>
-              <input type="text" id="nomeFiscal" name="nomeFiscal" required maxlength="100" />
+          <fieldset class="grupo-fiscal">
+            <legend>1º Fiscal/Inspetor</legend>
+            <div class="linha-dupla" style="margin-bottom: 10px">
+              <div class="campo-metade">
+                <label for="nomeFiscal">Nome:</label>
+                <input type="text" id="nomeFiscal" name="nomeFiscal" required maxlength="100" />
+              </div>
+              <div class="campo-metade">
+                <label for="cargoFiscal">Cargo:</label>
+                <div style="display: flex; gap: 5px">
+                  <select
+                    id="cargoFiscal"
+                    name="cargoFiscal"
+                    class="input-select-largo"
+                    style="flex-grow: 1"
+                  >
+                    <option value="Engenheiro Civil" selected>Engenheiro Civil</option>
+                    <option value="Engenheiro">Engenheiro</option>
+                    <option value="Técnico em Sistemas de Saneamento">
+                      Técnico em Sist. Saneamento
+                    </option>
+                    <option value="Outros">Outros...</option>
+                  </select>
+                  <input
+                    type="text"
+                    id="cargoFiscalOutros"
+                    name="cargoFiscalOutros"
+                    placeholder="Qual?"
+                    maxlength="80"
+                    style="display: none; flex-grow: 1; max-width: 150px"
+                  />
+                </div>
+              </div>
             </div>
-            <div class="campo-metade">
-              <label for="cargoFiscal">Cargo do 1º Fiscal:</label>
+            <div class="campo-simples" style="margin-top: 0; margin-bottom: 10px">
+              <label for="departamentoFiscal">Departamento:</label>
               <div style="display: flex; gap: 5px">
                 <select
-                  id="cargoFiscal"
-                  name="cargoFiscal"
+                  id="departamentoFiscal"
+                  name="departamentoFiscal"
                   class="input-select-largo"
                   style="flex-grow: 1"
                 >
-                  <option value="Engenheiro Civil" selected>Engenheiro Civil</option>
-                  <option value="Engenheiro">Engenheiro</option>
-                  <option value="Técnico em Sistemas de Saneamento">
-                    Técnico em Sist. Saneamento
+                  <option value="Divisão de Manutenção e Serviços de São José dos Campos" selected>
+                    Divisão de Manutenção e Serviços de São José dos Campos
                   </option>
-                  <option value="Outros">Outros...</option>
+                  <option value="Outros">Outros (Digite ao lado)...</option>
                 </select>
                 <input
                   type="text"
-                  id="cargoFiscalOutros"
-                  name="cargoFiscalOutros"
-                  placeholder="Qual?"
-                  maxlength="80"
-                  style="display: none; flex-grow: 1; max-width: 150px"
+                  id="departamentoFiscalOutros"
+                  name="departamentoFiscalOutros"
+                  placeholder="Qual o departamento?"
+                  maxlength="150"
+                  style="display: none; flex-grow: 1; max-width: 250px"
                 />
               </div>
             </div>
-          </div>
-          <div class="campo-simples" style="margin-top: 0; margin-bottom: 25px">
-            <label for="departamentoFiscal">Departamento (1º Fiscal):</label>
-            <div style="display: flex; gap: 5px">
-              <select
-                id="departamentoFiscal"
-                name="departamentoFiscal"
-                class="input-select-largo"
-                style="flex-grow: 1"
-              >
-                <option value="Divisão de Manutenção e Serviços de São José dos Campos" selected>
-                  Divisão de Manutenção e Serviços de São José dos Campos
-                </option>
-                <option value="Outros">Outros (Digite ao lado)...</option>
-              </select>
-              <input
-                type="text"
-                id="departamentoFiscalOutros"
-                name="departamentoFiscalOutros"
-                placeholder="Qual o departamento?"
-                maxlength="150"
-                style="display: none; flex-grow: 1; max-width: 250px"
-              />
-            </div>
-          </div>
+          </fieldset>
 
           <div class="campo-simples" style="margin-top: -5px; margin-bottom: 20px">
             <label
@@ -231,62 +248,68 @@
               margin-bottom: 15px;
             "
           >
-            <div class="linha-dupla" style="margin-bottom: 10px">
-              <div class="campo-metade">
-                <label for="nomeFiscal2">Nome do 2º Fiscal/Inspetor:</label>
-                <input type="text" id="nomeFiscal2" name="nomeFiscal2" maxlength="100" />
+            <fieldset class="grupo-fiscal">
+              <legend>2º Fiscal/Inspetor</legend>
+              <div class="linha-dupla" style="margin-bottom: 10px">
+                <div class="campo-metade">
+                  <label for="nomeFiscal2">Nome:</label>
+                  <input type="text" id="nomeFiscal2" name="nomeFiscal2" maxlength="100" />
+                </div>
+                <div class="campo-metade">
+                  <label for="cargoFiscal2">Cargo:</label>
+                  <div style="display: flex; gap: 5px">
+                    <select
+                      id="cargoFiscal2"
+                      name="cargoFiscal2"
+                      class="input-select-largo"
+                      style="flex-grow: 1"
+                    >
+                      <option value="Engenheiro Civil" selected>Engenheiro Civil</option>
+                      <option value="Engenheiro">Engenheiro</option>
+                      <option value="Técnico em Sistemas de Saneamento">
+                        Técnico em Sist. Saneamento
+                      </option>
+                      <option value="Outros">Outros...</option>
+                    </select>
+                    <input
+                      type="text"
+                      id="cargoFiscalOutros2"
+                      name="cargoFiscalOutros2"
+                      placeholder="Qual?"
+                      maxlength="80"
+                      style="display: none; flex-grow: 1; max-width: 150px"
+                    />
+                  </div>
+                </div>
               </div>
-              <div class="campo-metade">
-                <label for="cargoFiscal2">Cargo do 2º Fiscal:</label>
+              <div class="campo-simples" style="margin-bottom: 0">
+                <label for="departamentoFiscal2">Departamento:</label>
                 <div style="display: flex; gap: 5px">
                   <select
-                    id="cargoFiscal2"
-                    name="cargoFiscal2"
+                    id="departamentoFiscal2"
+                    name="departamentoFiscal2"
                     class="input-select-largo"
                     style="flex-grow: 1"
                   >
-                    <option value="Engenheiro Civil" selected>Engenheiro Civil</option>
-                    <option value="Engenheiro">Engenheiro</option>
-                    <option value="Técnico em Sistemas de Saneamento">
-                      Técnico em Sist. Saneamento
+                    <option
+                      value="Divisão de Manutenção e Serviços de São José dos Campos"
+                      selected
+                    >
+                      Divisão de Manutenção e Serviços de São José dos Campos
                     </option>
-                    <option value="Outros">Outros...</option>
+                    <option value="Outros">Outros (Digite ao lado)...</option>
                   </select>
                   <input
                     type="text"
-                    id="cargoFiscalOutros2"
-                    name="cargoFiscalOutros2"
-                    placeholder="Qual?"
-                    maxlength="80"
-                    style="display: none; flex-grow: 1; max-width: 150px"
+                    id="departamentoFiscalOutros2"
+                    name="departamentoFiscalOutros2"
+                    placeholder="Qual o departamento?"
+                    maxlength="150"
+                    style="display: none; flex-grow: 1; max-width: 250px"
                   />
                 </div>
               </div>
-            </div>
-            <div class="campo-simples" style="margin-bottom: 0">
-              <label for="departamentoFiscal2">Departamento (2º Fiscal):</label>
-              <div style="display: flex; gap: 5px">
-                <select
-                  id="departamentoFiscal2"
-                  name="departamentoFiscal2"
-                  class="input-select-largo"
-                  style="flex-grow: 1"
-                >
-                  <option value="Divisão de Manutenção e Serviços de São José dos Campos" selected>
-                    Divisão de Manutenção e Serviços de São José dos Campos
-                  </option>
-                  <option value="Outros">Outros (Digite ao lado)...</option>
-                </select>
-                <input
-                  type="text"
-                  id="departamentoFiscalOutros2"
-                  name="departamentoFiscalOutros2"
-                  placeholder="Qual o departamento?"
-                  maxlength="150"
-                  style="display: none; flex-grow: 1; max-width: 250px"
-                />
-              </div>
-            </div>
+            </fieldset>
           </div>
 
           <div class="caixa-assinatura">
@@ -517,8 +540,8 @@
             <legend>Metadados e Segurança</legend>
             <div class="grupo-opcao">
               <label
-                ><input type="checkbox" id="usarMetadados" /> Exibir Data, Hora e Coordenadas GPS
-                nas fotos</label
+                ><input type="checkbox" id="usarMetadados" checked /> Exibir Data, Hora e
+                Coordenadas GPS nas fotos</label
               >
             </div>
             <div
@@ -949,10 +972,13 @@
       </div>
     </div>
 
-    <script src="utils.js?v=44"></script>
-    <script src="domUtils.js?v=44"></script>
-    <script src="modules/storage.js?v=44"></script>
-    <script src="modules/gps.js?v=44"></script>
-    <script src="script.js?v=44"></script>
+    <script src="utils.js?v=48"></script>
+    <script src="domUtils.js?v=48"></script>
+    <script src="modules/storage.js?v=48"></script>
+    <script src="modules/gps.js?v=48"></script>
+    <script src="formHandler.js?v=48"></script>
+    <script src="galleryManager.js?v=48"></script>
+    <script src="reportGenerator.js?v=48"></script>
+    <script src="script.js?v=48"></script>
   </body>
 </html>

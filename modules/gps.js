@@ -21,7 +21,7 @@ function lerMetadadosExif(file) {
 
     if (typeof EXIF === 'undefined') {
       const meta =
-        _dataDoArquivo(file) + '📍 GPS: Bloqueado pelo aparelho celular (Use o botão abaixo)';
+        _dataDoArquivo(file) + '📍 GPS: Não disponível via navegador (use o botão abaixo)';
       resolve(meta.trim());
       return;
     }
@@ -55,7 +55,7 @@ function lerMetadadosExif(file) {
           textoMeta += `📍 GPS: Falha na leitura`;
         }
       } else {
-        textoMeta += `📍 GPS: Bloqueado pelo aparelho celular (Use o botão abaixo)`;
+        textoMeta += `📍 GPS: Não disponível via navegador (use o botão abaixo)`;
       }
       resolve(textoMeta.trim());
     });

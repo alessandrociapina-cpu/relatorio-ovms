@@ -28,10 +28,19 @@ afterEach(() => {
 // --- Casos sem leitura EXIF ---
 
 describe('lerMetadadosExif() — sem EXIF disponível', () => {
-  test('resolve com "" quando EXIF é undefined', async () => {
+  test('retorna mensagem GPS bloqueado quando EXIF é undefined', async () => {
     delete global.EXIF;
     const resultado = await lerMetadadosExif({ type: 'image/jpeg' });
-    expect(resultado).toBe('');
+    expect(resultado).toContain('Bloqueado pelo aparelho celular');
+  });
+
+  test('usa lastModified como data de fallback quando EXIF é undefined', async () => {
+    delete global.EXIF;
+    const lastModified = new Date(2024, 5, 15, 10, 30).getTime(); // 15/06/2024 10:30
+    const resultado = await lerMetadadosExif({ type: 'image/jpeg', lastModified });
+    expect(resultado).toContain('15/06/2024');
+    expect(resultado).toContain('10:30');
+    expect(resultado).toContain('Bloqueado pelo aparelho celular');
   });
 
   test('resolve com "" para arquivo não-imagem', async () => {
@@ -57,10 +66,18 @@ describe('lerMetadadosExif() — data/hora', () => {
     expect(resultado).toContain('10:30');
   });
 
-  test('não inclui data quando DateTimeOriginal ausente', async () => {
+  test('não inclui data quando DateTimeOriginal ausente e sem lastModified', async () => {
     global.EXIF = criarExifMock({});
     const resultado = await lerMetadadosExif({ type: 'image/png' });
     expect(resultado).not.toContain('🗓️');
+  });
+
+  test('usa lastModified como fallback quando DateTimeOriginal ausente', async () => {
+    global.EXIF = criarExifMock({});
+    const lastModified = new Date(2024, 0, 20, 9, 5).getTime(); // 20/01/2024 09:05
+    const resultado = await lerMetadadosExif({ type: 'image/jpeg', lastModified });
+    expect(resultado).toContain('20/01/2024');
+    expect(resultado).toContain('09:05');
   });
 
   test('ignora DateTimeOriginal com formato inválido (sem espaço)', async () => {

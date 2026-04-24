@@ -245,8 +245,25 @@
           substituindo o <code>outline: none</code> que prejudicava a navegação por teclado.
         </li>
         <li>
-          <strong>v47 (Atual):</strong> Ciclo de cobertura completa de testes e semântica: (1) Novas
-          suites — <code>storage.test.js</code> (9 testes, via <code>fake-indexeddb</code>),
+          <strong>v50 (Atual):</strong> Melhoria de mensagem: GPS sem dados EXIF exibe "Não
+          disponível via navegador" (o Android remove GPS ao compartilhar fotos com apps de
+          navegador desde o Android 10 — proteção de privacidade do sistema operacional).
+        </li>
+        <li>
+          <strong>v49:</strong> Correção de regressão de exibição de metadados: quando a biblioteca
+          EXIF não carrega ou não retorna data, <code>lerMetadadosExif</code> usa
+          <code>file.lastModified</code> como fallback de data e sempre retorna string não-vazia
+          para imagens — evitando que a div de metadados nunca aparecesse.
+          <strong>208 testes em 8 suites.</strong>
+        </li>
+        <li>
+          <strong>v48:</strong> Correção de regressão introduzida na v37 (Prettier): o atributo
+          <code>checked</code> do checkbox <code>#usarMetadados</code> havia sido removido durante a
+          formatação automática, fazendo os metadados ficarem ocultos por padrão.
+        </li>
+        <li>
+          <strong>v47:</strong> Ciclo de cobertura completa de testes e semântica: (1) Novas suites
+          — <code>storage.test.js</code> (9 testes, via <code>fake-indexeddb</code>),
           <code>gps.test.js</code> (20 testes cobrindo EXIF, GPS válido/nulo/bloqueado e conversão
           DMS→decimal), <code>script.test.js</code> (12 testes de orquestração e wiring dos módulos)
           — total de <strong>206 testes em 8 suites</strong>; (2)

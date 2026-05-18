@@ -94,18 +94,18 @@ const ReportGenerator = (() => {
     if (opt.layoutColunas === '1') _el.areaRelatorio.classList.add('layout-1-col');
     applyPrintMargins(opt.margensMm);
 
-    const imagensProcessadas = await Promise.all(
-      fotosValidas.map(async (f, i) => {
-        const base = f.editedPreviewDataUrl || f.previewDataUrl;
-        return {
-          url: await _cb.redimensionarImagem(base, opt.largura, opt.qualidade),
-          leg: `Imagem ${i + 1}: ${(f.textoLegenda || '').trim() || 'Sem legenda'}`,
-          meta: f.metadadosExif,
-          noLogo: f.ocultarLogo,
-          noMeta: f.ocultarMetadados,
-        };
-      })
-    );
+    const imagensProcessadas = [];
+    for (let i = 0; i < fotosValidas.length; i++) {
+      const f = fotosValidas[i];
+      const base = f.editedPreviewDataUrl || f.previewDataUrl;
+      imagensProcessadas.push({
+        url: await _cb.redimensionarImagem(base, opt.largura, opt.qualidade),
+        leg: `Imagem ${i + 1}: ${(f.textoLegenda || '').trim() || 'Sem legenda'}`,
+        meta: f.metadadosExif,
+        noLogo: f.ocultarLogo,
+        noMeta: f.ocultarMetadados,
+      });
+    }
 
     imagensProcessadas.forEach((imgObj) => {
       const itemDiv = document.createElement('div');

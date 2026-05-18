@@ -245,9 +245,18 @@
           substituindo o <code>outline: none</code> que prejudicava a navegação por teclado.
         </li>
         <li>
-          <strong>v50 (Atual):</strong> Melhoria de mensagem: GPS sem dados EXIF exibe "Não
-          disponível via navegador" (o Android remove GPS ao compartilhar fotos com apps de
-          navegador desde o Android 10 — proteção de privacidade do sistema operacional).
+          <strong>v51 (Atual):</strong> (1) Correção: o título "Relatório Fotográfico" aparecia na
+          primeira folha do PDF — o seletor CSS <code>body &gt; .container &gt; h1</code> deixou de
+          funcionar quando o <code>&lt;header&gt;</code> foi adicionado na v47; adicionado
+          <code>body &gt; .container &gt; header</code> à regra <code>@media print</code>. (2)
+          Performance: geração de relatório/PDF alterada de <code>Promise.all</code> paralelo para
+          loop sequencial com <code>await</code> por foto — elimina travamento de UI com muitas
+          fotos via canvas.
+        </li>
+        <li>
+          <strong>v50:</strong> Melhoria de mensagem: GPS sem dados EXIF exibe "Não disponível via
+          navegador" (o Android remove GPS ao compartilhar fotos com apps de navegador desde o
+          Android 10 — proteção de privacidade do sistema operacional).
         </li>
         <li>
           <strong>v49:</strong> Correção de regressão de exibição de metadados: quando a biblioteca

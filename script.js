@@ -421,6 +421,7 @@ document.addEventListener('DOMContentLoaded', () => {
       }
 
       if (estado.form.departamento1) selectDepartamento.value = estado.form.departamento1;
+      // Compatibilidade com projetos salvos antes da v36 (campo renomeado de 'departamento' para 'departamento1')
       if (estado.form.departamento && !estado.form.departamento1)
         selectDepartamento.value = estado.form.departamento;
       if (selectDepartamento.value === 'Outros') {
@@ -489,7 +490,7 @@ document.addEventListener('DOMContentLoaded', () => {
         autoSaveStatus.style.color = '#d9534f';
         console.error('Falha interna no IndexedDB:', e);
       }
-    }, 5000);
+    }, 1500);
   }
 
   formVistoria.addEventListener('input', salvarRascunhoLocal);
@@ -645,10 +646,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const nomeObra = inputLocalVistoria.value.trim();
     document.title = nomeObra ? `Relatório Fotográfico - ${nomeObra}` : 'Relatório Fotográfico';
 
-    setTimeout(() => {
-      window.print();
-      document.title = tituloOriginal;
-    }, 500);
+    await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+    window.print();
+    document.title = tituloOriginal;
   });
 
   btnAlternarPreview.addEventListener('click', () => {
@@ -1382,7 +1382,7 @@ document.addEventListener('DOMContentLoaded', () => {
       } else {
         // Padrão
         rodapeDiv.innerHTML = `Companhia de Saneamento Básico do Estado de São Paulo – Sabesp<br>
-        <span contenteditable="true" style="display:inline-block; outline:none;">Divisão de Manutenção e Serviços Operacionais de São José dos Campos - OVMS</span><br>
+        <span contenteditable="true" style="display:inline-block; outline:none;">${DEPARTAMENTO_PADRAO}</span><br>
         <span contenteditable="true" style="display: inline-block; outline: none; min-width: 100%;">Rua Euclides Miragaia, 126, Centro - CEP 12.245-820 - São José dos Campos - SP</span><br>
         <span>www.sabesp.com.br</span>`;
       }

@@ -52,6 +52,52 @@ const ReportGenerator = (() => {
     styleTag.textContent = css;
   }
 
+  function _queimarcaDagua(dataUrl, posMarca, tamMarca, opacMarca) {
+    return new Promise((resolve) => {
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        canvas.width = img.width;
+        canvas.height = img.height;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0);
+
+        const logo = new Image();
+        logo.onload = () => {
+          const fracs = { 'logo-pequeno': 0.08, 'logo-medio': 0.15, 'logo-grande': 0.22 };
+          const frac = fracs[tamMarca] || 0.15;
+          const logoW = Math.round(canvas.width * frac);
+          const logoH = Math.round(logoW * (logo.height / logo.width));
+          const margem = Math.round(canvas.width * 0.025);
+
+          let x, y;
+          if (posMarca === 'bottom-right') {
+            x = canvas.width - logoW - margem;
+            y = canvas.height - logoH - margem;
+          } else if (posMarca === 'bottom-left') {
+            x = margem;
+            y = canvas.height - logoH - margem;
+          } else if (posMarca === 'top-right') {
+            x = canvas.width - logoW - margem;
+            y = margem;
+          } else {
+            x = margem;
+            y = margem;
+          }
+
+          ctx.globalAlpha = opacMarca;
+          ctx.drawImage(logo, x, y, logoW, logoH);
+          ctx.globalAlpha = 1;
+          resolve(canvas.toDataURL('image/jpeg', 0.92));
+        };
+        logo.onerror = () => resolve(dataUrl);
+        logo.src = 'sabesp-logo.png';
+      };
+      img.onerror = () => resolve(dataUrl);
+      img.src = dataUrl;
+    });
+  }
+
   async function gerarRelatorio(ativarPreview = true) {
     if (!_cb.validarFormulario()) return;
     const fotosValidas = _st.fotos.filter((f) => f && f.originalDataUrl);
@@ -99,11 +145,14 @@ const ReportGenerator = (() => {
     for (let i = 0; i < fotosValidas.length; i++) {
       const f = fotosValidas[i];
       const base = f.editedPreviewDataUrl || f.previewDataUrl;
+      let url = await _cb.redimensionarImagem(base, opt.largura, opt.qualidade);
+      if (opt.usarMarca && !f.ocultarLogo) {
+        url = await _queimarcaDagua(url, opt.posMarca, opt.tamMarca, opt.opacMarca);
+      }
       imagensProcessadas.push({
-        url: await _cb.redimensionarImagem(base, opt.largura, opt.qualidade),
+        url,
         leg: `Imagem ${i + 1}: ${(f.textoLegenda || '').trim() || 'Sem legenda'}`,
         meta: f.metadadosExif,
-        noLogo: f.ocultarLogo,
         noMeta: f.ocultarMetadados,
       });
     }
@@ -123,14 +172,6 @@ const ReportGenerator = (() => {
       }
 
       wrapper.appendChild(imgEl);
-
-      if (opt.usarMarca && !imgObj.noLogo) {
-        const logo = document.createElement('img');
-        logo.src = 'sabesp-logo.png';
-        logo.classList.add('marca-dagua-overlay', `pos-${opt.posMarca}`, opt.tamMarca);
-        logo.style.opacity = opt.opacMarca;
-        wrapper.appendChild(logo);
-      }
 
       const legP = document.createElement('p');
       legP.classList.add('legenda');

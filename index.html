@@ -29,7 +29,7 @@
       crossorigin="anonymous"
     ></script>
 
-    <link rel="stylesheet" href="style.css?v=54" />
+    <link rel="stylesheet" href="style.css?v=55" />
   </head>
   <body>
     <main class="container">
@@ -47,7 +47,7 @@
           margin-bottom: 20px;
         "
       >
-        Versão 54 | Última atualização: 28/05/2026
+        Versão 55 | Última atualização: 28/05/2026
         <span class="info-tooltip-container" tabindex="0">
           <span class="info-icon">ℹ️</span>
           <span
@@ -55,10 +55,12 @@
             style="width: 320px; max-height: 350px; overflow-y: auto; text-align: left"
           >
             <b>Últimas Atualizações:</b><br /><br />
-            <b>v54 (Atual):</b> Correção: logo aparece em todas as fotos (logo pré-carregado como
-            data URL antes de processar o lote). Correção: barras pretas eliminadas — imagem
-            renderizada com max-width/max-height sem object-fit:contain, sem áreas transparentes no
-            elemento img.<br /><br />
+            <b>v55 (Atual):</b> Correção layout "1 coluna": páginas em branco eliminadas —
+            max-height reduzido para 165mm (cabia menos que a área útil da página, o que fazia o
+            Chrome renderizar caixas vazias). Cada foto 2+ inicia em nova página (page-break-before:
+            always).<br /><br />
+            <b>v54:</b> Correção: logo aparece em todas as fotos (logo pré-carregado como data URL
+            antes de processar o lote). Barras pretas eliminadas no modo 4pp.<br /><br />
             <b>v53:</b> Marca d'água gravada diretamente no canvas (canvas burn). Fundo branco com
             print-color-adjust na grade 4pp.<br /><br />
             <b>v52:</b> Layout "4 por página (uniforme)": todas as fotos ficam com mesma altura,
@@ -991,13 +993,13 @@
       </div>
     </div>
 
-    <script src="utils.js?v=54"></script>
-    <script src="domUtils.js?v=54"></script>
-    <script src="modules/storage.js?v=54"></script>
-    <script src="modules/gps.js?v=54"></script>
-    <script src="formHandler.js?v=54"></script>
-    <script src="galleryManager.js?v=54"></script>
-    <script src="reportGenerator.js?v=54"></script>
-    <script src="script.js?v=54"></script>
+    <script src="utils.js?v=55"></script>
+    <script src="domUtils.js?v=55"></script>
+    <script src="modules/storage.js?v=55"></script>
+    <script src="modules/gps.js?v=55"></script>
+    <script src="formHandler.js?v=55"></script>
+    <script src="galleryManager.js?v=55"></script>
+    <script src="reportGenerator.js?v=55"></script>
+    <script src="script.js?v=55"></script>
   </body>
 </html>

@@ -245,10 +245,18 @@
           substituindo o <code>outline: none</code> que prejudicava a navegação por teclado.
         </li>
         <li>
-          <strong>v54 (Atual):</strong> (1) Correção definitiva das barras pretas no modo "4 por
-          página": substituído <code>object-fit: contain</code> (que criava áreas transparentes
-          dentro do elemento <code>&lt;img&gt;</code>, renderizadas como preto pelo Chrome Android)
-          por <code>max-width/max-height: 100%; width/height: auto</code> — o elemento
+          <strong>v55 (Atual):</strong> Correção do layout "1 coluna" (1 foto por página): (1)
+          Páginas em branco e legenda separada da foto eliminadas — <code>max-height</code> reduzido
+          de 230mm para 165mm, garantindo que cada item caiba inteiramente na área útil de página
+          (~197mm) para que <code>page-break-inside: avoid</code> funcione corretamente sem
+          renderizar caixas vazias. (2) Cada foto a partir da segunda inicia obrigatoriamente em
+          nova página (<code>break-before: page</code>). <strong>209 testes em 8 suites.</strong>
+        </li>
+        <li>
+          <strong>v54:</strong> (1) Correção definitiva das barras pretas no modo "4 por página":
+          substituído <code>object-fit: contain</code> (que criava áreas transparentes dentro do
+          elemento <code>&lt;img&gt;</code>, renderizadas como preto pelo Chrome Android) por
+          <code>max-width/max-height: 100%; width/height: auto</code> — o elemento
           <code>&lt;img&gt;</code> passa a ter exatamente o tamanho do conteúdo visual, sem áreas
           transparentes. (2) Correção: logo aparece em todas as fotos — logo
           <code>sabesp-logo.png</code> agora é pré-carregado uma única vez como data URL antes de

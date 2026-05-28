@@ -356,6 +356,20 @@ describe('ReportGenerator.gerarRelatorio()', () => {
     expect(el.areaRelatorio.classList.contains('layout-1-col')).toBe(true);
   });
 
+  test('adiciona classe layout-4pp quando layoutColunas é 4pp', async () => {
+    el.radiosLayout[0].checked = false;
+    const radio4pp = addRadio('layoutColunas', '4pp', true);
+    el.radiosLayout = [el.radiosLayout[0], radio4pp];
+    el.inputLocalVistoria.value = 'Local';
+    el.inputDataVistoria.value = '2026-01-01';
+    st.fotos = [criarFoto()];
+
+    await ReportGenerator.gerarRelatorio(false);
+
+    expect(el.areaRelatorio.classList.contains('layout-4pp')).toBe(true);
+    expect(el.areaRelatorio.classList.contains('layout-1-col')).toBe(false);
+  });
+
   test('adiciona borda-preta-2pt quando bordaFotos é preta-2pt', async () => {
     // Adiciona radio de borda preta
     const radioBorda = document.querySelector('input[name="bordaFotos"]');

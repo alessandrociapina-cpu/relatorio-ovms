@@ -90,8 +90,9 @@ const ReportGenerator = (() => {
       <div class="info-vistoria"><p><strong>Local da Vistoria:</strong> ${esc(local)}</p><p><strong>Data da Vistoria:</strong> ${esc(dataFormatada)}</p>${horaHtml}</div>
     `;
 
-    _el.areaRelatorio.classList.remove('layout-1-col');
+    _el.areaRelatorio.classList.remove('layout-1-col', 'layout-4pp');
     if (opt.layoutColunas === '1') _el.areaRelatorio.classList.add('layout-1-col');
+    if (opt.layoutColunas === '4pp') _el.areaRelatorio.classList.add('layout-4pp');
     applyPrintMargins(opt.margensMm);
 
     const imagensProcessadas = [];

@@ -29,7 +29,7 @@
       crossorigin="anonymous"
     ></script>
 
-    <link rel="stylesheet" href="style.css?v=51" />
+    <link rel="stylesheet" href="style.css?v=52" />
   </head>
   <body>
     <main class="container">
@@ -47,7 +47,7 @@
           margin-bottom: 20px;
         "
       >
-        Versão 51 | Última atualização: 24/04/2026
+        Versão 52 | Última atualização: 24/04/2026
         <span class="info-tooltip-container" tabindex="0">
           <span class="info-icon">ℹ️</span>
           <span
@@ -55,9 +55,12 @@
             style="width: 320px; max-height: 350px; overflow-y: auto; text-align: left"
           >
             <b>Últimas Atualizações:</b><br /><br />
-            <b>v51 (Atual):</b> Correção: "Relatório Fotográfico" não aparece mais no PDF (seletor
-            CSS @media print quebrado desde v47). Geração de relatório mais fluida — imagens
-            processadas sequencialmente, evitando travamento com muitas fotos.<br /><br />
+            <b>v52 (Atual):</b> Layout "4 por página (uniforme)": todas as fotos ficam com mesma
+            altura (object-fit: contain), eliminando o desbalanceamento entre fotos portrait e
+            landscape. 209 testes.<br /><br />
+            <b>v51:</b> Correção: "Relatório Fotográfico" não aparece mais no PDF (seletor CSS
+            @media print quebrado desde v47). Geração de relatório mais fluida — imagens processadas
+            sequencialmente, evitando travamento com muitas fotos.<br /><br />
             <b>v50:</b> Mensagem GPS melhorada: "Não disponível via navegador" explica que o Android
             remove GPS ao compartilhar fotos com apps de navegador.<br /><br />
             <b>v49:</b> Correção: metadados sempre exibidos ao adicionar fotos — fallback para data
@@ -435,6 +438,10 @@
               <label
                 ><input type="radio" name="layoutColunas" value="2" checked /> 2 colunas
                 (padrão)</label
+              >
+              <label
+                ><input type="radio" name="layoutColunas" value="4pp" /> 4 por página
+                (uniforme)</label
               >
               <label
                 ><input type="radio" name="layoutColunas" value="1" /> 1 coluna (fotos
@@ -979,13 +986,13 @@
       </div>
     </div>
 
-    <script src="utils.js?v=51"></script>
-    <script src="domUtils.js?v=51"></script>
-    <script src="modules/storage.js?v=51"></script>
-    <script src="modules/gps.js?v=51"></script>
-    <script src="formHandler.js?v=51"></script>
-    <script src="galleryManager.js?v=51"></script>
-    <script src="reportGenerator.js?v=51"></script>
-    <script src="script.js?v=51"></script>
+    <script src="utils.js?v=52"></script>
+    <script src="domUtils.js?v=52"></script>
+    <script src="modules/storage.js?v=52"></script>
+    <script src="modules/gps.js?v=52"></script>
+    <script src="formHandler.js?v=52"></script>
+    <script src="galleryManager.js?v=52"></script>
+    <script src="reportGenerator.js?v=52"></script>
+    <script src="script.js?v=52"></script>
   </body>
 </html>

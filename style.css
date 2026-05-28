@@ -577,6 +577,40 @@ hr {
   word-wrap: break-word;
   width: 100%;
 }
+/* ── Modo 4 por página uniforme ─────────────────────────────────── */
+.layout-4pp .corpo-relatorio-grid {
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+}
+.layout-4pp .item-relatorio {
+  height: 290px;
+  page-break-inside: avoid;
+  overflow: hidden;
+}
+.layout-4pp .imagem-wrapper {
+  flex: 1;
+  width: 100%;
+  min-height: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  background-color: #f0f0f0;
+  border-radius: 4px;
+}
+.layout-4pp .item-relatorio img.foto-principal {
+  width: 100%;
+  height: 100%;
+  max-height: none;
+  object-fit: contain;
+}
+@media print {
+  .layout-4pp .item-relatorio {
+    height: 85mm;
+  }
+}
+/* ─────────────────────────────────────────────────────────────── */
+
 #observacoes-finais-relatorio {
   margin-top: 25px;
   padding-top: 15px;

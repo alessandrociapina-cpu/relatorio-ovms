@@ -245,9 +245,22 @@
           substituindo o <code>outline: none</code> que prejudicava a navegação por teclado.
         </li>
         <li>
-          <strong>v51 (Atual):</strong> (1) Correção: o título "Relatório Fotográfico" aparecia na
-          primeira folha do PDF — o seletor CSS <code>body &gt; .container &gt; h1</code> deixou de
-          funcionar quando o <code>&lt;header&gt;</code> foi adicionado na v47; adicionado
+          <strong>v53 (Atual):</strong> (1) Correção: barras pretas nas laterais de fotos no modo "4
+          por página" em PDF no Android — fundo branco com
+          <code>print-color-adjust: exact</code> nas células do layout. (2) Correção: logo Sabesp
+          saindo fora da foto em modo "4 por página" — marca d'água agora é gravada diretamente no
+          canvas da imagem (<i>canvas burn</i>), eliminando a sobreposição CSS que ficava
+          posicionada em relação à célula inteira. <strong>209 testes em 8 suites.</strong>
+        </li>
+        <li>
+          <strong>v52:</strong> Novo layout "4 por página (uniforme)" — todas as fotos cabem em
+          grade 2×2 com altura fixa de 85 mm, independente do aspecto original (portrait, landscape,
+          quadrado). Usa <code>object-fit: contain</code> para não cortar a imagem.
+        </li>
+        <li>
+          <strong>v51:</strong> (1) Correção: o título "Relatório Fotográfico" aparecia na primeira
+          folha do PDF — o seletor CSS <code>body &gt; .container &gt; h1</code> deixou de funcionar
+          quando o <code>&lt;header&gt;</code> foi adicionado na v47; adicionado
           <code>body &gt; .container &gt; header</code> à regra <code>@media print</code>. (2)
           Performance: geração de relatório/PDF alterada de <code>Promise.all</code> paralelo para
           loop sequencial com <code>await</code> por foto — elimina travamento de UI com muitas

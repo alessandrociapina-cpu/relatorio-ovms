@@ -29,7 +29,7 @@
       crossorigin="anonymous"
     ></script>
 
-    <link rel="stylesheet" href="style.css?v=53" />
+    <link rel="stylesheet" href="style.css?v=54" />
   </head>
   <body>
     <main class="container">
@@ -47,7 +47,7 @@
           margin-bottom: 20px;
         "
       >
-        Versão 53 | Última atualização: 28/05/2026
+        Versão 54 | Última atualização: 28/05/2026
         <span class="info-tooltip-container" tabindex="0">
           <span class="info-icon">ℹ️</span>
           <span
@@ -55,9 +55,14 @@
             style="width: 320px; max-height: 350px; overflow-y: auto; text-align: left"
           >
             <b>Últimas Atualizações:</b><br /><br />
-            <b>v52 (Atual):</b> Layout "4 por página (uniforme)": todas as fotos ficam com mesma
-            altura (object-fit: contain), eliminando o desbalanceamento entre fotos portrait e
-            landscape. 209 testes.<br /><br />
+            <b>v54 (Atual):</b> Correção: logo aparece em todas as fotos (logo pré-carregado como
+            data URL antes de processar o lote). Correção: barras pretas eliminadas — imagem
+            renderizada com max-width/max-height sem object-fit:contain, sem áreas transparentes no
+            elemento img.<br /><br />
+            <b>v53:</b> Marca d'água gravada diretamente no canvas (canvas burn). Fundo branco com
+            print-color-adjust na grade 4pp.<br /><br />
+            <b>v52:</b> Layout "4 por página (uniforme)": todas as fotos ficam com mesma altura,
+            eliminando o desbalanceamento entre fotos portrait e landscape. 209 testes.<br /><br />
             <b>v51:</b> Correção: "Relatório Fotográfico" não aparece mais no PDF (seletor CSS
             @media print quebrado desde v47). Geração de relatório mais fluida — imagens processadas
             sequencialmente, evitando travamento com muitas fotos.<br /><br />
@@ -986,13 +991,13 @@
       </div>
     </div>
 
-    <script src="utils.js?v=53"></script>
-    <script src="domUtils.js?v=53"></script>
-    <script src="modules/storage.js?v=53"></script>
-    <script src="modules/gps.js?v=53"></script>
-    <script src="formHandler.js?v=53"></script>
-    <script src="galleryManager.js?v=53"></script>
-    <script src="reportGenerator.js?v=53"></script>
-    <script src="script.js?v=53"></script>
+    <script src="utils.js?v=54"></script>
+    <script src="domUtils.js?v=54"></script>
+    <script src="modules/storage.js?v=54"></script>
+    <script src="modules/gps.js?v=54"></script>
+    <script src="formHandler.js?v=54"></script>
+    <script src="galleryManager.js?v=54"></script>
+    <script src="reportGenerator.js?v=54"></script>
+    <script src="script.js?v=54"></script>
   </body>
 </html>

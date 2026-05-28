@@ -52,46 +52,77 @@ const ReportGenerator = (() => {
     styleTag.textContent = css;
   }
 
-  function _queimarcaDagua(dataUrl, posMarca, tamMarca, opacMarca) {
+  function _logoParaDataUrl() {
     return new Promise((resolve) => {
       const img = new Image();
       img.onload = () => {
-        const canvas = document.createElement('canvas');
-        canvas.width = img.width;
-        canvas.height = img.height;
-        const ctx = canvas.getContext('2d');
-        ctx.drawImage(img, 0, 0);
+        try {
+          const c = document.createElement('canvas');
+          c.width = img.naturalWidth || img.width;
+          c.height = img.naturalHeight || img.height;
+          c.getContext('2d').drawImage(img, 0, 0);
+          resolve(c.toDataURL('image/png'));
+        } catch (_) {
+          resolve(null);
+        }
+      };
+      img.onerror = () => resolve(null);
+      img.src = 'sabesp-logo.png';
+    });
+  }
 
-        const logo = new Image();
-        logo.onload = () => {
-          const fracs = { 'logo-pequeno': 0.08, 'logo-medio': 0.15, 'logo-grande': 0.22 };
-          const frac = fracs[tamMarca] || 0.15;
-          const logoW = Math.round(canvas.width * frac);
-          const logoH = Math.round(logoW * (logo.height / logo.width));
-          const margem = Math.round(canvas.width * 0.025);
+  function _queimarcaDagua(dataUrl, logoDataUrl, posMarca, tamMarca, opacMarca) {
+    return new Promise((resolve) => {
+      const img = new Image();
+      img.onload = () => {
+        try {
+          const w = img.naturalWidth || img.width;
+          const h = img.naturalHeight || img.height;
+          const canvas = document.createElement('canvas');
+          canvas.width = w;
+          canvas.height = h;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0);
 
-          let x, y;
-          if (posMarca === 'bottom-right') {
-            x = canvas.width - logoW - margem;
-            y = canvas.height - logoH - margem;
-          } else if (posMarca === 'bottom-left') {
-            x = margem;
-            y = canvas.height - logoH - margem;
-          } else if (posMarca === 'top-right') {
-            x = canvas.width - logoW - margem;
-            y = margem;
-          } else {
-            x = margem;
-            y = margem;
-          }
+          const logo = new Image();
+          logo.onload = () => {
+            try {
+              const fracs = { 'logo-pequeno': 0.08, 'logo-medio': 0.15, 'logo-grande': 0.22 };
+              const frac = fracs[tamMarca] || 0.15;
+              const logoW = Math.round(w * frac);
+              const logoH = Math.round(
+                logoW * ((logo.naturalHeight || logo.height) / (logo.naturalWidth || logo.width))
+              );
+              const margem = Math.round(w * 0.025);
 
-          ctx.globalAlpha = opacMarca;
-          ctx.drawImage(logo, x, y, logoW, logoH);
-          ctx.globalAlpha = 1;
-          resolve(canvas.toDataURL('image/jpeg', 0.92));
-        };
-        logo.onerror = () => resolve(dataUrl);
-        logo.src = 'sabesp-logo.png';
+              let x, y;
+              if (posMarca === 'bottom-right') {
+                x = w - logoW - margem;
+                y = h - logoH - margem;
+              } else if (posMarca === 'bottom-left') {
+                x = margem;
+                y = h - logoH - margem;
+              } else if (posMarca === 'top-right') {
+                x = w - logoW - margem;
+                y = margem;
+              } else {
+                x = margem;
+                y = margem;
+              }
+
+              ctx.globalAlpha = opacMarca;
+              ctx.drawImage(logo, x, y, logoW, logoH);
+              ctx.globalAlpha = 1;
+              resolve(canvas.toDataURL('image/jpeg', 0.92));
+            } catch (_) {
+              resolve(dataUrl);
+            }
+          };
+          logo.onerror = () => resolve(dataUrl);
+          logo.src = logoDataUrl;
+        } catch (_) {
+          resolve(dataUrl);
+        }
       };
       img.onerror = () => resolve(dataUrl);
       img.src = dataUrl;
@@ -141,13 +172,15 @@ const ReportGenerator = (() => {
     if (opt.layoutColunas === '4pp') _el.areaRelatorio.classList.add('layout-4pp');
     applyPrintMargins(opt.margensMm);
 
+    const logoDataUrl = opt.usarMarca ? await _logoParaDataUrl() : null;
+
     const imagensProcessadas = [];
     for (let i = 0; i < fotosValidas.length; i++) {
       const f = fotosValidas[i];
       const base = f.editedPreviewDataUrl || f.previewDataUrl;
       let url = await _cb.redimensionarImagem(base, opt.largura, opt.qualidade);
-      if (opt.usarMarca && !f.ocultarLogo) {
-        url = await _queimarcaDagua(url, opt.posMarca, opt.tamMarca, opt.opacMarca);
+      if (logoDataUrl && !f.ocultarLogo) {
+        url = await _queimarcaDagua(url, logoDataUrl, opt.posMarca, opt.tamMarca, opt.opacMarca);
       }
       imagensProcessadas.push({
         url,

@@ -245,12 +245,22 @@
           substituindo o <code>outline: none</code> que prejudicava a navegação por teclado.
         </li>
         <li>
-          <strong>v53 (Atual):</strong> (1) Correção: barras pretas nas laterais de fotos no modo "4
-          por página" em PDF no Android — fundo branco com
-          <code>print-color-adjust: exact</code> nas células do layout. (2) Correção: logo Sabesp
-          saindo fora da foto em modo "4 por página" — marca d'água agora é gravada diretamente no
-          canvas da imagem (<i>canvas burn</i>), eliminando a sobreposição CSS que ficava
-          posicionada em relação à célula inteira. <strong>209 testes em 8 suites.</strong>
+          <strong>v54 (Atual):</strong> (1) Correção definitiva das barras pretas no modo "4 por
+          página": substituído <code>object-fit: contain</code> (que criava áreas transparentes
+          dentro do elemento <code>&lt;img&gt;</code>, renderizadas como preto pelo Chrome Android)
+          por <code>max-width/max-height: 100%; width/height: auto</code> — o elemento
+          <code>&lt;img&gt;</code> passa a ter exatamente o tamanho do conteúdo visual, sem áreas
+          transparentes. (2) Correção: logo aparece em todas as fotos — logo
+          <code>sabesp-logo.png</code> agora é pré-carregado uma única vez como data URL antes de
+          processar o lote de imagens, eliminando falhas silenciosas por CORS ou canvas taint nas
+          chamadas subsequentes. <strong>209 testes em 8 suites.</strong>
+        </li>
+        <li>
+          <strong>v53:</strong> (1) Correção: barras pretas nas laterais de fotos no modo "4 por
+          página" em PDF no Android — fundo branco com <code>print-color-adjust: exact</code> nas
+          células do layout. (2) Correção: logo Sabesp saindo fora da foto em modo "4 por página" —
+          marca d'água gravada diretamente no canvas da imagem (<i>canvas burn</i>), eliminando a
+          sobreposição CSS que ficava posicionada em relação à célula inteira.
         </li>
         <li>
           <strong>v52:</strong> Novo layout "4 por página (uniforme)" — todas as fotos cabem em

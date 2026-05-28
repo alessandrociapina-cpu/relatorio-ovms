@@ -993,8 +993,15 @@ hr {
   body.preview-print #area-relatorio.layout-1-col .corpo-relatorio-grid {
     grid-template-columns: 1fr !important;
   }
+  body.preview-print #area-relatorio.layout-1-col .item-relatorio + .item-relatorio {
+    break-before: page;
+    page-break-before: always;
+  }
   body.preview-print #area-relatorio.layout-1-col .item-relatorio img.foto-principal {
-    max-height: 230mm;
+    max-height: 165mm;
+    max-width: 100%;
+    width: auto;
+    height: auto;
   }
 
   body.preview-print .rodape-texto,

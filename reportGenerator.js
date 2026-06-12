@@ -153,6 +153,11 @@ const ReportGenerator = (() => {
       ? `<p><strong>Hora:</strong> ${esc(_el.inputHoraVistoria.value)}</p>`
       : '';
 
+    const complemento = (_el.inputComplementoCabecalho?.value || '').trim();
+    const tituloVistoria = complemento
+      ? `Relatório Fotográfico - ${complemento}`
+      : 'RELATÓRIO FOTOGRÁFICO DE VISTORIA';
+
     _el.areaRelatorio.style.fontFamily = opt.fonte;
     _el.areaRelatorio.style.fontSize = `${opt.tamanhoFonte}pt`;
     _el.cabecalhoRelatorioDiv.innerHTML = `
@@ -160,7 +165,7 @@ const ReportGenerator = (() => {
         <div class="espacador-logo"></div>
         <div class="titulos-cabecalho">
           <div class="titulo-companhia">COMPANHIA DE SANEAMENTO BÁSICO DO ESTADO DE SÃO PAULO</div>
-          <h2 class="titulo-vistoria">RELATÓRIO FOTOGRÁFICO DE VISTORIA</h2>
+          <h2 class="titulo-vistoria">${esc(tituloVistoria)}</h2>
         </div>
         <img src="sabesp-logo.png" alt="Logo" class="logo-relatorio-direito">
       </div>

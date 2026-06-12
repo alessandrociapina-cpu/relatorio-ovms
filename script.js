@@ -11,6 +11,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const elements = {
     // Form
     formVistoria: document.getElementById('form-vistoria'),
+    inputComplementoCabecalho: document.getElementById('complementoCabecalho'),
     inputLocalVistoria: document.getElementById('localVistoria'),
     inputDataVistoria: document.getElementById('dataVistoria'),
     inputHoraVistoria: document.getElementById('horaVistoria'),

@@ -29,7 +29,7 @@
       crossorigin="anonymous"
     ></script>
 
-    <link rel="stylesheet" href="style.css?v=55" />
+    <link rel="stylesheet" href="style.css?v=56" />
   </head>
   <body>
     <main class="container">
@@ -47,7 +47,7 @@
           margin-bottom: 20px;
         "
       >
-        Versão 55 | Última atualização: 28/05/2026
+        Versão 56 | Última atualização: 28/05/2026
         <span class="info-tooltip-container" tabindex="0">
           <span class="info-icon">ℹ️</span>
           <span
@@ -55,10 +55,11 @@
             style="width: 320px; max-height: 350px; overflow-y: auto; text-align: left"
           >
             <b>Últimas Atualizações:</b><br /><br />
-            <b>v55 (Atual):</b> Correção layout "1 coluna": páginas em branco eliminadas —
-            max-height reduzido para 165mm (cabia menos que a área útil da página, o que fazia o
-            Chrome renderizar caixas vazias). Cada foto 2+ inicia em nova página (page-break-before:
-            always).<br /><br />
+            <b>v56 (Atual):</b> Novo campo "Complementação de Cabeçalho (opcional)": se preenchido,
+            substitui o título do PDF por "Relatório Fotográfico - [texto]"; se vazio, mantém
+            "RELATÓRIO FOTOGRÁFICO DE VISTORIA".<br /><br />
+            <b>v55:</b> Correção layout "1 coluna": páginas em branco eliminadas — max-height
+            reduzido para 165mm. Cada foto 2+ inicia em nova página.<br /><br />
             <b>v54:</b> Correção: logo aparece em todas as fotos (logo pré-carregado como data URL
             antes de processar o lote). Barras pretas eliminadas no modo 4pp.<br /><br />
             <b>v53:</b> Marca d'água gravada diretamente no canvas (canvas burn). Fundo branco com
@@ -170,6 +171,17 @@
       <section class="secao-entrada" aria-labelledby="titulo-secao-1">
         <h2 id="titulo-secao-1">1. Informações da Vistoria</h2>
         <form id="form-vistoria">
+          <div class="campo-simples">
+            <label for="complementoCabecalho">Complementação de Cabeçalho (opcional):</label>
+            <input
+              type="text"
+              id="complementoCabecalho"
+              name="complementoCabecalho"
+              maxlength="150"
+              placeholder="Ex: Contrato n°2345/2026, ou Contrato Global"
+            />
+          </div>
+
           <div class="campo-simples">
             <label for="localVistoria">Local da Vistoria:</label>
             <input type="text" id="localVistoria" name="localVistoria" required maxlength="200" />
@@ -993,13 +1005,13 @@
       </div>
     </div>
 
-    <script src="utils.js?v=55"></script>
-    <script src="domUtils.js?v=55"></script>
-    <script src="modules/storage.js?v=55"></script>
-    <script src="modules/gps.js?v=55"></script>
-    <script src="formHandler.js?v=55"></script>
-    <script src="galleryManager.js?v=55"></script>
-    <script src="reportGenerator.js?v=55"></script>
-    <script src="script.js?v=55"></script>
+    <script src="utils.js?v=56"></script>
+    <script src="domUtils.js?v=56"></script>
+    <script src="modules/storage.js?v=56"></script>
+    <script src="modules/gps.js?v=56"></script>
+    <script src="formHandler.js?v=56"></script>
+    <script src="galleryManager.js?v=56"></script>
+    <script src="reportGenerator.js?v=56"></script>
+    <script src="script.js?v=56"></script>
   </body>
 </html>

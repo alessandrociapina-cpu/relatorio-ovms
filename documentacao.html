@@ -245,12 +245,20 @@
           substituindo o <code>outline: none</code> que prejudicava a navegação por teclado.
         </li>
         <li>
-          <strong>v55 (Atual):</strong> Correção do layout "1 coluna" (1 foto por página): (1)
-          Páginas em branco e legenda separada da foto eliminadas — <code>max-height</code> reduzido
-          de 230mm para 165mm, garantindo que cada item caiba inteiramente na área útil de página
-          (~197mm) para que <code>page-break-inside: avoid</code> funcione corretamente sem
-          renderizar caixas vazias. (2) Cada foto a partir da segunda inicia obrigatoriamente em
-          nova página (<code>break-before: page</code>). <strong>209 testes em 8 suites.</strong>
+          <strong>v56 (Atual):</strong> Novo campo "Complementação de Cabeçalho (opcional)" na seção
+          1 do formulário: se preenchido, o título do PDF passa a ser
+          <em>"Relatório Fotográfico – [texto inserido]"</em>; se vazio, mantém o padrão
+          <em>"RELATÓRIO FOTOGRÁFICO DE VISTORIA"</em>. Campo salvo no auto-save e exportado no
+          projeto JSON. <strong>209 testes em 8 suites.</strong>
+        </li>
+        <li>
+          <strong>v55:</strong> Correção do layout "1 coluna" (1 foto por página): (1) Páginas em
+          branco e legenda separada da foto eliminadas — <code>max-height</code> reduzido de 230mm
+          para 165mm, garantindo que cada item caiba inteiramente na área útil de página (~197mm)
+          para que <code>page-break-inside: avoid</code> funcione corretamente sem renderizar caixas
+          vazias. (2) Cada foto a partir da segunda inicia obrigatoriamente em nova página (<code
+            >break-before: page</code
+          >). <strong>209 testes em 8 suites.</strong>
         </li>
         <li>
           <strong>v54:</strong> (1) Correção definitiva das barras pretas no modo "4 por página":

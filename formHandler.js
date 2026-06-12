@@ -187,6 +187,7 @@ const FormHandler = (() => {
         ?.value || 'nenhuma';
     return {
       form: {
+        complementoCabecalho: _el.inputComplementoCabecalho?.value || '',
         local: _el.inputLocalVistoria.value,
         data: _el.inputDataVistoria.value,
         hora: _el.inputHoraVistoria.value,
@@ -213,6 +214,8 @@ const FormHandler = (() => {
 
   function carregarEstado(estado) {
     if (estado.form) {
+      if (_el.inputComplementoCabecalho)
+        _el.inputComplementoCabecalho.value = estado.form.complementoCabecalho || '';
       _el.inputLocalVistoria.value = estado.form.local || '';
       _el.inputDataVistoria.value = estado.form.data || '';
       _el.inputHoraVistoria.value = estado.form.hora || '';

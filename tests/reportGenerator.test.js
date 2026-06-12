@@ -122,6 +122,7 @@ function criarElementos() {
     inputCargoOutros2: addInput(),
     inputNomeFiscal: addInput('inputNomeFiscal'),
     inputNomeFiscal2: addInput('inputNomeFiscal2'),
+    inputComplementoCabecalho: addInput(),
     inputLocalVistoria: addInput('inputLocalVistoria'),
     inputDataVistoria: addInput('inputDataVistoria'),
     inputHoraVistoria: addInput('inputHoraVistoria'),

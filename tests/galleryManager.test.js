@@ -60,6 +60,7 @@ function criarElementos() {
   return {
     galeriaPreview,
     inputSelecionarFotos: add('input', 'inputSelecionarFotos'),
+    inputSelecionarFotosArquivos: add('input', 'inputSelecionarFotosArquivos'),
     checkboxMarca,
     divOpcoesMarca: add('div', 'divOpcoesMarca'),
     selectPosicaoMarca: add('select', 'selectPosicaoMarca'),

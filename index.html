@@ -29,7 +29,7 @@
       crossorigin="anonymous"
     ></script>
 
-    <link rel="stylesheet" href="style.css?v=56" />
+    <link rel="stylesheet" href="style.css?v=57" />
   </head>
   <body>
     <main class="container">
@@ -47,7 +47,7 @@
           margin-bottom: 20px;
         "
       >
-        Versão 56 | Última atualização: 12/06/2026
+        Versão 57 | Última atualização: 01/07/2026
         <span class="info-tooltip-container" tabindex="0">
           <span class="info-icon">ℹ️</span>
           <span
@@ -615,7 +615,22 @@
         <h2 id="titulo-secao-2">2. Seleção de Fotos e Legendas</h2>
         <div style="display: flex; gap: 10px; margin-bottom: 15px; flex-wrap: wrap">
           <input type="file" id="selecionarFotos" accept="image/*" multiple style="display: none" />
-          <label for="selecionarFotos" class="botao-upload">Selecionar Fotos</label>
+          <label for="selecionarFotos" class="botao-upload">📷 Galeria / Câmera</label>
+
+          <input
+            type="file"
+            id="selecionarFotosArquivos"
+            accept="image/jpeg,image/jpg,image/png,image/webp,image/heic,image/heif"
+            multiple
+            style="display: none"
+          />
+          <label
+            for="selecionarFotosArquivos"
+            class="botao-secundario"
+            style="background-color: #28a745; color: white"
+            title="Abre o gerenciador de arquivos — preserva metadados EXIF e GPS"
+            >📁 Gerenciador de Arquivos</label
+          >
 
           <input type="file" id="selecionarVideo" accept="video/*" style="display: none" />
           <label
@@ -641,7 +656,13 @@
           <strong>💡 Dica de Captura:</strong> Para otimizar o espaço na folha A4 e evitar "buracos"
           no relatório, configure a câmera do seu aparelho celular para a
           <strong>proporção 4:3</strong> e dê preferência a tirar fotos com o
-          <strong>celular deitado (modo paisagem)</strong>.
+          <strong>celular deitado (modo paisagem)</strong>.<br /><br />
+          <strong>📍 Metadados GPS/EXIF:</strong> Use o botão
+          <strong>📁 Gerenciador de Arquivos</strong> para selecionar fotos diretamente pelo
+          gerenciador do celular (ex.: <em>Files by Google</em> / <em>Meus Arquivos</em>). Isso
+          preserva a data, hora e localização GPS das fotos. O botão
+          <strong>📷 Galeria / Câmera</strong> usa o seletor padrão do Android, que pode remover
+          esses metadados.
         </div>
 
         <div id="galeria-fotos-legenda" class="galeria-preview"></div>
@@ -1005,13 +1026,13 @@
       </div>
     </div>
 
-    <script src="utils.js?v=56"></script>
-    <script src="domUtils.js?v=56"></script>
-    <script src="modules/storage.js?v=56"></script>
-    <script src="modules/gps.js?v=56"></script>
-    <script src="formHandler.js?v=56"></script>
-    <script src="galleryManager.js?v=56"></script>
-    <script src="reportGenerator.js?v=56"></script>
-    <script src="script.js?v=56"></script>
+    <script src="utils.js?v=57"></script>
+    <script src="domUtils.js?v=57"></script>
+    <script src="modules/storage.js?v=57"></script>
+    <script src="modules/gps.js?v=57"></script>
+    <script src="formHandler.js?v=57"></script>
+    <script src="galleryManager.js?v=57"></script>
+    <script src="reportGenerator.js?v=57"></script>
+    <script src="script.js?v=57"></script>
   </body>
 </html>

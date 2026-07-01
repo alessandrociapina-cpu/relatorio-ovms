@@ -119,7 +119,7 @@ const GalleryManager = (() => {
 
     await Promise.all(sortedFiles.map((file, index) => processarFoto(file, index)));
     _st.fotos = [..._st.fotos, ...novasFotos.filter((f) => f !== null)];
-    _el.inputSelecionarFotos.value = '';
+    event.target.value = '';
     renderizarGaleria();
     _cb.salvarRascunhoLocal();
   }
@@ -527,6 +527,9 @@ const GalleryManager = (() => {
 
   function _bindEvents() {
     _el.inputSelecionarFotos.addEventListener('change', handleFotosSelecionadas);
+    if (_el.inputSelecionarFotosArquivos) {
+      _el.inputSelecionarFotosArquivos.addEventListener('change', handleFotosSelecionadas);
+    }
 
     _el.checkboxMarca.addEventListener('change', (e) => {
       _el.divOpcoesMarca.style.display = e.target.checked ? 'flex' : 'none';

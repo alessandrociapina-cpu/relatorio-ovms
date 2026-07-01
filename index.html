@@ -617,13 +617,7 @@
           <input type="file" id="selecionarFotos" accept="image/*" multiple style="display: none" />
           <label for="selecionarFotos" class="botao-upload">📷 Galeria / Câmera</label>
 
-          <input
-            type="file"
-            id="selecionarFotosArquivos"
-            accept="image/jpeg,image/jpg,image/png,image/webp,image/heic,image/heif"
-            multiple
-            style="display: none"
-          />
+          <input type="file" id="selecionarFotosArquivos" multiple style="display: none" />
           <label
             for="selecionarFotosArquivos"
             class="botao-secundario"
@@ -659,10 +653,15 @@
           <strong>celular deitado (modo paisagem)</strong>.<br /><br />
           <strong>📍 Metadados GPS/EXIF:</strong> Use o botão
           <strong>📁 Gerenciador de Arquivos</strong> para selecionar fotos diretamente pelo
-          gerenciador do celular (ex.: <em>Files by Google</em> / <em>Meus Arquivos</em>). Isso
-          preserva a data, hora e localização GPS das fotos. O botão
-          <strong>📷 Galeria / Câmera</strong> usa o seletor padrão do Android, que pode remover
-          esses metadados.
+          gerenciador do celular (ex.: <em>Files by Google</em> / <em>Meus Arquivos</em>). Esse
+          botão abre o explorador de arquivos do sistema — navegue até a pasta de fotos da câmera
+          para preservar data, hora e localização GPS. O botão
+          <strong>📷 Galeria / Câmera</strong> usa a galeria padrão do Android, que remove esses
+          metadados automaticamente.
+          <em
+            >Nota: o explorador de arquivos exibe todos os tipos de arquivo, mas somente imagens
+            serão importadas.</em
+          >
         </div>
 
         <div id="galeria-fotos-legenda" class="galeria-preview"></div>

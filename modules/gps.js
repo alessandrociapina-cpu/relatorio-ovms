@@ -20,8 +20,7 @@ function lerMetadadosExif(file) {
     }
 
     if (typeof EXIF === 'undefined') {
-      const meta =
-        _dataDoArquivo(file) + '📍 GPS: Não disponível via navegador (use o botão abaixo)';
+      const meta = _dataDoArquivo(file) + '📍 GPS: Não encontrado na foto (use o botão abaixo)';
       resolve(meta.trim());
       return;
     }
@@ -49,13 +48,13 @@ function lerMetadadosExif(file) {
           if (calcLat !== 0 && calcLng !== 0 && !isNaN(calcLat) && !isNaN(calcLng)) {
             textoMeta += `📍 GPS: ${calcLat.toFixed(6)}, ${calcLng.toFixed(6)}`;
           } else {
-            textoMeta += `📍 GPS: Removido pelo sistema do aparelho celular`;
+            textoMeta += `📍 GPS: Removido pelo sistema (use o botão abaixo)`;
           }
         } catch (e) {
           textoMeta += `📍 GPS: Falha na leitura`;
         }
       } else {
-        textoMeta += `📍 GPS: Não disponível via navegador (use o botão abaixo)`;
+        textoMeta += `📍 GPS: Não encontrado na foto (use o botão abaixo)`;
       }
       resolve(textoMeta.trim());
     });

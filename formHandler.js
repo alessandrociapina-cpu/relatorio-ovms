@@ -214,8 +214,12 @@ const FormHandler = (() => {
 
   function carregarEstado(estado) {
     if (estado.form) {
-      if (_el.inputComplementoCabecalho)
+      if (_el.inputComplementoCabecalho) {
         _el.inputComplementoCabecalho.value = estado.form.complementoCabecalho || '';
+        const complementoCount = document.getElementById('complementoCount');
+        if (complementoCount)
+          complementoCount.textContent = `${_el.inputComplementoCabecalho.value.length}/60`;
+      }
       _el.inputLocalVistoria.value = estado.form.local || '';
       _el.inputDataVistoria.value = estado.form.data || '';
       _el.inputHoraVistoria.value = estado.form.hora || '';
@@ -325,6 +329,14 @@ const FormHandler = (() => {
   }
 
   function _bindEvents() {
+    const complementoCount = document.getElementById('complementoCount');
+    if (_el.inputComplementoCabecalho && complementoCount) {
+      const update = () =>
+        (complementoCount.textContent = `${_el.inputComplementoCabecalho.value.length}/60`);
+      _el.inputComplementoCabecalho.addEventListener('input', update);
+      update();
+    }
+
     vincularSelectOutros(_el.selectCargo, _el.inputCargoOutros);
     vincularSelectOutros(_el.selectDepartamento, _el.inputDepartamentoOutros);
     vincularSelectOutros(_el.selectCargo2, _el.inputCargoOutros2);

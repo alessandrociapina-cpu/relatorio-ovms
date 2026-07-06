@@ -29,7 +29,7 @@
       crossorigin="anonymous"
     ></script>
 
-    <link rel="stylesheet" href="style.css?v=57" />
+    <link rel="stylesheet" href="style.css?v=58" />
   </head>
   <body>
     <main class="container">
@@ -47,7 +47,7 @@
           margin-bottom: 20px;
         "
       >
-        Versão 57 | Última atualização: 01/07/2026
+        Versão 58 | Última atualização: 06/07/2026
         <span class="info-tooltip-container" tabindex="0">
           <span class="info-icon">ℹ️</span>
           <span
@@ -55,7 +55,13 @@
             style="width: 320px; max-height: 350px; overflow-y: auto; text-align: left"
           >
             <b>Últimas Atualizações:</b><br /><br />
-            <b>v56 (Atual):</b> Novo campo "Complementação de Cabeçalho (opcional)": se preenchido,
+            <b>v58 (Atual):</b> Correção: título do cabeçalho agora permite quebra de linha quando
+            "Complementação" é preenchida — elimina deformação do grid e do layout de fotos. Limite
+            do campo reduzido de 150 para 60 caracteres (contador visível). Mensagem GPS ajustada
+            para "Não encontrado na foto" (mais precisa que "via navegador").<br /><br />
+            <b>v57:</b> Botão 📁 Gerenciador de Arquivos preserva EXIF/GPS; galeria mantida para uso
+            convencional.<br /><br />
+            <b>v56:</b> Novo campo "Complementação de Cabeçalho (opcional)": se preenchido,
             substitui o título do PDF por "Relatório Fotográfico - [texto]"; se vazio, mantém
             "RELATÓRIO FOTOGRÁFICO DE VISTORIA".<br /><br />
             <b>v55:</b> Correção layout "1 coluna": páginas em branco eliminadas — max-height
@@ -172,12 +178,17 @@
         <h2 id="titulo-secao-1">1. Informações da Vistoria</h2>
         <form id="form-vistoria">
           <div class="campo-simples">
-            <label for="complementoCabecalho">Complementação de Cabeçalho (opcional):</label>
+            <label for="complementoCabecalho"
+              >Complementação de Cabeçalho (opcional):
+              <small id="complementoCount" style="color: #6c757d; font-weight: normal"
+                >0/60</small
+              ></label
+            >
             <input
               type="text"
               id="complementoCabecalho"
               name="complementoCabecalho"
-              maxlength="150"
+              maxlength="60"
               placeholder="Ex: Contrato n°2345/2026, ou Contrato Global"
             />
           </div>
@@ -1025,13 +1036,13 @@
       </div>
     </div>
 
-    <script src="utils.js?v=57"></script>
-    <script src="domUtils.js?v=57"></script>
-    <script src="modules/storage.js?v=57"></script>
-    <script src="modules/gps.js?v=57"></script>
-    <script src="formHandler.js?v=57"></script>
-    <script src="galleryManager.js?v=57"></script>
-    <script src="reportGenerator.js?v=57"></script>
-    <script src="script.js?v=57"></script>
+    <script src="utils.js?v=58"></script>
+    <script src="domUtils.js?v=58"></script>
+    <script src="modules/storage.js?v=58"></script>
+    <script src="modules/gps.js?v=58"></script>
+    <script src="formHandler.js?v=58"></script>
+    <script src="galleryManager.js?v=58"></script>
+    <script src="reportGenerator.js?v=58"></script>
+    <script src="script.js?v=58"></script>
   </body>
 </html>

@@ -924,9 +924,12 @@ hr {
   }
   body.preview-print .titulo-vistoria {
     font-size: 18pt;
-    white-space: nowrap;
+    white-space: normal;
+    overflow-wrap: break-word;
+    word-break: break-word;
     text-transform: uppercase;
     text-align: center;
+    line-height: 1.2;
   }
   body.preview-print .logo-relatorio-direito {
     max-width: 31mm;

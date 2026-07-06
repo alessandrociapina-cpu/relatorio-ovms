@@ -245,8 +245,17 @@
           substituindo o <code>outline: none</code> que prejudicava a navegação por teclado.
         </li>
         <li>
-          <strong>v57 (Atual):</strong> Novo botão <strong>📁 Gerenciador de Arquivos</strong> na
-          seção de seleção de fotos: abre o gerenciador de arquivos do dispositivo (ex.:
+          <strong>v58 (Atual):</strong> Correção de bug no cabeçalho: título do relatório com
+          "Complementação" longa agora quebra linha corretamente em vez de transbordar o grid e
+          deformar o layout das fotos (<code>white-space: normal</code> +
+          <code>overflow-wrap: break-word</code> no <code>.titulo-vistoria</code> em modo
+          impressão). Limite do campo reduzido de 150 para 60 caracteres com contador visível.
+          Mensagem GPS ajustada para "Não encontrado na foto".
+          <strong>209 testes em 8 suites.</strong>
+        </li>
+        <li>
+          <strong>v57:</strong> Novo botão <strong>📁 Gerenciador de Arquivos</strong> na seção de
+          seleção de fotos: abre o gerenciador de arquivos do dispositivo (ex.:
           <em>Files by Google</em>), preservando metadados EXIF e GPS das fotos — o seletor padrão
           de galeria do Android 13+ pode remover esses dados. Botão "Galeria / Câmera" mantido para
           seleção convencional. <strong>209 testes em 8 suites.</strong>

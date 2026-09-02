@@ -149,9 +149,9 @@ const ReportGenerator = (() => {
       month: '2-digit',
       year: 'numeric',
     });
-    const horaHtml = _el.inputHoraVistoria.value
-      ? `<p><strong>Hora:</strong> ${esc(_el.inputHoraVistoria.value)}</p>`
-      : '';
+    const horaRaw = _el.inputHoraVistoria.value;
+    const horaFormatada = horaRaw ? horaRaw.replace(/^(\d{2}):(\d{2})$/, '$1h$2m') : '';
+    const horaHtml = horaFormatada ? `<p><strong>Hora:</strong> ${esc(horaFormatada)}</p>` : '';
 
     const complemento = (_el.inputComplementoCabecalho?.value || '').trim();
     const tituloVistoria = complemento

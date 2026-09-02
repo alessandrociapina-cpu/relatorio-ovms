@@ -150,6 +150,7 @@ const GalleryManager = (() => {
 
       // Keyboard navigation: arrows to reorder, Delete to remove, Enter to edit
       itemPreviewDiv.addEventListener('keydown', (e) => {
+        if (e.target.tagName === 'TEXTAREA' || e.target.tagName === 'INPUT') return;
         if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') {
           e.preventDefault();
           if (idx > 0) {

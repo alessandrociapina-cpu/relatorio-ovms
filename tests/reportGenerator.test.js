@@ -203,7 +203,7 @@ describe('ReportGenerator.gerarRelatorio()', () => {
 
     await ReportGenerator.gerarRelatorio(false);
 
-    expect(el.cabecalhoRelatorioDiv.innerHTML).toContain('14:30');
+    expect(el.cabecalhoRelatorioDiv.innerHTML).toContain('14h30m');
   });
 
   test('chama redimensionarImagem para cada foto', async () => {

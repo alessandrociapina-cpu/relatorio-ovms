@@ -1,28 +1,26 @@
-const CACHE_NAME = 'ovms-app-v60';
+const CACHE_NAME = 'ovms-app-v61';
 
-const urlsToCache = [
+// Apenas recursos locais no cache de instalação — CDNs externos não bloqueiam o SW se falharem
+const localUrlsToCache = [
   './',
   './index.html',
   './documentacao.html',
-  './style.css?v=60',
-  './utils.js?v=60',
-  './domUtils.js?v=60',
-  './modules/storage.js?v=60',
-  './modules/gps.js?v=60',
-  './formHandler.js?v=60',
-  './galleryManager.js?v=60',
-  './reportGenerator.js?v=60',
-  './script.js?v=60',
+  './style.css?v=61',
+  './utils.js?v=61',
+  './domUtils.js?v=61',
+  './modules/storage.js?v=61',
+  './modules/gps.js?v=61',
+  './formHandler.js?v=61',
+  './galleryManager.js?v=61',
+  './reportGenerator.js?v=61',
+  './script.js?v=61',
   './manifest.json',
   './sabesp-logo.png',
-  'https://cdn.jsdelivr.net/npm/exif-js@2.3.0',
-  'https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.css',
-  'https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.js',
 ];
 
 self.addEventListener('install', (event) => {
   self.skipWaiting();
-  event.waitUntil(caches.open(CACHE_NAME).then((cache) => cache.addAll(urlsToCache)));
+  event.waitUntil(caches.open(CACHE_NAME).then((cache) => cache.addAll(localUrlsToCache)));
 });
 
 self.addEventListener('activate', (event) => {
@@ -44,10 +42,12 @@ self.addEventListener('fetch', (event) => {
   event.respondWith(
     fetch(event.request)
       .then((response) => {
-        const clone = response.clone();
-        caches.open(CACHE_NAME).then((cache) => {
-          cache.put(event.request, clone);
-        });
+        if (response && response.ok) {
+          const clone = response.clone();
+          caches.open(CACHE_NAME).then((cache) => {
+            cache.put(event.request, clone);
+          });
+        }
         return response;
       })
       .catch(() => {

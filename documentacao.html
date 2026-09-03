@@ -245,8 +245,18 @@
           substituindo o <code>outline: none</code> que prejudicava a navegação por teclado.
         </li>
         <li>
-          <strong>v60 (Atual):</strong> Correção de bug: teclas de seta e Delete não interferem mais
-          ao editar texto na caixa de legenda das fotos. Hora do relatório formatada como
+          <strong>v61 (Atual):</strong> Melhorias técnicas: builds reproduzíveis com
+          <code>package-lock.json</code> versionado e <code>npm ci</code> no CI; dependências do
+          Lighthouse fixadas como devDependencies; SW cache de instalação limitado a recursos locais
+          (CDNs externos não bloqueiam o install); fetch handler valida <code>response.ok</code>
+          antes de armazenar; importação de fotos agora sequencial para reduzir pico de memória;
+          <code>originalDataUrlImutavel</code> preserva o arquivo original mesmo após rotações; URL
+          do vídeo revogada ao fechar o modal.
+          <strong>209 testes em 8 suites.</strong>
+        </li>
+        <li>
+          <strong>v60:</strong> Correção de bug: teclas de seta e Delete não interferem mais ao
+          editar texto na caixa de legenda das fotos. Hora do relatório formatada como
           <code>XXhXXm</code> (ex: 08h32m).
           <strong>209 testes em 8 suites.</strong>
         </li>

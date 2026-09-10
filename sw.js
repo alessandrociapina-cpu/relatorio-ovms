@@ -1,19 +1,19 @@
-const CACHE_NAME = 'ovms-app-v61';
+const CACHE_NAME = 'ovms-app-v62';
 
 // Apenas recursos locais no cache de instalação — CDNs externos não bloqueiam o SW se falharem
 const localUrlsToCache = [
   './',
   './index.html',
   './documentacao.html',
-  './style.css?v=61',
-  './utils.js?v=61',
-  './domUtils.js?v=61',
-  './modules/storage.js?v=61',
-  './modules/gps.js?v=61',
-  './formHandler.js?v=61',
-  './galleryManager.js?v=61',
-  './reportGenerator.js?v=61',
-  './script.js?v=61',
+  './style.css?v=62',
+  './utils.js?v=62',
+  './domUtils.js?v=62',
+  './modules/storage.js?v=62',
+  './modules/gps.js?v=62',
+  './formHandler.js?v=62',
+  './galleryManager.js?v=62',
+  './reportGenerator.js?v=62',
+  './script.js?v=62',
   './manifest.json',
   './sabesp-logo.png',
 ];

@@ -303,8 +303,8 @@ const ReportGenerator = (() => {
     } else {
       rodapeDiv.innerHTML = `Companhia de Saneamento Básico do Estado de São Paulo – Sabesp<br>
       <span contenteditable="true" style="display:inline-block; outline:none;">Divisão de Manutenção e Serviços Operacionais de São José dos Campos - OVMS</span><br>
-      <span contenteditable="true" style="display: inline-block; outline: none; min-width: 100%;">Rua Euclides Miragaia, 126, Centro - CEP 12.245-820 - São José dos Campos - SP</span><br>
-      <span>www.sabesp.com.br</span>`;
+      <span contenteditable="true" style="display: inline-block; outline: none; min-width: 100%;">Av. Heitor Villa Lobos, 1229 - Vila Ema - CEP 12243-260 - São José dos Campos - SP</span><br>
+      <span>Tel. 55(12)3904-3202 &nbsp;|&nbsp; www.sabesp.com.br</span>`;
     }
   }
 

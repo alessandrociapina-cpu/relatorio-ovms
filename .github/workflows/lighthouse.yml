@@ -20,17 +20,14 @@ jobs:
           node-version: 20
 
       - name: Install dependencies
-        run: npm install
-
-      - name: Install serve and LHCI
-        run: npm install -g serve @lhci/cli
+        run: npm ci
 
       - name: Start local server
-        run: serve -l 8080 . &
+        run: npx serve -l 8080 . &
         shell: bash
 
       - name: Wait for server
         run: npx wait-on http://localhost:8080 --timeout 15000
 
       - name: Run Lighthouse CI
-        run: lhci autorun
+        run: npx lhci autorun

@@ -105,6 +105,7 @@ const GalleryManager = (() => {
           id: `foto-${Date.now()}-${index}`,
           fileName: file.name,
           originalDataUrl,
+          originalDataUrlImutavel: originalDataUrl,
           previewDataUrl: resizedPreview,
           editedPreviewDataUrl: null,
           textoLegenda: '',
@@ -117,7 +118,9 @@ const GalleryManager = (() => {
       }
     }
 
-    await Promise.all(sortedFiles.map((file, index) => processarFoto(file, index)));
+    for (let i = 0; i < sortedFiles.length; i++) {
+      await processarFoto(sortedFiles[i], i);
+    }
     _st.fotos = [..._st.fotos, ...novasFotos.filter((f) => f !== null)];
     event.target.value = '';
     renderizarGaleria();
@@ -642,6 +645,9 @@ const GalleryManager = (() => {
       const file = e.target.files[0];
       if (!file) return;
       _videoFileName = file.name;
+      if (_el.videoPlayer.src && _el.videoPlayer.src.startsWith('blob:')) {
+        URL.revokeObjectURL(_el.videoPlayer.src);
+      }
       _el.videoPlayer.src = URL.createObjectURL(file);
       _el.videoPlayer.onloadedmetadata = () => {
         _el.videoSlider.max = _el.videoPlayer.duration;
@@ -681,6 +687,7 @@ const GalleryManager = (() => {
         id: `foto-${Date.now()}`,
         fileName: `Frame de ${_videoFileName}`,
         originalDataUrl,
+        originalDataUrlImutavel: originalDataUrl,
         previewDataUrl: await redimensionarImagem(originalDataUrl, 1024, 0.7),
         editedPreviewDataUrl: null,
         textoLegenda: `Extraído do vídeo: ${_videoFileName}`,
@@ -698,6 +705,9 @@ const GalleryManager = (() => {
       e.preventDefault();
       _el.modalVideo.classList.add('modal-oculto');
       _el.videoPlayer.pause();
+      if (_el.videoPlayer.src && _el.videoPlayer.src.startsWith('blob:')) {
+        URL.revokeObjectURL(_el.videoPlayer.src);
+      }
       _el.videoPlayer.src = '';
     });
   }

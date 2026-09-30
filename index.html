@@ -29,7 +29,7 @@
       crossorigin="anonymous"
     ></script>
 
-    <link rel="stylesheet" href="style.css?v=62" />
+    <link rel="stylesheet" href="style.css?v=63" />
   </head>
   <body>
     <main class="container">
@@ -47,7 +47,7 @@
           margin-bottom: 20px;
         "
       >
-        Versão 62 | Última atualização: 10/09/2026
+        Versão 63 | Última atualização: 30/09/2026
         <span class="info-tooltip-container" tabindex="0">
           <span class="info-icon">ℹ️</span>
           <span
@@ -55,8 +55,13 @@
             style="width: 320px; max-height: 350px; overflow-y: auto; text-align: left"
           >
             <b>Últimas Atualizações:</b><br /><br />
-            <b>v62 (Atual):</b> Endereço do rodapé atualizado para Av. Heitor Villa Lobos, 1229 -
-            Vila Ema - CEP 12243-260 - SJC. Telefone 55(12)3904-3202 adicionado.<br /><br />
+            <b>v63 (Atual):</b> Caixa de seleção em cada foto: marque várias e mova-as juntas
+            (Subir, Descer, Início, Fim) ou exclua em lote. "Exibir Data, Hora e GPS" agora vem
+            desmarcado. Novo botão 📸 Tirar Foto com GPS (celular): registra a localização do
+            aparelho no momento da foto, já que o Android apaga o GPS das fotos da galeria. Excluir
+            foto pede confirmação.<br /><br />
+            <b>v62:</b> Endereço do rodapé atualizado para Av. Heitor Villa Lobos, 1229 - Vila Ema -
+            CEP 12243-260 - SJC. Telefone 55(12)3904-3202 adicionado.<br /><br />
             <b>v61:</b> Melhorias técnicas: builds reproduzíveis (package-lock.json); npm ci no CI;
             dependências do Lighthouse fixadas; SW cache restrito a recursos locais; importação de
             fotos sequencial (menor pico de memória); original da foto preservado em campo imutável;
@@ -593,8 +598,8 @@
             <legend>Metadados e Segurança</legend>
             <div class="grupo-opcao">
               <label
-                ><input type="checkbox" id="usarMetadados" checked /> Exibir Data, Hora e
-                Coordenadas GPS nas fotos</label
+                ><input type="checkbox" id="usarMetadados" /> Exibir Data, Hora e Coordenadas GPS
+                nas fotos</label
               >
             </div>
             <div
@@ -609,21 +614,27 @@
                 border-radius: 4px;
               "
             >
-              <strong>⚠️ AVISO DE METADADOS E PERDA DE GPS:</strong>
+              <strong>⚠️ COMO OBTER A LOCALIZAÇÃO (GPS) DAS FOTOS:</strong>
               <ul style="margin: 8px 0 0 20px; padding: 0">
                 <li style="margin-bottom: 5px">
-                  Aplicativos como <strong>WhatsApp</strong> apagam automaticamente os dados de
-                  localização (GPS) das fotos por segurança.
+                  <strong>No celular (Android):</strong> por privacidade, o sistema apaga o GPS de
+                  toda foto escolhida na galeria ou nos arquivos — isso não pode ser contornado pelo
+                  navegador. A data e a hora da foto continuam disponíveis.
                 </li>
                 <li style="margin-bottom: 5px">
-                  <strong>Uso em Computador (Desktop):</strong> Prefira transferir as fotografias do
-                  aparelho celular para o PC via <strong>Cabo USB</strong> ou em anexo original por
-                  <strong>E-mail</strong>.
+                  <strong>Solução em campo:</strong> use o botão
+                  <strong>"📸 Tirar Foto com GPS"</strong> (seção 2). A foto é tirada pelo app e
+                  recebe a localização atual do celular, identificada no relatório como
+                  <em>(celular, ±precisão)</em>.
+                </li>
+                <li style="margin-bottom: 5px">
+                  <strong>Foto já existente:</strong> se você ainda estiver no local, use
+                  <strong>"📍 Atualizar GPS pelo Celular"</strong> abaixo da foto.
                 </li>
                 <li>
-                  <strong>Uso no Campo (Celular):</strong> Caso a foto fique sem GPS, basta clicar
-                  no botão <strong>"📍 Atualizar GPS pelo Celular"</strong>, logo abaixo da foto
-                  inserida.
+                  <strong>No computador:</strong> fotos copiadas por <strong>cabo USB</strong> ou
+                  recebidas como anexo original por <strong>e-mail</strong> mantêm o GPS. WhatsApp
+                  sempre remove a localização.
                 </li>
               </ul>
             </div>
@@ -635,15 +646,21 @@
         <h2 id="titulo-secao-2">2. Seleção de Fotos e Legendas</h2>
         <div style="display: flex; gap: 10px; margin-bottom: 15px; flex-wrap: wrap">
           <input type="file" id="selecionarFotos" accept="image/*" multiple style="display: none" />
-          <label for="selecionarFotos" class="botao-upload">📷 Galeria / Câmera</label>
+          <label for="selecionarFotos" class="botao-upload">🖼️ Galeria / Arquivos</label>
 
-          <input type="file" id="selecionarFotosArquivos" multiple style="display: none" />
+          <input
+            type="file"
+            id="capturarFoto"
+            accept="image/*"
+            capture="environment"
+            style="display: none"
+          />
           <label
-            for="selecionarFotosArquivos"
-            class="botao-secundario"
+            for="capturarFoto"
+            class="botao-secundario so-celular"
             style="background-color: #28a745; color: white"
-            title="Abre o gerenciador de arquivos — preserva metadados EXIF e GPS"
-            >📁 Gerenciador de Arquivos</label
+            title="Abre a câmera e registra a localização atual do celular na foto"
+            >📸 Tirar Foto com GPS</label
           >
 
           <input type="file" id="selecionarVideo" accept="video/*" style="display: none" />
@@ -671,17 +688,10 @@
           no relatório, configure a câmera do seu aparelho celular para a
           <strong>proporção 4:3</strong> e dê preferência a tirar fotos com o
           <strong>celular deitado (modo paisagem)</strong>.<br /><br />
-          <strong>📍 Metadados GPS/EXIF:</strong> Use o botão
-          <strong>📁 Gerenciador de Arquivos</strong> para selecionar fotos diretamente pelo
-          gerenciador do celular (ex.: <em>Files by Google</em> / <em>Meus Arquivos</em>). Esse
-          botão abre o explorador de arquivos do sistema — navegue até a pasta de fotos da câmera
-          para preservar data, hora e localização GPS. O botão
-          <strong>📷 Galeria / Câmera</strong> usa a galeria padrão do Android, que remove esses
-          metadados automaticamente.
-          <em
-            >Nota: o explorador de arquivos exibe todos os tipos de arquivo, mas somente imagens
-            serão importadas.</em
-          >
+          <strong>📍 GPS nas fotos:</strong> no celular, use
+          <strong>📸 Tirar Foto com GPS</strong> — o Android remove a localização das fotos
+          escolhidas pela galeria. <strong>🔀 Reordenar:</strong> marque a caixa <em>Foto N</em> de
+          uma ou mais fotos e use os botões da barra acima da galeria para movê-las juntas.
         </div>
 
         <div id="galeria-fotos-legenda" class="galeria-preview"></div>
@@ -1045,13 +1055,13 @@
       </div>
     </div>
 
-    <script src="utils.js?v=62"></script>
-    <script src="domUtils.js?v=62"></script>
-    <script src="modules/storage.js?v=62"></script>
-    <script src="modules/gps.js?v=62"></script>
-    <script src="formHandler.js?v=62"></script>
-    <script src="galleryManager.js?v=62"></script>
-    <script src="reportGenerator.js?v=62"></script>
-    <script src="script.js?v=62"></script>
+    <script src="utils.js?v=63"></script>
+    <script src="domUtils.js?v=63"></script>
+    <script src="modules/storage.js?v=63"></script>
+    <script src="modules/gps.js?v=63"></script>
+    <script src="formHandler.js?v=63"></script>
+    <script src="galleryManager.js?v=63"></script>
+    <script src="reportGenerator.js?v=63"></script>
+    <script src="script.js?v=63"></script>
   </body>
 </html>

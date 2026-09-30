@@ -1,4 +1,5 @@
-/* global mostrarAlerta, confirmar, lerMetadadosExif */
+/* global mostrarAlerta, confirmar, lerMetadadosExif, temGps, foiCapturadaAgora,
+   obterPosicaoAparelho, formatarGpsAparelho, substituirGps, limparMetaLegado */
 'use strict';
 
 const GalleryManager = (() => {
@@ -25,6 +26,13 @@ const GalleryManager = (() => {
   // Debounce + focus state
   let _renderTimeout = null;
   let _focusedIndex = null;
+
+  // Seleção múltipla (por referência do objeto, sobrevive à reordenação; não é persistida)
+  const _selecionadas = new Set();
+  let _focoAcaoLote = null;
+
+  // Posição do celular solicitada ao abrir a câmera, para já estar pronta quando a foto voltar
+  let _posicaoCaptura = null;
 
   function init(state, elements, callbacks) {
     _st = state;
@@ -79,9 +87,10 @@ const GalleryManager = (() => {
     img.src = foto.originalDataUrl;
   }
 
-  async function handleFotosSelecionadas(event) {
+  async function handleFotosSelecionadas(event, capturaCamera = false) {
     const files = event.target.files;
     if (files.length === 0) return;
+    let avisarSemGps = false;
     _el.galeriaPreview.innerHTML = '<h4>Processando imagens... Por favor, aguarde.</h4>';
     const sortedFiles = Array.from(files).sort((a, b) =>
       a.name.localeCompare(b.name, undefined, { numeric: true })
@@ -93,7 +102,14 @@ const GalleryManager = (() => {
         novasFotos[index] = null;
         return;
       }
-      const metadadosExtraidos = await lerMetadadosExif(file);
+      let metadadosExtraidos = await lerMetadadosExif(file);
+      // Galeria/arquivos no Android chegam com o GPS zerado pelo sistema; só uma foto
+      // tirada agora pode receber a posição atual do celular com segurança.
+      if (capturaCamera && !temGps(metadadosExtraidos) && foiCapturadaAgora(file)) {
+        const pos = await (_posicaoCaptura || obterPosicaoAparelho());
+        if (pos) metadadosExtraidos = substituirGps(metadadosExtraidos, formatarGpsAparelho(pos));
+        else avisarSemGps = true;
+      }
       const originalDataUrl = await new Promise((resolve) => {
         const reader = new FileReader();
         reader.onload = (e) => resolve(e.target.result);
@@ -123,8 +139,16 @@ const GalleryManager = (() => {
     }
     _st.fotos = [..._st.fotos, ...novasFotos.filter((f) => f !== null)];
     event.target.value = '';
+    _posicaoCaptura = null;
     renderizarGaleria();
     _cb.salvarRascunhoLocal();
+    if (avisarSemGps) {
+      mostrarAlerta(
+        'Não foi possível obter a localização do celular. Ative o GPS e permita o acesso à ' +
+          'localização no navegador; depois use "📍 Atualizar GPS pelo Celular" na foto.',
+        'error'
+      );
+    }
   }
 
   // --- Gallery rendering (debounced) ---
@@ -144,9 +168,31 @@ const GalleryManager = (() => {
     const logoGlobalAtivo = _el.checkboxMarca.checked;
     const mostrarMetadados = _el.checkboxMetadados.checked;
 
+    for (const foto of _selecionadas) {
+      if (!_st.fotos.includes(foto)) _selecionadas.delete(foto);
+    }
+    _el.galeriaPreview.appendChild(_criarBarraSelecao());
+
     _st.fotos.forEach((fotoInfo, idx) => {
       const itemPreviewDiv = document.createElement('div');
       itemPreviewDiv.classList.add('foto-legenda-item-preview');
+      const selecionada = _selecionadas.has(fotoInfo);
+      itemPreviewDiv.classList.toggle('foto-selecionada', selecionada);
+
+      const selecaoLabel = document.createElement('label');
+      selecaoLabel.classList.add('selecao-foto');
+      const selecaoCheckbox = document.createElement('input');
+      selecaoCheckbox.type = 'checkbox';
+      selecaoCheckbox.checked = selecionada;
+      selecaoCheckbox.setAttribute('aria-label', `Selecionar foto ${idx + 1}`);
+      selecaoCheckbox.addEventListener('change', () => {
+        if (selecaoCheckbox.checked) _selecionadas.add(fotoInfo);
+        else _selecionadas.delete(fotoInfo);
+        itemPreviewDiv.classList.toggle('foto-selecionada', selecaoCheckbox.checked);
+        _atualizarBarraSelecao();
+      });
+      selecaoLabel.append(selecaoCheckbox, ` Foto ${idx + 1}`);
+      itemPreviewDiv.appendChild(selecaoLabel);
       itemPreviewDiv.setAttribute('tabindex', '0');
       itemPreviewDiv.setAttribute('role', 'article');
       itemPreviewDiv.setAttribute('aria-label', `Foto ${idx + 1}: ${fotoInfo.fileName}`);
@@ -268,43 +314,12 @@ const GalleryManager = (() => {
       };
 
       const btnRemover = criarBtn('✖ Excluir', 'Excluir esta foto', ['btn-remover']);
-      btnRemover.onclick = () => {
-        _st.fotos.splice(idx, 1);
+      btnRemover.onclick = async () => {
+        if (!(await confirmar('Deseja excluir esta foto?'))) return;
+        _st.fotos.splice(_st.fotos.indexOf(fotoInfo), 1);
+        _selecionadas.delete(fotoInfo);
         renderizarGaleria();
         _cb.salvarRascunhoLocal();
-      };
-
-      const btnGPSAtual = criarBtn(
-        '📍 Atualizar GPS pelo Celular',
-        'Usar GPS do dispositivo para atualizar localização',
-        ['btn-gps']
-      );
-      btnGPSAtual.title = 'Usa a antena GPS do aparelho celular para preencher a localização';
-      btnGPSAtual.onclick = async () => {
-        if (navigator.geolocation) {
-          btnGPSAtual.innerHTML = '⏳ Procurando...';
-          navigator.geolocation.getCurrentPosition(
-            (pos) => {
-              const nLat = pos.coords.latitude.toFixed(6);
-              const nLng = pos.coords.longitude.toFixed(6);
-              let metaAtual = fotoInfo.metadadosExif || '';
-              if (metaAtual.includes('📍')) metaAtual = metaAtual.split('📍')[0].trim();
-              fotoInfo.metadadosExif = metaAtual + `  📍 GPS: ${nLat}, ${nLng}`;
-              renderizarGaleria();
-              _cb.salvarRascunhoLocal();
-            },
-            () => {
-              mostrarAlerta(
-                'Por favor, ative a Localização (GPS) no seu celular e dê permissão ao navegador.',
-                'error'
-              );
-              btnGPSAtual.innerHTML = '📍 Atualizar GPS pelo Celular';
-            },
-            { enableHighAccuracy: true }
-          );
-        } else {
-          mostrarAlerta('GPS não suportado neste navegador.', 'error');
-        }
       };
 
       acoesDiv.append(
@@ -317,18 +332,49 @@ const GalleryManager = (() => {
         btnRestaurar,
         btnToggleLogo,
         btnToggleMeta,
-        btnRemover,
-        btnGPSAtual
+        btnRemover
       );
+
+      if (mostrarMetadados) {
+        const btnGPSAtual = criarBtn(
+          '📍 Atualizar GPS pelo Celular',
+          'Usar GPS do celular para registrar a localização desta foto',
+          ['btn-gps']
+        );
+        btnGPSAtual.title =
+          'Registra a posição atual do celular. Use somente se estiver no local onde a foto foi tirada.';
+        btnGPSAtual.onclick = async () => {
+          btnGPSAtual.disabled = true;
+          btnGPSAtual.textContent = '⏳ Procurando...';
+          const pos = await obterPosicaoAparelho();
+          if (pos) {
+            fotoInfo.metadadosExif = substituirGps(
+              fotoInfo.metadadosExif,
+              formatarGpsAparelho(pos)
+            );
+            renderizarGaleria();
+            _cb.salvarRascunhoLocal();
+          } else {
+            btnGPSAtual.disabled = false;
+            btnGPSAtual.textContent = '📍 Atualizar GPS pelo Celular';
+            mostrarAlerta(
+              'Por favor, ative a Localização (GPS) no seu celular e dê permissão ao navegador.',
+              'error'
+            );
+          }
+        };
+        acoesDiv.appendChild(btnGPSAtual);
+      }
 
       itemPreviewDiv.appendChild(imgElement);
 
-      if (fotoInfo.metadadosExif && mostrarMetadados && !fotoInfo.ocultarMetadados) {
+      const metaExibida = limparMetaLegado(fotoInfo.metadadosExif);
+      if (mostrarMetadados && !fotoInfo.ocultarMetadados) {
         const metaInfoPreview = document.createElement('div');
-        metaInfoPreview.style.fontSize = '0.75em';
-        metaInfoPreview.style.color = '#777';
-        metaInfoPreview.style.marginBottom = '5px';
-        metaInfoPreview.textContent = fotoInfo.metadadosExif;
+        metaInfoPreview.classList.add('meta-preview');
+        metaInfoPreview.textContent = temGps(metaExibida)
+          ? metaExibida
+          : `${metaExibida}  📍 Sem GPS na foto`.trim();
         itemPreviewDiv.appendChild(metaInfoPreview);
       }
       itemPreviewDiv.appendChild(legendaTextarea);
@@ -343,6 +389,14 @@ const GalleryManager = (() => {
       if (target) target.focus();
       _focusedIndex = null;
     }
+    if (_focoAcaoLote !== null) {
+      const barra = _el.galeriaPreview.querySelector('.barra-selecao');
+      const alvo =
+        barra.querySelector(`button[data-acao="${_focoAcaoLote}"]:not(:disabled)`) ||
+        barra.querySelector('button:not(:disabled)');
+      if (alvo) alvo.focus();
+      _focoAcaoLote = null;
+    }
   }
 
   function moverFoto(index, direcao) {
@@ -353,6 +407,119 @@ const GalleryManager = (() => {
     _st.fotos[novo] = temp;
     renderizarGaleria();
     _cb.salvarRascunhoLocal();
+  }
+
+  // --- Seleção múltipla ---
+
+  // Cada selecionada troca com a vizinha não selecionada; a ordem relativa entre elas é mantida
+  // e as que já estão encostadas no limite ficam paradas.
+  function moverSelecionadas(direcao) {
+    const f = _st.fotos;
+    const sel = (i) => _selecionadas.has(f[i]);
+    let mudou = false;
+    if (direcao < 0) {
+      for (let i = 1; i < f.length; i++) {
+        if (sel(i) && !sel(i - 1)) {
+          [f[i - 1], f[i]] = [f[i], f[i - 1]];
+          mudou = true;
+        }
+      }
+    } else {
+      for (let i = f.length - 2; i >= 0; i--) {
+        if (sel(i) && !sel(i + 1)) {
+          [f[i + 1], f[i]] = [f[i], f[i + 1]];
+          mudou = true;
+        }
+      }
+    }
+    if (mudou) {
+      renderizarGaleria();
+      _cb.salvarRascunhoLocal();
+    }
+  }
+
+  function moverSelecionadasParaExtremo(paraInicio) {
+    const marcadas = _st.fotos.filter((foto) => _selecionadas.has(foto));
+    const demais = _st.fotos.filter((foto) => !_selecionadas.has(foto));
+    _st.fotos.splice(
+      0,
+      _st.fotos.length,
+      ...(paraInicio ? marcadas : demais),
+      ...(paraInicio ? demais : marcadas)
+    );
+    renderizarGaleria();
+    _cb.salvarRascunhoLocal();
+  }
+
+  async function excluirSelecionadas() {
+    const n = _selecionadas.size;
+    if (!(await confirmar(`Deseja excluir ${n} foto(s) selecionada(s)?`))) return;
+    _st.fotos = _st.fotos.filter((foto) => !_selecionadas.has(foto));
+    _selecionadas.clear();
+    renderizarGaleria();
+    _cb.salvarRascunhoLocal();
+  }
+
+  function _criarBarraSelecao() {
+    const barra = document.createElement('div');
+    barra.classList.add('barra-selecao');
+    barra.setAttribute('role', 'group');
+    barra.setAttribute('aria-label', 'Ações para as fotos selecionadas');
+
+    const contador = document.createElement('span');
+    contador.classList.add('contador-selecao');
+    contador.setAttribute('aria-live', 'polite');
+
+    function btn(acao, texto, ariaLabel, onClick, classes = []) {
+      const b = document.createElement('button');
+      b.type = 'button';
+      b.textContent = texto;
+      b.dataset.acao = acao;
+      b.setAttribute('aria-label', ariaLabel);
+      b.classList.add('btn-acao-foto', ...classes);
+      b.addEventListener('click', () => {
+        _focoAcaoLote = acao;
+        onClick();
+      });
+      return b;
+    }
+
+    barra.append(
+      contador,
+      btn('todas', '☑ Todas', 'Selecionar todas as fotos', () => {
+        _st.fotos.forEach((foto) => _selecionadas.add(foto));
+        renderizarGaleria();
+      }),
+      btn('limpar', '☐ Desmarcar', 'Desmarcar todas as fotos', () => {
+        _selecionadas.clear();
+        renderizarGaleria();
+      }),
+      btn('inicio', '⏫ Início', 'Mover selecionadas para o início', () =>
+        moverSelecionadasParaExtremo(true)
+      ),
+      btn('subir', '▲ Subir', 'Subir fotos selecionadas', () => moverSelecionadas(-1)),
+      btn('descer', '▼ Descer', 'Descer fotos selecionadas', () => moverSelecionadas(1)),
+      btn('fim', '⏬ Fim', 'Mover selecionadas para o fim', () =>
+        moverSelecionadasParaExtremo(false)
+      ),
+      btn('excluir', '✖ Excluir', 'Excluir fotos selecionadas', excluirSelecionadas, [
+        'btn-remover',
+      ])
+    );
+    _atualizarBarraSelecao(barra);
+    return barra;
+  }
+
+  function _atualizarBarraSelecao(barra = _el.galeriaPreview.querySelector('.barra-selecao')) {
+    if (!barra) return;
+    const n = _selecionadas.size;
+    const total = _st.fotos.length;
+    barra.querySelector('.contador-selecao').textContent =
+      n === 0 ? 'Marque as fotos para movê-las juntas' : `${n} de ${total} selecionada(s)`;
+    barra.querySelectorAll('button').forEach((b) => {
+      if (b.dataset.acao === 'todas') b.disabled = n === total;
+      else b.disabled = n === 0;
+    });
   }
 
   // --- Crop ---
@@ -530,9 +697,12 @@ const GalleryManager = (() => {
   }
 
   function _bindEvents() {
-    _el.inputSelecionarFotos.addEventListener('change', handleFotosSelecionadas);
-    if (_el.inputSelecionarFotosArquivos) {
-      _el.inputSelecionarFotosArquivos.addEventListener('change', handleFotosSelecionadas);
+    _el.inputSelecionarFotos.addEventListener('change', (e) => handleFotosSelecionadas(e));
+    if (_el.inputCapturarFoto) {
+      _el.inputCapturarFoto.addEventListener('click', () => {
+        _posicaoCaptura = obterPosicaoAparelho();
+      });
+      _el.inputCapturarFoto.addEventListener('change', (e) => handleFotosSelecionadas(e, true));
     }
 
     _el.checkboxMarca.addEventListener('change', (e) => {

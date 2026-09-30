@@ -14,6 +14,7 @@ global.esc = (s) =>
 global.resolverDepartamento = jest.fn((select, outros) => outros || select);
 global.criarBlocoAssinatura = jest.fn((nome) => `<div class="bloco-assinatura">${nome}</div>`);
 global.mostrarAlerta = jest.fn(() => Promise.resolve());
+global.limparMetaLegado = require('../modules/gps').limparMetaLegado;
 Element.prototype.scrollIntoView = jest.fn();
 
 const { ReportGenerator } = require('../reportGenerator');
@@ -204,6 +205,39 @@ describe('ReportGenerator.gerarRelatorio()', () => {
     await ReportGenerator.gerarRelatorio(false);
 
     expect(el.cabecalhoRelatorioDiv.innerHTML).toContain('14h30m');
+  });
+
+  test('metadados só aparecem no relatório quando a opção está marcada', async () => {
+    el.inputLocalVistoria.value = 'Local';
+    el.inputDataVistoria.value = '2026-01-01';
+    st.fotos = [criarFoto({ metadadosExif: '🗓️ 01/01/2026 às 10:00  📍 GPS: -23.1, -45.8' })];
+
+    el.checkboxMetadados.checked = false;
+    await ReportGenerator.gerarRelatorio(false);
+    expect(el.corpoRelatorioDiv.querySelector('.metadados-foto')).toBeNull();
+
+    el.checkboxMetadados.checked = true;
+    await ReportGenerator.gerarRelatorio(false);
+    expect(el.corpoRelatorioDiv.querySelector('.metadados-foto').textContent).toContain(
+      '-23.1, -45.8'
+    );
+  });
+
+  test('aviso antigo de GPS salvo em projetos anteriores não vai para o relatório', async () => {
+    el.inputLocalVistoria.value = 'Local';
+    el.inputDataVistoria.value = '2026-01-01';
+    el.checkboxMetadados.checked = true;
+    st.fotos = [
+      criarFoto({
+        metadadosExif:
+          '🗓️ 01/01/2026 às 10:00  📍 GPS: Não encontrado na foto (use o botão abaixo)',
+      }),
+    ];
+
+    await ReportGenerator.gerarRelatorio(false);
+
+    const meta = el.corpoRelatorioDiv.querySelector('.metadados-foto').textContent;
+    expect(meta).toBe('🗓️ 01/01/2026 às 10:00');
   });
 
   test('chama redimensionarImagem para cada foto', async () => {

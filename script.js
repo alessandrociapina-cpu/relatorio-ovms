@@ -45,7 +45,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Gallery
     galeriaPreview: document.getElementById('galeria-fotos-legenda'),
     inputSelecionarFotos: document.getElementById('selecionarFotos'),
-    inputSelecionarFotosArquivos: document.getElementById('selecionarFotosArquivos'),
+    inputCapturarFoto: document.getElementById('capturarFoto'),
     checkboxMarca: document.getElementById('usarMarcaDagua'),
     divOpcoesMarca: document.getElementById('opcoesMarcaDagua'),
     selectPosicaoMarca: document.getElementById('posicaoMarcaDagua'),

@@ -6,7 +6,9 @@
 // Mock globals que galleryManager.js depende
 global.mostrarAlerta = jest.fn(() => Promise.resolve());
 global.confirmar = jest.fn(() => Promise.resolve(false));
+Object.assign(global, require('../modules/gps'));
 global.lerMetadadosExif = jest.fn(() => Promise.resolve(''));
+global.obterPosicaoAparelho = jest.fn(() => Promise.resolve(null));
 
 // Mock Canvas API (não disponível no jsdom)
 HTMLCanvasElement.prototype.getContext = jest.fn(() => ({
@@ -60,7 +62,7 @@ function criarElementos() {
   return {
     galeriaPreview,
     inputSelecionarFotos: add('input', 'inputSelecionarFotos'),
-    inputSelecionarFotosArquivos: add('input', 'inputSelecionarFotosArquivos'),
+    inputCapturarFoto: add('input', 'inputCapturarFoto'),
     checkboxMarca,
     divOpcoesMarca: add('div', 'divOpcoesMarca'),
     selectPosicaoMarca: add('select', 'selectPosicaoMarca'),
@@ -366,17 +368,31 @@ describe('Botões de ação na galeria', () => {
     );
   }
 
-  test('clique em excluir remove a foto correta', () => {
+  test('clique em excluir pede confirmação e remove a foto correta', async () => {
+    global.confirmar.mockResolvedValue(true);
     const f1 = criarFoto({ id: 'f1' });
     const f2 = criarFoto({ id: 'f2' });
     const items = renderEObterItems([f1, f2]);
 
     btnPor(items[0], 'Excluir esta foto').click();
+    await Promise.resolve();
     jest.runAllTimers();
 
+    expect(global.confirmar).toHaveBeenCalled();
     expect(st.fotos).toHaveLength(1);
     expect(st.fotos[0].id).toBe('f2');
     expect(cb.salvarRascunhoLocal).toHaveBeenCalled();
+  });
+
+  test('clique em excluir mantém a foto quando a confirmação é cancelada', async () => {
+    global.confirmar.mockResolvedValue(false);
+    const items = renderEObterItems([criarFoto({ id: 'f1' })]);
+
+    btnPor(items[0], 'Excluir esta foto').click();
+    await Promise.resolve();
+    jest.runAllTimers();
+
+    expect(st.fotos).toHaveLength(1);
   });
 
   test('clique em subir move a foto para cima', () => {
@@ -427,5 +443,231 @@ describe('Botões de ação na galeria', () => {
     buttons.forEach((btn) => {
       expect(btn.getAttribute('aria-label')).toBeTruthy();
     });
+  });
+});
+
+// ---------------------------------------------------------------------------
+describe('Seleção múltipla e movimentação em lote', () => {
+  let el, st, cb;
+
+  beforeEach(() => {
+    jest.useFakeTimers();
+    jest.clearAllMocks();
+    el = criarElementos();
+    st = { fotos: [], assinatura1: null, assinatura2: null };
+    cb = { salvarRascunhoLocal: jest.fn() };
+    GalleryManager.init(st, el, cb);
+  });
+
+  afterEach(() => jest.useRealTimers());
+
+  function render(fotos) {
+    if (fotos) st.fotos = fotos;
+    GalleryManager.renderizarGaleria();
+    jest.runAllTimers();
+  }
+
+  function marcar(...posicoes) {
+    posicoes.forEach((p) => {
+      const cb = el.galeriaPreview.querySelectorAll('.selecao-foto input')[p];
+      cb.checked = true;
+      cb.dispatchEvent(new Event('change'));
+    });
+  }
+
+  function acao(nome) {
+    el.galeriaPreview.querySelector(`.barra-selecao button[data-acao="${nome}"]`).click();
+    jest.runAllTimers();
+  }
+
+  const ids = () => st.fotos.map((f) => f.id).join(',');
+  const fotos = (...nomes) => nomes.map((id) => criarFoto({ id }));
+
+  test('cada foto tem caixa de seleção com aria-label', () => {
+    render(fotos('a', 'b'));
+    const caixas = el.galeriaPreview.querySelectorAll('.selecao-foto input[type="checkbox"]');
+    expect(caixas).toHaveLength(2);
+    expect(caixas[1].getAttribute('aria-label')).toBe('Selecionar foto 2');
+  });
+
+  test('barra de seleção não aparece sem fotos', () => {
+    render([]);
+    expect(el.galeriaPreview.querySelector('.barra-selecao')).toBeNull();
+  });
+
+  test('botões de lote ficam desabilitados sem seleção', () => {
+    render(fotos('a', 'b'));
+    const subir = el.galeriaPreview.querySelector('button[data-acao="subir"]');
+    const todas = el.galeriaPreview.querySelector('button[data-acao="todas"]');
+    expect(subir.disabled).toBe(true);
+    expect(todas.disabled).toBe(false);
+    marcar(1);
+    expect(subir.disabled).toBe(false);
+    expect(el.galeriaPreview.querySelector('.contador-selecao').textContent).toContain('1 de 2');
+  });
+
+  test('marcar a foto destaca o item', () => {
+    render(fotos('a', 'b'));
+    marcar(0);
+    const item = el.galeriaPreview.querySelectorAll('.foto-legenda-item-preview')[0];
+    expect(item.classList.contains('foto-selecionada')).toBe(true);
+  });
+
+  test('subir move um bloco de selecionadas mantendo a ordem entre elas', () => {
+    render(fotos('a', 'b', 'c', 'd'));
+    marcar(2, 3);
+    acao('subir');
+    expect(ids()).toBe('a,c,d,b');
+    expect(cb.salvarRascunhoLocal).toHaveBeenCalled();
+  });
+
+  test('subir com selecionadas não contíguas move cada uma uma posição', () => {
+    render(fotos('a', 'b', 'c', 'd', 'e'));
+    marcar(1, 3);
+    acao('subir');
+    expect(ids()).toBe('b,a,d,c,e');
+  });
+
+  test('descer move as selecionadas e para no fim da lista', () => {
+    render(fotos('a', 'b', 'c', 'd'));
+    marcar(0, 3);
+    acao('descer');
+    expect(ids()).toBe('b,a,c,d');
+  });
+
+  test('seleção acompanha as fotos após mover (subir duas vezes)', () => {
+    render(fotos('a', 'b', 'c'));
+    marcar(2);
+    acao('subir');
+    acao('subir');
+    expect(ids()).toBe('c,a,b');
+    const caixas = el.galeriaPreview.querySelectorAll('.selecao-foto input');
+    expect(caixas[0].checked).toBe(true);
+  });
+
+  test('início e fim levam as selecionadas para os extremos', () => {
+    render(fotos('a', 'b', 'c', 'd'));
+    marcar(1, 3);
+    acao('inicio');
+    expect(ids()).toBe('b,d,a,c');
+    acao('fim');
+    expect(ids()).toBe('a,c,b,d');
+  });
+
+  test('todas e limpar controlam a seleção', () => {
+    render(fotos('a', 'b', 'c'));
+    acao('todas');
+    let caixas = el.galeriaPreview.querySelectorAll('.selecao-foto input');
+    expect(Array.from(caixas).every((c) => c.checked)).toBe(true);
+    acao('limpar');
+    caixas = el.galeriaPreview.querySelectorAll('.selecao-foto input');
+    expect(Array.from(caixas).some((c) => c.checked)).toBe(false);
+  });
+
+  test('excluir selecionadas remove apenas as marcadas após confirmação', async () => {
+    global.confirmar.mockResolvedValue(true);
+    render(fotos('a', 'b', 'c'));
+    marcar(0, 2);
+    el.galeriaPreview.querySelector('button[data-acao="excluir"]').click();
+    await Promise.resolve();
+    jest.runAllTimers();
+    expect(ids()).toBe('b');
+  });
+
+  test('marcar a caixa não dispara a movimentação por teclado', () => {
+    render(fotos('a', 'b'));
+    const caixa = el.galeriaPreview.querySelectorAll('.selecao-foto input')[0];
+    caixa.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true }));
+    expect(ids()).toBe('a,b');
+  });
+});
+
+// ---------------------------------------------------------------------------
+describe('Metadados e GPS na galeria', () => {
+  let el, st, cb;
+
+  beforeEach(() => {
+    jest.useFakeTimers();
+    jest.clearAllMocks();
+    el = criarElementos();
+    st = { fotos: [], assinatura1: null, assinatura2: null };
+    cb = { salvarRascunhoLocal: jest.fn() };
+    GalleryManager.init(st, el, cb);
+  });
+
+  afterEach(() => jest.useRealTimers());
+
+  function render(fotos) {
+    st.fotos = fotos;
+    GalleryManager.renderizarGaleria();
+    jest.runAllTimers();
+  }
+
+  const btnGps = () =>
+    Array.from(el.galeriaPreview.querySelectorAll('button')).find((b) =>
+      b.classList.contains('btn-gps')
+    );
+
+  test('botão de GPS fica oculto quando a exibição de metadados está desligada', () => {
+    el.checkboxMetadados.checked = false;
+    render([criarFoto()]);
+    expect(btnGps()).toBeUndefined();
+  });
+
+  test('botão de GPS aparece quando a exibição de metadados está ligada', () => {
+    el.checkboxMetadados.checked = true;
+    render([criarFoto()]);
+    expect(btnGps()).toBeDefined();
+  });
+
+  test('prévia avisa quando a foto não tem GPS', () => {
+    el.checkboxMetadados.checked = true;
+    render([criarFoto({ metadadosExif: '🗓️ 01/09/2026 às 10:00' })]);
+    expect(el.galeriaPreview.querySelector('.meta-preview').textContent).toContain(
+      'Sem GPS na foto'
+    );
+  });
+
+  test('mensagem antiga "Não encontrado na foto" não é exibida', () => {
+    el.checkboxMetadados.checked = true;
+    render([
+      criarFoto({
+        metadadosExif:
+          '🗓️ 01/09/2026 às 10:00  📍 GPS: Não encontrado na foto (use o botão abaixo)',
+      }),
+    ]);
+    const texto = el.galeriaPreview.querySelector('.meta-preview').textContent;
+    expect(texto).not.toContain('Não encontrado');
+    expect(texto).toContain('01/09/2026');
+  });
+
+  test('atualizar GPS pelo celular grava coordenada com origem e mantém a data', async () => {
+    el.checkboxMetadados.checked = true;
+    global.obterPosicaoAparelho.mockResolvedValue({ lat: -23.2, lng: -45.9, precisao: 8.4 });
+    const foto = criarFoto({ metadadosExif: '🗓️ 01/09/2026 às 10:00' });
+    render([foto]);
+
+    btnGps().click();
+    await Promise.resolve();
+    await Promise.resolve();
+
+    expect(foto.metadadosExif).toBe(
+      '🗓️ 01/09/2026 às 10:00  📍 GPS: -23.200000, -45.900000 (celular, ±8 m)'
+    );
+    expect(cb.salvarRascunhoLocal).toHaveBeenCalled();
+  });
+
+  test('falha ao obter GPS avisa o usuário e não altera a foto', async () => {
+    el.checkboxMetadados.checked = true;
+    global.obterPosicaoAparelho.mockResolvedValue(null);
+    const foto = criarFoto({ metadadosExif: '🗓️ 01/09/2026 às 10:00' });
+    render([foto]);
+
+    btnGps().click();
+    await Promise.resolve();
+    await Promise.resolve();
+
+    expect(global.mostrarAlerta).toHaveBeenCalled();
+    expect(foto.metadadosExif).toBe('🗓️ 01/09/2026 às 10:00');
   });
 });

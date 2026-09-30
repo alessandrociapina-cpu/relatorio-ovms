@@ -387,6 +387,64 @@ hr {
   background-color: #d6d8db;
 }
 
+/* Seleção múltipla na galeria */
+.barra-selecao {
+  flex: 1 1 100%;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 10px;
+  background-color: #eef2f5;
+  border: 1px solid #ced4da;
+  border-radius: 5px;
+  position: sticky;
+  top: 0;
+  z-index: 5;
+}
+.barra-selecao .btn-acao-foto {
+  flex: 0 1 auto;
+  padding: 6px 10px;
+  font-size: 0.8em;
+}
+.contador-selecao {
+  flex: 1 1 100%;
+  font-size: 0.85em;
+  color: #495057;
+}
+.selecao-foto {
+  align-self: flex-start;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 6px;
+  font-size: 0.9em;
+  font-weight: bold;
+  color: #495057;
+  cursor: pointer;
+}
+.selecao-foto input {
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+}
+.foto-selecionada {
+  border: 2px solid #007bff;
+  background-color: #f0f7ff;
+}
+.meta-preview {
+  font-size: 0.75em;
+  color: #777;
+  margin-bottom: 5px;
+}
+
+/* Câmera com GPS só faz sentido em aparelho com câmera e GPS (celular/tablet) */
+@media (hover: hover) and (pointer: fine) {
+  .so-celular {
+    display: none !important;
+  }
+}
+
 /* Modais */
 .modal-oculto {
   display: none !important;

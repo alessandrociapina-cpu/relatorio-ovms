@@ -1,4 +1,4 @@
-/* global esc, resolverDepartamento, criarBlocoAssinatura, mostrarAlerta */
+/* global esc, resolverDepartamento, criarBlocoAssinatura, mostrarAlerta, limparMetaLegado */
 'use strict';
 
 const ReportGenerator = (() => {
@@ -190,7 +190,7 @@ const ReportGenerator = (() => {
       imagensProcessadas.push({
         url,
         leg: `Imagem ${i + 1}: ${(f.textoLegenda || '').trim() || 'Sem legenda'}`,
-        meta: f.metadadosExif,
+        meta: limparMetaLegado(f.metadadosExif),
         noMeta: f.ocultarMetadados,
       });
     }

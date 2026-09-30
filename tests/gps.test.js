@@ -19,7 +19,15 @@ function criarExifMock(tags = {}) {
   };
 }
 
-const { lerMetadadosExif } = require('../modules/gps');
+const {
+  lerMetadadosExif,
+  temGps,
+  foiCapturadaAgora,
+  obterPosicaoAparelho,
+  formatarGpsAparelho,
+  substituirGps,
+  limparMetaLegado,
+} = require('../modules/gps');
 
 afterEach(() => {
   delete global.EXIF;
@@ -28,10 +36,10 @@ afterEach(() => {
 // --- Casos sem leitura EXIF ---
 
 describe('lerMetadadosExif() — sem EXIF disponível', () => {
-  test('retorna mensagem GPS bloqueado quando EXIF é undefined', async () => {
+  test('retorna vazio quando EXIF é undefined e não há data do arquivo', async () => {
     delete global.EXIF;
     const resultado = await lerMetadadosExif({ type: 'image/jpeg' });
-    expect(resultado).toContain('Não encontrado na foto');
+    expect(resultado).toBe('');
   });
 
   test('usa lastModified como data de fallback quando EXIF é undefined', async () => {
@@ -40,7 +48,7 @@ describe('lerMetadadosExif() — sem EXIF disponível', () => {
     const resultado = await lerMetadadosExif({ type: 'image/jpeg', lastModified });
     expect(resultado).toContain('15/06/2024');
     expect(resultado).toContain('10:30');
-    expect(resultado).toContain('Não encontrado na foto');
+    expect(resultado).not.toContain('📍');
   });
 
   test('resolve com "" para arquivo não-imagem', async () => {
@@ -118,7 +126,7 @@ describe('lerMetadadosExif() — GPS presente e válido', () => {
     expect(resultado).toContain('-46.');
   });
 
-  test('GPS com lat/lng = 0 exibe mensagem "Removido pelo sistema"', async () => {
+  test('GPS zerado pelo Android (lat/lng = 0) é tratado como ausente', async () => {
     global.EXIF = criarExifMock({
       GPSLatitude: [0, 0, 0],
       GPSLongitude: [0, 0, 0],
@@ -126,13 +134,13 @@ describe('lerMetadadosExif() — GPS presente e válido', () => {
       GPSLongitudeRef: 'E',
     });
     const resultado = await lerMetadadosExif({ type: 'image/jpeg' });
-    expect(resultado).toContain('Removido pelo sistema');
+    expect(resultado).not.toContain('📍');
   });
 
-  test('GPS ausente exibe mensagem "Não encontrado na foto"', async () => {
-    global.EXIF = criarExifMock({});
+  test('GPS ausente não gera texto de aviso nos metadados', async () => {
+    global.EXIF = criarExifMock({ DateTimeOriginal: '2024:06:15 10:30:00' });
     const resultado = await lerMetadadosExif({ type: 'image/jpeg' });
-    expect(resultado).toContain('Não encontrado na foto');
+    expect(resultado).toBe('🗓️ 15/06/2024 às 10:30');
   });
 
   test('resultado contém GPS quando ambos data e GPS presentes', async () => {
@@ -204,5 +212,121 @@ describe('aplicarRefGps()', () => {
 
   test('ref desconhecida retorna o valor sem modificação', () => {
     expect(aplicarRefGps(10, 'X')).toBe(10);
+  });
+});
+
+// --- Helpers de GPS do celular ---
+
+describe('temGps()', () => {
+  test('detecta coordenada registrada', () => {
+    expect(temGps('🗓️ 01/01/2026 às 10:00  📍 GPS: -23.1, -45.8')).toBe(true);
+  });
+
+  test('retorna false para texto sem GPS ou vazio', () => {
+    expect(temGps('🗓️ 01/01/2026 às 10:00')).toBe(false);
+    expect(temGps('')).toBe(false);
+    expect(temGps(undefined)).toBe(false);
+  });
+});
+
+describe('foiCapturadaAgora()', () => {
+  const agora = new Date(2026, 8, 30, 12, 0).getTime();
+
+  test('arquivo gravado há 1 minuto conta como captura atual', () => {
+    expect(foiCapturadaAgora({ lastModified: agora - 60 * 1000 }, agora)).toBe(true);
+  });
+
+  test('foto antiga da galeria não conta como captura atual', () => {
+    expect(foiCapturadaAgora({ lastModified: agora - 60 * 60 * 1000 }, agora)).toBe(false);
+  });
+
+  test('arquivo sem lastModified não conta como captura atual', () => {
+    expect(foiCapturadaAgora({}, agora)).toBe(false);
+  });
+});
+
+describe('formatarGpsAparelho()', () => {
+  test('inclui coordenadas, origem e precisão arredondada', () => {
+    expect(formatarGpsAparelho({ lat: -23.18, lng: -45.88, precisao: 12.6 })).toBe(
+      '📍 GPS: -23.180000, -45.880000 (celular, ±13 m)'
+    );
+  });
+
+  test('omite precisão quando não informada', () => {
+    expect(formatarGpsAparelho({ lat: 1, lng: 2 })).toBe('📍 GPS: 1.000000, 2.000000 (celular)');
+  });
+});
+
+describe('substituirGps()', () => {
+  const novo = '📍 GPS: 1.000000, 2.000000 (celular)';
+
+  test('acrescenta GPS mantendo a data', () => {
+    expect(substituirGps('🗓️ 01/01/2026 às 10:00', novo)).toBe(`🗓️ 01/01/2026 às 10:00  ${novo}`);
+  });
+
+  test('substitui GPS existente', () => {
+    expect(substituirGps('🗓️ 01/01/2026 às 10:00  📍 GPS: 9, 9', novo)).toBe(
+      `🗓️ 01/01/2026 às 10:00  ${novo}`
+    );
+  });
+
+  test('funciona sem metadados anteriores', () => {
+    expect(substituirGps('', novo)).toBe(novo);
+    expect(substituirGps(undefined, novo)).toBe(novo);
+  });
+});
+
+describe('limparMetaLegado()', () => {
+  test.each([
+    '📍 GPS: Não encontrado na foto (use o botão abaixo)',
+    '📍 GPS: Não disponível via navegador (use o botão abaixo)',
+    '📍 GPS: Removido pelo sistema do aparelho celular',
+    '📍 GPS: Falha na leitura',
+  ])('remove aviso antigo: %s', (aviso) => {
+    expect(limparMetaLegado(`🗓️ 01/01/2026 às 10:00  ${aviso}`)).toBe('🗓️ 01/01/2026 às 10:00');
+  });
+
+  test('preserva coordenadas válidas', () => {
+    const meta = '🗓️ 01/01/2026 às 10:00  📍 GPS: -23.1, -45.8';
+    expect(limparMetaLegado(meta)).toBe(meta);
+  });
+
+  test('retorna vazio para entrada vazia', () => {
+    expect(limparMetaLegado('')).toBe('');
+    expect(limparMetaLegado(null)).toBe('');
+  });
+});
+
+describe('obterPosicaoAparelho()', () => {
+  const geoOriginal = navigator.geolocation;
+
+  afterEach(() => {
+    Object.defineProperty(navigator, 'geolocation', { value: geoOriginal, configurable: true });
+  });
+
+  function mockGeo(impl) {
+    Object.defineProperty(navigator, 'geolocation', {
+      value: { getCurrentPosition: jest.fn(impl) },
+      configurable: true,
+    });
+  }
+
+  test('resolve com latitude, longitude e precisão', async () => {
+    mockGeo((ok) => ok({ coords: { latitude: -23.1, longitude: -45.8, accuracy: 7 } }));
+    await expect(obterPosicaoAparelho()).resolves.toEqual({
+      lat: -23.1,
+      lng: -45.8,
+      precisao: 7,
+    });
+  });
+
+  test('resolve null quando o usuário nega a permissão', async () => {
+    mockGeo((_ok, erro) => erro({ code: 1 }));
+    await expect(obterPosicaoAparelho()).resolves.toBeNull();
+  });
+
+  test('resolve null quando o navegador não tem geolocalização', async () => {
+    Object.defineProperty(navigator, 'geolocation', { value: undefined, configurable: true });
+    await expect(obterPosicaoAparelho()).resolves.toBeNull();
   });
 });

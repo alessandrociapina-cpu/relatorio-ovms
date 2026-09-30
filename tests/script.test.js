@@ -193,3 +193,22 @@ describe('script.js — inicialização dos módulos', () => {
     expect(salvarRascunhoLocal).toHaveBeenCalled();
   });
 });
+
+// ---------------------------------------------------------------------------
+describe('index.html — padrões do formulário', () => {
+  const html = require('fs').readFileSync(
+    require('path').join(__dirname, '..', 'index.html'),
+    'utf8'
+  );
+  const doc = new DOMParser().parseFromString(html, 'text/html');
+
+  test('"Exibir Data, Hora e Coordenadas GPS" vem desmarcado por padrão', () => {
+    expect(doc.getElementById('usarMetadados').checked).toBe(false);
+  });
+
+  test('botão de câmera com GPS abre a câmera traseira', () => {
+    const input = doc.getElementById('capturarFoto');
+    expect(input.getAttribute('capture')).toBe('environment');
+    expect(input.getAttribute('accept')).toBe('image/*');
+  });
+});

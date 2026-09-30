@@ -31,7 +31,7 @@ npm run format            # Aplica Prettier em JS/HTML/CSS
 ## Testes
 
 - **Framework**: Jest 29 + jest-environment-jsdom
-- **Localização**: `tests/*.test.js` (8 suites, 209 testes)
+- **Localização**: `tests/*.test.js` (8 suites, 251 testes)
 - **Cobertura atual**: utils, domUtils, formHandler, galleryManager, reportGenerator, script, storage, gps
 - Os testes mockam globals do browser (`esc`, `resolverDepartamento`, `criarBlocoAssinatura`, `mostrarAlerta`) e DOM via jsdom
 
@@ -81,5 +81,5 @@ Tamanhos (fração da largura da imagem): `logo-pequeno` = 8%, `logo-medio` = 15
 
 1. Trabalhar na branch `claude/analyze-repository-CJ7O7`
 2. Fazer bump de versão em `sw.js` e `index.html` (e `documentacao.html`)
-3. Rodar `npm test` — devem passar 209/209
+3. Rodar `npm test` — devem passar 251/251
 4. Commit + push + PR para `main` + squash merge
